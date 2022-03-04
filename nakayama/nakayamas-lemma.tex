@@ -1,41 +1,27 @@
-\documentclass[12pt]{article}
-\usepackage[top=1in, bottom=1in, left=1in, right=1in ]{geometry}
+\documentclass[12pt]{amsart}
+\usepackage[top=1in, bottom=1in, left=1.2in, right=1.2in ]{geometry}
 \usepackage{amsmath,amsfonts,amssymb, amsthm}
-\usepackage[colorlinks, filecolor=cyan, urlcolor=niceblue]{hyperref}
 
 \usepackage{libertinus}
 \usepackage[T1]{fontenc}
-\usepackage{fancyhdr}
-\usepackage[shortlabels]{enumitem}
-\usepackage[mathscr]{euscript}
 
-\renewcommand{\baselinestretch}{1}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
 \thispagestyle{empty}
 
+\fancyhead[L]{{Lambda Group Project}}
+\fancyhead[R]{\thepage}
+\fancyhead[C]{\textbf{Nakayama's Lemma}}
 
-\newcommand{\NN}{\mathbb{N}}
-\newcommand{\ZZ}{\mathbb{Z}}
-\newcommand{\RR}{\mathbb{R}}
-\newcommand{\CC}{\mathbb{C}}
-\newcommand{\QQ}{\mathbb{Q}}
-\newcommand{\Zm}[1]{\mathbb{Z}/{#1}\mathbb{Z}}
-\newcommand{\VV}{\mathbb{V}}
-
-\newcommand{\kay}{\mathsf{k}}
-
-\newcommand{\WW}{\mathcal{W}}
-\renewcommand{\AA}{\mathcal{A}}
-\newcommand{\BB}{\mathcal{B}}
+\renewcommand{\baselinestretch}{1.2}
+\parskip 0.2cm
 
 \newcommand{\HRule}{\begin{center}\rule{\linewidth}{.01cm}\end{center}}
 
-\setlength{\parskip}{1em}
-
+\usepackage[shortlabels]{enumitem}
 
 %THEOREM ENVIRONMENTS
-
-
-\newtheorem{theorem}{Theorem}[section]
+\newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{proposition}[theorem]{Proposition}
@@ -43,26 +29,14 @@
 %DEFINITION STYLE ENVIRONMENTS
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
-\newtheorem*{definition*}{Definition}
-\newtheorem{definition-theorem}[theorem]{Definition/Theorem}
-\newtheorem{setup}[theorem]{Setup}
-\newtheorem*{notation*}{Notation}
 \newtheorem{notation}[theorem]{Notation}
 \newtheorem{example}[theorem]{Example}
 \newtheorem{examples}[theorem]{Examples}
 
-
 %REMARK STYLE ENVIRONMENTS
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
-\newtheorem*{convention}{Co\usepackage{tikz-cd}nvention}
 
-% http://www.neverendingbooks.org/mumfords-treasure-map
-
-\pagestyle{fancy}
-\fancyhead[L]{{\textbf{MATH 831}}}
-\fancyhead[R]{\thepage}
-\fancyhead[C]{Nakayama's Lemma}
 
 
 
@@ -94,9 +68,9 @@ A group $G$ is called \textbf{abelian} if $a \ast b = b \ast a$ for all $a, b \i
 \begin{definition}[Ring]
 A \textbf{ring} is a set $R$ with two binary operations, denoted $+$ and $\cdot$, for which the following hold.
 \begin{enumerate}[topsep=0cm,itemsep=0cm]
-\item \textbf{Abelian group under addition.}  $R$ is an abelian group under $+$ with identity denoted ``$0$.''
+\item \textbf{Abelian group under addition.}  $R$ is an abelian group under $+$ with identity denoted $0$.
 \item \textbf{Associativity of multiplication.}  $(r \cdot s) \cdot t = r \cdot (s \cdot t)$ for all $r, s, t \in R$.
- \item \textbf{Multiplicative identity.}  There is an element  denoted ``$1$'' in $R$ for which $r \cdot 1 = r$ and $1 \cdot r = r$ for every $r \in R$. 
+ \item \textbf{Multiplicative identity.}  There is an element  denoted $1$ in $R$ for which $r \cdot 1 = r$ and $1 \cdot r = r$ for every $r \in R$. 
  \item \textbf{Distributivity.} $r \cdot (s + t) = r \cdot s + r \cdot t$ and  $(r + s) \cdot t = r \cdot t + s \cdot t$ for all $r, s, t \in R$.  
 \end{enumerate}
 A ring $R$ is called \textbf{commutative} if $r \cdot s = s \cdot r$ for all $r, s \in R$. 
@@ -106,27 +80,60 @@ A ring $R$ is called \textbf{commutative} if $r \cdot s = s \cdot r$ for all $r,
 \begin{definition}[Ideal of a commutative ring]
 An \textbf{ideal} of a commutative ring $R$ is a subset $I \subseteq R$ for which the following hold. 
 \begin{enumerate}[topsep=0cm,itemsep=0cm]
-\item \textbf{Abelian group under addition.}  $R$ is an abelian group under $+$ with identity denoted ``$0$.''
-\item \textbf{Absorption.}  $r a \in I$ for all $r \in R$ and $a \in I$.
+\item \textbf{Abelian group under addition.}  $R$ is an abelian group under $+$ with identity denoted $0$.
+\item \textbf{Absorption.} For any $r \in R$ and $a \in I$, the element $r a = a r$ is in $I$. 
 \end{enumerate}
 An ideal $\mathfrak{m}$ of a ring $R$ is called \textbf{maximal} if it is  a proper ideal, i.e., $\mathfrak{m} \subsetneq R,$ and there is no other proper ideal strictly containing $\mathfrak{m}$, i.e., if $\mathfrak{m} \subseteq J \subsetneq R$ for some ideal $J$ of $R$, then $J = \mathfrak{m}$. 
 \end{definition}
 
 
 
+
+
+
+\begin{remark}[Characterization of proper ideals] \label{proper-ideal: R}
+An ideal $I$ of a commutative ring $R$ satisfies $I = R$ if and only if $1 \in I$:  
+If $I=R$, then certainly $1 \in R = I$.  On the other hand, if $1 \in I$, then by the absorption property of ideals, $r = r \cdot 1 \in R$ for any $r \in R$, i.e., $R \subseteq I$, and so $I = R.$  Hence an ideal is proper if and only if it does not contain $1$. 
+\end{remark}
+
+
+
+\begin{definition}[Multiplicative inverse/unit of a ring] 
+An element $s$ of a commutative ring $R$ is a \textbf{(muliplicative) inverse}  of $r \in S$ if $rs = 1$.
+If $r\in R$ has a multiplicative inverse, we call it a \textbf{unit} of $R$. 
+\end{definition}
+
+\begin{remark}[Multiples of units are again units] \label{multiples-units: R}
+Ifotice that if $r \in R$ is not a unit, then neither is $rs$ for any $s \in R$:   If $(rs)t = 1$, then $r$ has inverse $st$ since by the associativity of multiplication in $R$,  $1 = (rs)t = r(st)$. 
+\end{remark}
+
+
+
+\begin{remark} \label{maximal-ideals-existence: R}
+Assuming the axiom of choice, every non-unit $x \in R$ is contained in some maximal ideal:
+Given a chain of proper ideals containing $x$
+\[
+I_1 \subsetneq I_2 \subsetneq I_3 \subsetneq \cdots  \subseteq R
+\]
+one can check that the union $\bigcup_{i=1}^\infty I_i$ is again an ideal of $R$ containing $x$, so the existence of a maximal ideal follows by Zorn's lemma.  
+\end{remark}
+
+
+
+\begin{lemma} \label{units-local-ring: L}
+Suppose that $R$ is a commutative local ring with maximal ideal $\mathfrak{m}$.  
+If $x \in \mathfrak{m}$, then $1-x$ is a unit.
+\end{lemma}
+
+\begin{proof}[Informal proof]
+Suppose, by way of contradiction, that $1-x$ is not a unit.  Then by Remark \ref{maximal-ideals-existence: R}, $1-x$ is contained in the unique maximal ideal $\mathfrak{m}$.  So then $x$ and $1-x$ are both in $\mathfrak{m}$, and since $-x \in \mathfrak{m}$ as well, $(1+x) + (-x) = 1 \in \mathfrak{m}$. 
+This forces $\mathfrak{m} = R$ by Remark \ref{proper-ideal: R}, a contradiction since maximal ideals are proper. Hence $1-x$ is indeed a unit. 
+\end{proof}
+
+
 \begin{definition}
 	A \textbf{local ring} is a ring that has a unique maximal ideal. 
 \end{definition}
-
-\begin{remark}
-Assuming the axiom of choice, every ring has at least one maximal ideal since
-given ideals
-\[
-I_1 \subsetneq I_2 \subsetneq I_3 \subsetneq \cdots R
-\]
-one can check that the union $\bigcup_{i=1}^\infty I_i$ is again an ideal of $R$, so the existence of a maximal ideal follows by Zorn's lemma.  In fact, any \emph{unit} of $R$--element with no multiplicative inverse--is contained in a maximal ideal. 
-\end{remark}
-
 
 
 \begin{definition}[Module over a ring]
@@ -145,29 +152,51 @@ $
 for some $r_1, \ldots, r_n \in R$. 
 \end{definition}
 
-Though the following has long been traditionally called a ``lemma,'' it is a fundamental theorem in the field of commutative algebra, and could arguably called the ``Fundamental Theorem of Commutative Algebra.''
 
 \begin{definition}
 	Suppose that $R$ is a commmutative ring, $I$ is an ideal of $R$, than $M$ is an $R$-module.  Then $IM$ is the set of elements of the form 
-	$a_1 u_1 + a_2 u_2 + \cdots + a_k u_k$, where $a_1, \ldots, a_2$.  
-Due to the absorption property of ideals, $IM$ is an $R$-module contained in $M$. 	
+	$a_1 u_1 + a_2 u_2 + \cdots + a_k u_k$, where $a_1, \ldots, a_k \in I$ and $u_1, \ldots, u_k \in M$.  
+Notice that by the absorption property of ideals, $IM$ is an $R$-module contained in $M$. 	
 \end{definition}
+
+Though the following has long been traditionally called a ``lemma,'' it is a fundamental theorem in the field of commutative algebra, and could arguably called the ``Fundamental Theorem of Commutative Algebra.'' 
+Below, the notation ``$M=0$'' means that $M$ is the $R$-module consisting of only one element, $0$. 
 
 
 \begin{theorem}[Nakayama's Lemma]
-	Let $M$ be a finitely generated module over a local ring $R$ that has maximal ideal $\mathfrak m$. 
+	Let $M$ be a finitely generated module over a commutative local ring $R$ that has maximal ideal $\mathfrak{m}$. 
 	If $M = \mathfrak{m}M$, then $M=0$. 
 \end{theorem}
 
 \begin{proof}[Informal Proof]
 We apply induction on the number of generators $n$ of $M$. 
+
 For the base case $n=1$, suppose that $u$ generates $M$.	
-Then every element of $M$ has the form $ru$ for some $r \in R$, and hence every element of $\mathfrak{m}M$ has the form $a(ru) = (ar)u = (ra)u$ for some $a \in    \mathfrak{m}$.  By the absorption property of ideals, $ra \in \mathfrak{m}$, and we conclude that every element of $\mathfrak{m}M$ has the form $xu$ for some $x \in \mathfrak{m}$. 
+Then every element of $M$ has the form $ru$ for some $r \in R$, and hence every element of $\mathfrak{m}M$ has the form $a(ru) $
+for some $a \in    \mathfrak{m}$. 
+By the associative  property of multiplication in $R$, $a(ru) = (ar)u$.  
+Then by the absorption property of ideals, $ar \in \mathfrak{m}$, and we conclude that every element of $\mathfrak{m}M$ has the form $xu$ for some element $x \in \mathfrak{m}$ (namely, $x = ar$). 
 
-Suppose that $M = \mathfrak{m} M$.  Then since $u \in M$, $u = xu$ for some $x \in \mathfrak{m}$.  Hence $(1-x) u = 0$. We claim that $1-x$ has a multiplicative inverse. If not, then it is contained in $\mathfrak{m}$, but then since $x \in m$, we have that $1 = (1-x)+x \in \mathfrak{m}$, contradicting the fact that $\mathfrak{m}$ is a proper ideal of $R$.  Hence $1-x$ has a multiplicative inverse $y$, and so \[ 0 = y \cdot 0= y((1-x)u) = (y(1-x)) u = 1 \cdot u = u. \]  This forces $M=0$, and the statement holds. 
+Since $M = \mathfrak{m} M$ and $u \in M$, we can write $u = xu$ for some $x \in \mathfrak{m}$.  Hence $(1-x) u = 0$.
+By Lemma \ref{units-local-ring: L},  $1-x$ is a unit.  Suppose it has inverse $y$,  so \[ 0 = y \cdot 0= y((1-x)u) = (y(1-x)) u = 1 \cdot u = u. \]  Hence every element in $M$ is zero, i.e. $M=0$.
 
-Now, inductively, for some $n \geq 1$,  assume that $M$ is generated by $u_1, \ldots, u_n \in M$.  Let $Ru_1$ denote the $R$-module generated by $u_1$, and let 
- if $N = M/R u_1$ be the $R$-module consisting of equivalence classes of elements of $M$ with respect to the equivalence relation given by $w \sim w'$ if and only if $w - w' \in R u_1$.  Then $N$ is generated by the equivalence classes of $u_2, \ldots, u_n$, $(n-1)$-many element of $N$, and $\mathfrak{m}N = N$ still holds.  
- So by the inductive hypothesis, $N=0$, which says that $M = R u_1$.  But we have already done the case where $n=1$. 
+Inductively, fix  $n > 1$ and assume that the only $R$-module $N$ generated by $n-1$ elements that satisfies $N = \mathfrak{m}N$ is $N=0$.
+
+Take an $R$-module $M$ generated by $u_1, \ldots, u_n \in M$. 
+
+Since $M = \mathfrak{m}M$ and $u_1 \in M$, we can write 
+\[
+u_1 = x_1 u_1 + x_2 u_2 + \cdots + x_n u_n
+\]
+for some $x_1, \ldots, x_n \in \mathfrak{m}$. 
+Then $(1-x_1)u_1 =  x_2 u_2 + \cdots + x_n u_n$, where again by Lemma \ref{units-local-ring: L}, $1-x_1$ is a unit. 
+If $z$ is its inverse, then 
+\begin{align*}
+z ((1-x_1)u_1)  &= z( x_2 u_2 + \cdots + x_n u_n ) \\
+(z (1-x_1))u_1 &= z( x_2 u_2 ) + \cdots + z (x_n u_n) \\
+u_1 &= (z x_2) u_2 + \cdots + (z x_n) u_n. 
+\end{align*}
+Hence $M$ is generated by $u_2, \ldots, u_n$, and by the inductive hypothesis, 
+$M = 0$.
 \end{proof}
 \end{document}
