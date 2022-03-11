@@ -1,0 +1,9 @@
+-Q theories algebra
+theories/Semigroups.v
+theories/Monoids.v
+theories/Groups.v
+theories/AbelianGroups.v
+theories/GroupHoms.v
+theories/Rings.v
+theories/CommRings.v
+theories/Modules.v

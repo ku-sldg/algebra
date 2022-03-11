@@ -1,8 +1,0 @@
--Q theories/ Algebra
-theories/Semigroup.v
-theories/Monoid.v
-theories/Group.v
-theories/AbelianGroup.v
-theories/Ring.v
-theories/CommRing.v
-theories/Module.v
