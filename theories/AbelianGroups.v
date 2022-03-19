@@ -13,7 +13,7 @@ Context (ident: Carrier).
 Context (inv: Carrier -> Carrier).
 Context {inv_proper: Proper (equiv ==> equiv) inv}.
 
-Infix "~" := equiv (at level 60, no associativity).
+Infix "==" := equiv (at level 60, no associativity).
 Infix "<o>" := op (at level 40, left associativity).
 
 Class AbelianGroup := {
@@ -33,7 +33,7 @@ Theorem subgroup_cosets_coincide:
     P m ->
     (forall (a: Carrier),
       exists (n: Carrier),
-        P n /\ a <o> m ~ n <o> a).
+        P n /\ a <o> m == n <o> a).
 Proof.
   intros m HPm a.
   exists m.
@@ -99,7 +99,7 @@ Context (ident: Carrier).
 Context (inv: Carrier -> Carrier).
 Context {inv_proper: Proper (equiv ==> equiv) inv}.
 Context (abelian: AbelianGroup equiv op ident inv).
-Infix "~" := equiv (at level 60, no associativity).
+Infix "==" := equiv (at level 60, no associativity).
 Infix "<o>" := op (at level 40, left associativity).
 Context (P: Carrier -> Prop).
 Context {P_proper: Proper (equiv ==> iff) P}.
@@ -112,7 +112,7 @@ Proof.
   { apply (quotient_subgroup_group equiv op ident inv P). }
   { constructor.
     intros a b.
-    assert (inv (a <o> b) <o> (b <o> a) ~ ident).
+    assert (inv (a <o> b) <o> (b <o> a) == ident).
     { transitivity (inv (a <o> b) <o> (a <o> b));
         [apply (semigroup_op_l equiv op);
           apply (abelian_comm equiv op ident inv) |].

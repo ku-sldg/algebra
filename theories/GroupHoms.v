@@ -1,7 +1,7 @@
 Require Import Coq.Relations.Relations.
 Require Import Coq.Classes.RelationClasses.
 Require Import Coq.Classes.Morphisms.
-From algebra Require Import Groups.
+From algebra Require Import Monoids Groups.
 
 Section GroupHoms.
 Context {Domain Range: Type}.
@@ -24,71 +24,63 @@ Context {Rgroup: Group Requiv Rop Rident Rinv}.
 Context (hom: Domain -> Range).
 Context {hom_proper: Proper (Dequiv ==> Requiv) hom}.
 
-Infix "~" := Dequiv (at level 60, no associativity).
-Infix "<o>" := Dop (at level 40, left associativity).
-Infix "&" := Requiv (at level 60, no associativity).
-Infix ">o<" := Rop (at level 40, left associativity).
+Infix "=D=" := Dequiv (at level 60, no associativity).
+Infix "<D>" := Dop (at level 40, left associativity).
+Infix "=R=" := Requiv (at level 60, no associativity).
+Infix "<R>" := Rop (at level 40, left associativity).
 
 Class GroupHom := {
   group_hom_op:
     forall (a b: Domain),
-      hom (a <o> b) & hom a >o< hom b;
+      hom (a <D> b) =R= hom a <R> hom b;
 }.
 
 Context {grouphom: GroupHom}.
 
 Theorem group_hom_ident:
-  hom Dident & Rident.
+  hom Dident =R= Rident.
 Proof.
   apply (group_idemp_ident Requiv Rop Rident Rinv).
-  transitivity (hom (Dident <o> Dident));
-    [symmetry; apply group_hom_op |].
+  setoid_rewrite <- group_hom_op.
   apply hom_proper.
   apply (group_ident_r Dequiv Dop Dident Dinv).
 Qed.
 
 Theorem group_hom_inv (a: Domain):
-  hom (Dinv a) & Rinv (hom a).
+  hom (Dinv a) =R= Rinv (hom a).
 Proof.
   apply (group_inv_r_unique Requiv Rop Rident Rinv).
-  transitivity (hom (a <o> Dinv a));
-    [symmetry; apply group_hom_op |].
-  transitivity (hom Dident);
-    [apply hom_proper | apply group_hom_ident].
-  apply (group_inv_r Dequiv Dop Dident Dinv).
+  setoid_rewrite <- group_hom_op.
+  setoid_rewrite (group_inv_r Dequiv Dop Dident Dinv).
+  apply group_hom_ident.
 Qed.
 
-Definition kernelPred (a: Domain) := hom a & Rident.
+Definition kernelPred (a: Domain) := hom a =R= Rident.
 
 Theorem group_hom_injective:
-  (forall (a b: Domain), hom a & hom b -> a ~ b) <->
-  (forall (a: Domain), kernelPred a -> a ~ Dident).
+  (forall (a b: Domain), hom a =R= hom b -> a =D= b) <->
+  (forall (a: Domain), kernelPred a -> a =D= Dident).
 Proof.
   split;
     [intros Hinj | intros Hkern].
-  { intros a Hk.
-    assert (hom a & hom Dident).
-    { transitivity (Rident);
-        [assumption | symmetry; apply group_hom_ident]. }
+  { intros a Hka.
+    assert (hom a =R= hom Dident).
+    { setoid_rewrite group_hom_ident.
+      assumption. }
     { apply Hinj in H.
       assumption. } }
   { intros a b Hab.
-    assert (hom (a <o> Dinv b) & Rident).
-    { transitivity (hom a >o< hom (Dinv b));
-        [apply group_hom_op |].
-      transitivity (hom a >o< Rinv (hom b));
-        [apply (group_op_l Requiv Rop);
-          apply group_hom_inv |].
+    assert (hom (a <D> Dinv b) =R= Rident).
+    { setoid_rewrite group_hom_op.
+      setoid_rewrite group_hom_inv.
       symmetry.
       apply (group_move_r Requiv Rop Rident Rinv).
-      transitivity (hom b);
-        [apply (group_ident_l Requiv Rop Rident Rinv) |].
+      setoid_rewrite (monoid_ident_l Requiv Rop Rident).
       symmetry.
       assumption. }
     { apply Hkern in H.
       apply (group_cancel_r Dequiv Dop Dident Dinv) with (c := Dinv b).
-      transitivity (Dident);
-        [| symmetry; apply (group_inv_r Dequiv Dop Dident Dinv) ].
+      setoid_rewrite (group_inv_r Dequiv Dop Dident Dinv).
       assumption. } }
 Qed.
 
@@ -99,28 +91,26 @@ Proof.
   unfold kernelPred.
   split;
     [intros Hka0 | intros Hka1].
-  { transitivity (hom a0);
-      [apply hom_proper; symmetry |];
-      assumption. }
-  { transitivity (hom a1);
-      [apply hom_proper |];
-      assumption. }
+  { setoid_rewrite <- Hka0.
+    apply hom_proper.
+    symmetry.
+    assumption. }
+  { setoid_rewrite <- Hka1.
+    apply hom_proper.
+    assumption. }
 Qed.
 
 Lemma group_hom_kern_op_closed (a b: Domain):
   kernelPred a ->
   kernelPred b ->
-  kernelPred (a <o> b).
+  kernelPred (a <D> b).
 Proof.
   unfold kernelPred.
   intros Hka Hkb.
-  transitivity (hom a >o< hom b);
-    [apply group_hom_op |].
-  transitivity (hom a >o< Rident);
-    [apply (group_op_l Requiv Rop); assumption |].
-  transitivity (hom a);
-    [apply (group_ident_r Requiv Rop Rident Rinv)
-    | assumption].
+  setoid_rewrite group_hom_op.
+  setoid_rewrite Hka.
+  setoid_rewrite (monoid_ident_l Requiv Rop Rident).
+  assumption.
 Qed.
 
 Lemma group_hom_kern_inv_closed (a: Domain):
@@ -129,13 +119,9 @@ Lemma group_hom_kern_inv_closed (a: Domain):
 Proof.
   unfold kernelPred.
   intros Hka.
-  transitivity (Rinv (hom a));
-    [apply group_hom_inv |].
-  symmetry.
-  apply (group_inv_r_unique Requiv Rop Rident Rinv).
-  transitivity (hom a);
-    [apply (group_ident_r Requiv Rop Rident Rinv)
-    | assumption].
+  setoid_rewrite group_hom_inv.
+  setoid_rewrite Hka.
+  apply (group_inv_ident Requiv Rop Rident Rinv).
 Qed.
 
 #[global]
@@ -147,26 +133,15 @@ Instance group_hom_kern_subgroup: Subgroup Dop Dident Dinv kernelPred := {
 
 Theorem group_hom_kern_conj_closed (a: Domain):
   kernelPred a ->
-  forall (g: Domain), kernelPred (g <o> a <o> Dinv g).
+  forall (g: Domain), kernelPred (g <D> a <D> Dinv g).
 Proof.
   unfold kernelPred.
   intros Hka g.
-  transitivity (hom (g <o> a) >o< hom (Dinv g));
-    [apply group_hom_op |].
-  transitivity (hom g >o< hom a >o< hom (Dinv g));
-    [apply (group_op_r Requiv Rop);
-      apply group_hom_op |].
-  transitivity (hom g >o< hom a >o< Rinv (hom g));
-    [apply (group_op_l Requiv Rop);
-      apply group_hom_inv |].
-  symmetry.
-  apply (group_move_r Requiv Rop Rident Rinv).
-  transitivity (hom g);
-    [apply (group_ident_l Requiv Rop Rident Rinv) |].
-  symmetry.
-  transitivity (hom g >o< Rident);
-    [apply (group_op_l Requiv Rop); assumption |].
-  apply (group_ident_r Requiv Rop Rident Rinv).
+  repeat setoid_rewrite group_hom_op.
+  setoid_rewrite Hka.
+  setoid_rewrite (monoid_ident_r Requiv Rop Rident).
+  setoid_rewrite group_hom_inv.
+  apply (group_inv_r Requiv Rop Rident Rinv).
 Qed.
 
 Corollary group_hom_kern_congru_coincide:
@@ -197,7 +172,7 @@ Corollary group_hom_kern_cosets_coincide:
     forall (a: Domain),
       exists (n: Domain),
         kernelPred n /\
-        a <o> m ~ n <o> a.
+        a <D> m =D= n <D> a.
 Proof.
   apply (normal_subgroup_equiv_cosets_conj Dequiv Dop Dident Dinv kernelPred).
   { apply group_hom_kern_proper. }
@@ -207,7 +182,7 @@ Qed.
 Corollary group_hom_kern_conj_closed_exact:
   forall (n a: Domain),
     kernelPred n <->
-    kernelPred (a <o> n <o> Dinv a).
+    kernelPred (a <D> n <D> Dinv a).
 Proof.
   apply (normal_subgroup_equiv_conj_closed Dequiv Dop Dident Dinv kernelPred).
   { apply group_hom_kern_proper. }
@@ -215,13 +190,13 @@ Proof.
 Qed.
 
 Theorem group_hom_kern_congru_inj (a b: Domain):
-  hom a & hom b -> left_congru Dop Dinv kernelPred a b.
+  hom a =R= hom b -> left_congru Dop Dinv kernelPred a b.
 Proof.
   intros Hhom.
   unfold left_congru, kernelPred.
-  transitivity (hom (Dinv a) >o< hom b);
+  transitivity (hom (Dinv a) <R> hom b);
     [apply group_hom_op |].
-  transitivity (Rinv (hom a) >o< hom b);
+  transitivity (Rinv (hom a) <R> hom b);
     [apply (group_op_r Requiv Rop);
       apply group_hom_inv |].
   symmetry.
@@ -247,7 +222,7 @@ Context {P_proper: Proper (equiv ==> iff) P}.
 Context {subgroup: Subgroup op ident inv P}.
 
 Infix "<o>" := op (at level 40, left associativity).
-Infix "~" := equiv (at level 60, no associativity).
+Infix "==" := equiv (at level 60, no associativity).
 
 Let lcongru := left_congru op inv P.
 Let rcongru := right_congru op inv P.

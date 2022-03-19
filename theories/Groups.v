@@ -1,6 +1,5 @@
 Require Import Coq.Relations.Relations.
-Require Import Coq.Classes.RelationClasses.
-Require Import Coq.Classes.Morphisms.
+From Coq.Classes Require Import RelationClasses Morphisms.
 From algebra Require Import Semigroups Monoids.
 
 Section Groups.
@@ -13,15 +12,15 @@ Context (ident: Carrier).
 Context (inv: Carrier -> Carrier).
 Context {inv_proper: Proper (equiv ==> equiv) inv}.
 
-Infix "~" := equiv (at level 60, no associativity).
+Infix "==" := equiv (at level 60, no associativity).
 Infix "<o>" := op (at level 40, left associativity).
 
 Class Group := {
   group_monoid :> Monoid equiv op ident;
   group_inv_l:
-    forall (a: Carrier), inv a <o> a ~ ident;
+    forall (a: Carrier), inv a <o> a == ident;
   group_inv_r:
-    forall (a: Carrier), a <o> inv a ~ ident;
+    forall (a: Carrier), a <o> inv a == ident;
 }.
 
 Context {group: Group}.
@@ -42,109 +41,81 @@ Definition group_ident_r :=
   monoid_ident_r equiv op ident.
 
 Lemma group_cancel_l (a b c: Carrier):
-  c <o> a ~ c <o> b -> a ~ b.
+  c <o> a == c <o> b -> a == b.
 Proof.
   intros H.
   apply group_op_l with (c := inv c) in H.
-  transitivity (ident <o> b);
-    [| apply group_ident_l].
-  transitivity (inv c <o> c <o> b);
-    [| apply group_op_r; apply group_inv_l].
-  transitivity (inv c <o> (c <o> b));
-    [| symmetry; apply group_assoc].
-  transitivity (ident <o> a);
-    [symmetry; apply group_ident_l |].
-  transitivity (inv c <o> c <o> a);
-    [symmetry; apply group_op_r; apply group_inv_l |].
-  transitivity (inv c <o> (c <o> a));
-    [apply group_assoc |].
+  setoid_rewrite <- (monoid_ident_l equiv op ident).
+  setoid_rewrite <- (group_inv_l c).
+  setoid_rewrite (semigroup_assoc equiv op).
   assumption.
 Qed.
 
 Lemma group_cancel_r (a b c: Carrier):
-  a <o> c ~ b <o> c -> a ~ b.
+  a <o> c == b <o> c -> a == b.
 Proof.
   intros H.
   apply group_op_r with (c := inv c) in H.
-  transitivity (b <o> ident);
-    [| apply group_ident_r].
-  transitivity (b <o> (c <o> inv c));
-    [| apply group_op_l; apply group_inv_r].
-  transitivity (b <o> c <o> inv c);
-    [| apply group_assoc].
-  transitivity (a <o> ident);
-    [symmetry; apply group_ident_r |].
-  transitivity (a <o> (c <o> inv c));
-    [symmetry; apply group_op_l; apply group_inv_r |].
-  transitivity (a <o> c <o> inv c);
-    [symmetry; apply group_assoc |].
+  setoid_rewrite <- (monoid_ident_r equiv op ident).
+  setoid_rewrite <- (group_inv_r c).
+  setoid_rewrite <- (semigroup_assoc equiv op).
   assumption.
 Qed.
 
 Lemma group_move_l (a b c: Carrier):
-  a <o> b ~ c -> b ~ inv a <o> c.
+  a <o> b == c -> b == inv a <o> c.
 Proof.
   intros H.
   apply group_cancel_l with (a).
-  transitivity (a <o> inv a <o> c);
-    [| apply group_assoc].
-  transitivity (ident <o> c);
-    [| apply group_op_r; symmetry; apply group_inv_r].
-  transitivity (c);
-    [assumption | symmetry; apply group_ident_l].
+  setoid_rewrite <- (semigroup_assoc equiv op).
+  setoid_rewrite group_inv_r.
+  setoid_rewrite (monoid_ident_l equiv op ident).
+  assumption.
 Qed.
 
 Lemma group_move_r (a b c: Carrier):
-  a <o> b ~ c -> a ~ c <o> inv b.
+  a <o> b == c -> a == c <o> inv b.
 Proof.
   intros H.
   apply group_cancel_r with (b).
-  transitivity (c <o> (inv b <o> b));
-    [| symmetry; apply group_assoc].
-  transitivity (c <o> ident);
-    [| symmetry; apply group_op_l; apply group_inv_l].
-  transitivity c;
-    [assumption | symmetry; apply group_ident_r].
+  setoid_rewrite (semigroup_assoc equiv op).
+  setoid_rewrite group_inv_l.
+  setoid_rewrite (monoid_ident_r equiv op ident).
+  assumption.
 Qed.
 
 Theorem group_idemp_ident (a: Carrier):
-  a <o> a ~ a ->
-  a ~ ident.
+  a <o> a == a ->
+  a == ident.
 Proof.
   intros H.
   apply group_cancel_r with (a).
-  transitivity (a);
-    [assumption |].
-  symmetry.
-  apply group_ident_l.
+  setoid_rewrite (monoid_ident_l equiv op ident).
+  assumption.
 Qed.
 
 Theorem group_inv_l_unique (a aInv: Carrier):
-  aInv <o> a ~ ident ->
-  aInv ~ inv a.
+  aInv <o> a == ident ->
+  aInv == inv a.
 Proof.
   intros H.
   apply group_cancel_r with (a).
-  transitivity (ident);
-    [assumption |].
-  symmetry.
-  apply group_inv_l.
+  setoid_rewrite group_inv_l.
+  assumption.
 Qed.
 
 Theorem group_inv_r_unique (a aInv: Carrier):
-  a <o> aInv ~ ident ->
-  aInv ~ inv a.
+  a <o> aInv == ident ->
+  aInv == inv a.
 Proof.
   intros H.
   apply group_cancel_l with (a).
-  transitivity (ident);
-    [assumption |].
-  symmetry.
-  apply group_inv_r.
+  setoid_rewrite group_inv_r.
+  assumption.
 Qed.
 
 Theorem group_inv_involute (a: Carrier):
-  inv (inv a) ~ a.
+  inv (inv a) == a.
 Proof.
   symmetry.
   apply group_inv_r_unique.
@@ -152,52 +123,48 @@ Proof.
 Qed.
 
 Theorem group_inv_op (a b: Carrier):
-  inv (a <o> b) ~ inv b <o> inv a.
+  inv (a <o> b) == inv b <o> inv a.
 Proof.
   symmetry.
   apply group_inv_r_unique.
-  transitivity (a <o> b <o> inv b <o> inv a);
-    [symmetry; apply group_assoc |].
+  setoid_rewrite <- (semigroup_assoc equiv op).
   symmetry.
   apply group_move_r.
-  transitivity (a);
-    [apply group_ident_l |].
+  setoid_rewrite (monoid_ident_l equiv op ident).
   apply group_move_r.
   reflexivity.
 Qed.
 
 Theorem group_solution_r (a b: Carrier):
-  (exists (x: Carrier), x <o> a ~ b) /\
+  (exists (x: Carrier), x <o> a == b) /\
   (forall (x: Carrier),
-    x <o> a ~ b -> x ~ b <o> inv a).
+    x <o> a == b -> x == b <o> inv a).
 Proof.
   split.
   { exists (b <o> inv a).
-    transitivity (b <o> (inv a <o> a));
-      [apply group_assoc |].
-    apply group_op_l_solo.
+    setoid_rewrite (semigroup_assoc equiv op).
+    apply (monoid_op_l_solo equiv op ident).
     apply group_inv_l. }
   { intros x.
     apply group_move_r. }
 Qed.
 
 Theorem group_solution_l (a b: Carrier):
-  (exists (x: Carrier), a <o> x ~ b) /\
+  (exists (x: Carrier), a <o> x == b) /\
   (forall (x: Carrier),
-    a <o> x ~ b -> x ~ inv a <o> b).
+    a <o> x == b -> x == inv a <o> b).
 Proof.
   split.
   { exists (inv a <o> b).
-    transitivity (a <o> inv a <o> b);
-      [symmetry; apply group_assoc |].
-    apply group_op_r_solo.
+    setoid_rewrite <- (semigroup_assoc equiv op).
+    apply (monoid_op_r_solo equiv op ident).
     apply group_inv_r. }
   { intros x.
     apply group_move_l. }
 Qed.
 
 Theorem group_inv_ident:
-  inv ident ~ ident.
+  inv ident == ident.
 Proof.
   symmetry.
   apply group_inv_r_unique.
@@ -216,7 +183,7 @@ Lemma subset_op_inv_closed_ident:
 Proof.
   intros [x HPx] Hop_inv.
   specialize (Hop_inv x x HPx HPx).
-  assert (x <o> inv x ~ ident) by apply group_inv_r.
+  assert (x <o> inv x == ident) by apply group_inv_r.
   apply P_proper in H.
   apply H.
   assumption.
@@ -233,8 +200,8 @@ Proof.
     as HPident
     by apply (subset_op_inv_closed_ident Hx Hop_inv).
   specialize (Hop_inv ident a HPident HPa).
-  assert (ident <o> inv a ~ inv a)
-    by apply group_ident_l.
+  assert (ident <o> inv a == inv a)
+    by apply (monoid_ident_l equiv op ident).
   apply P_proper in H.
   apply H.
   assumption.
@@ -251,8 +218,8 @@ Proof.
     as HPb'
     by apply (subset_op_inv_closed_inv_closed Hx Hop_inv b HPb).
   specialize (Hop_inv a (inv b) HPa HPb').
-  assert (a <o> inv (inv b) ~ a <o> b)
-    by (apply group_op_l; apply group_inv_involute).
+  assert (a <o> inv (inv b) == a <o> b)
+    by (apply (semigroup_op_l equiv op); apply group_inv_involute).
   apply P_proper in H.
   apply H.
   assumption.
@@ -289,7 +256,7 @@ Lemma subgroup_inv_inv_closed (a: Carrier):
 Proof.
   intros HPa'.
   apply subgroup_inv_closed in HPa'.
-  assert (inv (inv a) ~ a)
+  assert (inv (inv a) == a)
     by apply group_inv_involute.
   apply P_proper in H.
   apply H.
@@ -308,7 +275,7 @@ Proof.
   unfold left_congru.
   split;
     intros HPa'b;
-  assert (inv a0 <o> b0 ~ inv a1 <o> b1);
+  assert (inv a0 <o> b0 == inv a1 <o> b1);
     try (apply op_proper;
       [apply inv_proper |];
       assumption);
@@ -324,7 +291,7 @@ Proof.
   unfold right_congru.
   split;
     intros Hab';
-  assert (a0 <o> inv b0 ~ a1 <o> inv b1);
+  assert (a0 <o> inv b0 == a1 <o> inv b1);
     try (apply op_proper;
       [| apply inv_proper];
       assumption);
@@ -337,7 +304,7 @@ Lemma left_congru_reflexive (a: Carrier):
   left_congru a a.
 Proof.
   unfold left_congru.
-  assert (inv a <o> a ~ ident)
+  assert (inv a <o> a == ident)
     by apply group_inv_l.
   apply P_proper in H.
   apply H.
@@ -350,11 +317,10 @@ Proof.
   unfold left_congru.
   intros HPa'b.
   apply subgroup_inv_closed in HPa'b.
-  assert (inv (inv a <o> b) ~ inv b <o> a).
-  { transitivity (inv b <o> inv (inv a));
-      [apply group_inv_op |].
-    apply group_op_l.
-    apply group_inv_involute. }
+  assert (inv (inv a <o> b) == inv b <o> a).
+  { setoid_rewrite group_inv_op.
+    setoid_rewrite group_inv_involute.
+    reflexivity. }
   { apply P_proper in H.
     apply H.
     assumption. }
@@ -367,13 +333,11 @@ Lemma left_congru_transitive (a b c: Carrier):
 Proof.
   unfold left_congru.
   intros HPa'b HPb'c.
-  assert (inv a <o> b <o> (inv b <o> c) ~ inv a <o> c).
-  { transitivity (inv a <o> b <o> inv b <o> c);
-      [symmetry; apply group_assoc |].
-    apply group_op_r.
-    transitivity (inv a <o> (b <o> inv b));
-      [apply group_assoc |].
-    apply group_op_l_solo.
+  assert (inv a <o> b <o> (inv b <o> c) == inv a <o> c).
+  { setoid_rewrite <- (semigroup_assoc equiv op).
+    apply (semigroup_op_r equiv op).
+    setoid_rewrite (semigroup_assoc equiv op).
+    apply (monoid_op_l_solo equiv op ident).
     apply group_inv_r. }
   { apply P_proper in H.
     apply H.
@@ -392,7 +356,7 @@ Lemma right_congru_reflexive (a: Carrier):
   right_congru a a.
 Proof.
   unfold right_congru.
-  assert (a <o> inv a ~ ident)
+  assert (a <o> inv a == ident)
     by apply group_inv_r.
   apply P_proper in H.
   apply H.
@@ -405,11 +369,10 @@ Proof.
   unfold right_congru.
   intros HPab'.
   apply subgroup_inv_closed in HPab'.
-  assert (inv (a <o> inv b) ~ b <o> inv a).
-  { transitivity (inv (inv b) <o> inv a);
-      [apply group_inv_op |].
-    apply group_op_r.
-    apply group_inv_involute. }
+  assert (inv (a <o> inv b) == b <o> inv a).
+  { setoid_rewrite group_inv_op.
+    setoid_rewrite group_inv_involute.
+    reflexivity. }
   { apply P_proper in H.
     apply H.
     assumption. }
@@ -422,13 +385,11 @@ Lemma right_congru_transitive (a b c: Carrier):
 Proof.
   unfold right_congru.
   intros HPab' HPbc'.
-  assert (a <o> inv b <o> (b <o> inv c) ~ a <o> inv c).
-  { transitivity (a <o> inv b <o> b <o> inv c);
-      [symmetry; apply group_assoc |].
-    apply group_op_r.
-    transitivity (a <o> (inv b <o> b));
-      [apply group_assoc |].
-    apply group_op_l_solo.
+  assert (a <o> inv b <o> (b <o> inv c) == a <o> inv c).
+  { setoid_rewrite <- (semigroup_assoc equiv op).
+    apply (semigroup_op_r equiv op).
+    setoid_rewrite (semigroup_assoc equiv op).
+    apply (monoid_op_l_solo equiv op ident).
     apply group_inv_l. }
   { apply P_proper in H.
     apply H.
@@ -446,7 +407,7 @@ Instance right_congru_equiv: Equivalence right_congru := {
 Definition left_cosets_eq (a b: Carrier) :=
   forall (m: Carrier),
     P m ->
-    exists (n: Carrier), P n /\ a <o> m ~ b <o> n.
+    exists (n: Carrier), P n /\ a <o> m == b <o> n.
 
 Lemma subgroup_equiv_left_congru_cosets_eq (a b: Carrier):
   left_congru a b <-> left_cosets_eq a b.
@@ -457,39 +418,28 @@ Proof.
   { exists (inv b <o> (a <o> m)).
     split.
     { apply subgroup_inv_closed in HPa'b.
-      assert (inv (inv a <o> b) <o> m ~ inv b <o> (a <o> m)).
-      { transitivity (inv b <o> inv (inv a) <o> m);
-          [apply group_op_r; apply group_inv_op |].
-        transitivity (inv b <o> (inv (inv a) <o> m));
-          [apply group_assoc |].
-        apply group_op_l.
-        apply group_op_r.
-        apply group_inv_involute. }
+      assert (inv (inv a <o> b) <o> m == inv b <o> (a <o> m)).
+      { setoid_rewrite group_inv_op.
+        setoid_rewrite group_inv_involute.
+        apply (semigroup_assoc equiv op). }
       { apply P_proper in H.
         apply H.
         apply subgroup_op_closed;
           assumption. } }
-    { symmetry.
-      transitivity (b <o> inv b <o> (a <o> m));
-        [symmetry; apply group_assoc |].
-      apply group_op_r_solo.
+    { setoid_rewrite <- (semigroup_assoc equiv op).
+      symmetry.
+      apply (monoid_op_r_solo equiv op ident).
       apply group_inv_r. } }
   { specialize (Hcoset ident subgroup_ident).
     inversion_clear Hcoset as [n [HPn H]].
-    assert (inv n ~ inv a <o> b).
-    { symmetry.
-      apply group_inv_l_unique.
-      apply group_cancel_l with (c := a).
-      transitivity (a <o> (inv a <o> b) <o> n);
-        [symmetry; apply group_assoc |].
-      transitivity (a <o> inv a <o> b <o> n);
-        [symmetry; apply group_op_r; apply group_assoc |].
-      transitivity (ident <o> b <o> n);
-        [repeat apply group_op_r; apply group_inv_r |].
-      transitivity (b <o> n);
-        [apply group_op_r; apply group_ident_l |].
-      symmetry.
-      assumption. }
+    setoid_rewrite (monoid_ident_r equiv op ident) in H.
+    symmetry in H.
+    apply group_move_l in H.
+    assert (inv n == inv a <o> b).
+    { setoid_rewrite H.
+      setoid_rewrite group_inv_op.
+      setoid_rewrite group_inv_involute.
+      reflexivity. }
     { apply P_proper in H0.
       apply H0.
       apply subgroup_inv_closed.
@@ -499,7 +449,7 @@ Qed.
 Definition right_cosets_eq (a b: Carrier) :=
   forall (m: Carrier),
     P m ->
-    exists (n: Carrier), P n /\ m <o> a ~ n <o> b.
+    exists (n: Carrier), P n /\ m <o> a == n <o> b.
 
 Lemma subgroup_equiv_right_congru_cosets_eq (a b: Carrier):
   right_congru a b <-> right_cosets_eq a b.
@@ -510,28 +460,18 @@ Proof.
   { exists (m <o> (a <o> inv b)).
     split;
       [apply subgroup_op_closed; assumption |].
+    setoid_rewrite <- (semigroup_assoc equiv op).
+    setoid_rewrite (semigroup_assoc equiv op).
     symmetry.
-    transitivity (m <o> a <o> inv b <o> b);
-      [apply group_op_r; symmetry; apply group_assoc |].
-    transitivity (m <o> a <o> (inv b <o> b));
-      [apply group_assoc |].
-    apply group_op_l_solo.
+    apply (monoid_op_l_solo equiv op ident).
     apply group_inv_l. }
   { specialize (Hcoset ident subgroup_ident).
     inversion_clear Hcoset as [n [HPn H]].
-    assert (a <o> inv b ~ n).
-    { apply group_cancel_r with (c := b).
-      transitivity (a <o> (inv b <o> b));
-        [apply group_assoc |].
-      transitivity (a <o> ident);
-        [apply group_op_l; apply group_inv_l |].
-      transitivity (a);
-        [apply group_ident_r |].
-      transitivity (ident <o> a);
-        [symmetry; apply group_ident_l | assumption]. }
-    { apply P_proper in H0.
-      apply H0.
-      assumption. } }
+    setoid_rewrite (monoid_ident_l equiv op ident) in H.
+    symmetry in H.
+    apply group_move_r in H.
+    setoid_rewrite <- H.
+    assumption. }
 Qed.
 
 Let normal_subgroup_congru_coincide := (* 1 *)
@@ -545,7 +485,7 @@ Let normal_subgroup_cosets_coincide := (* 3 *)
     P m ->
     forall (a: Carrier),
       exists (n: Carrier),
-        P n /\ a <o> m ~ n <o> a.
+        P n /\ a <o> m == n <o> a.
 Let normal_subgroup_conj_closed := (* 4 *)
   forall (n: Carrier),
     P n ->
@@ -593,25 +533,19 @@ Proof.
   { intros n HPn a.
     specialize (Hcosets n HPn a).
     inversion_clear Hcosets as [m [HPm H]].
-    assert (a <o> n <o> inv a ~ m).
-    { symmetry.
-      apply group_move_r.
-      symmetry.
-      assumption. }
-    { apply P_proper in H0.
-      apply H0.
-      assumption. } }
+    symmetry in H.
+    apply group_move_r in H.
+    setoid_rewrite <- H.
+    assumption. }
   { intros m HPm a.
     exists (a <o> m <o> inv a).
     split.
     { apply Hconj.
       assumption. }
-    { symmetry.
-      transitivity (a <o> m <o> (inv a <o> a));
-        [apply group_assoc |].
-      transitivity (a <o> m <o> ident);
-        [apply group_op_l; apply group_inv_l |].
-      apply group_ident_r. } }
+    { setoid_rewrite (semigroup_assoc equiv op).
+      symmetry.
+      apply (monoid_op_l_solo equiv op ident).
+      apply group_inv_l. } }
 Qed.
 
 Theorem normal_subgroup_equiv_conj_closed:
@@ -627,21 +561,13 @@ Proof.
       assumption. }
     { apply H in Hconj_n.
       specialize (Hconj_n (inv a)).
-      assert (inv a <o> (a <o> n <o> inv a) <o> inv (inv a) ~ n).
-      { transitivity (inv a <o> (a <o> n) <o> inv a <o> inv (inv a));
-          [ apply group_op_r; symmetry; apply group_assoc |].
-        transitivity (inv a <o> a <o> n <o> inv a <o> inv (inv a));
-          [ repeat apply group_op_r; symmetry; apply group_assoc |].
-        transitivity (ident <o> n <o> inv a <o> inv (inv a));
-          [ repeat apply group_op_r; apply group_inv_l |].
-        transitivity (n <o> inv a <o> inv (inv a));
-          [ repeat apply group_op_r; apply group_ident_l |].
-        symmetry;
-        apply group_move_r.
-        reflexivity. }
-      { apply P_proper in H0.
-        apply H0.
-        assumption. } } }
+      repeat setoid_rewrite <- (semigroup_assoc equiv op) in Hconj_n.
+      setoid_rewrite (group_inv_l a) in Hconj_n.
+      setoid_rewrite (monoid_ident_l equiv op ident) in Hconj_n.
+      setoid_rewrite (semigroup_assoc equiv op) in Hconj_n.
+      setoid_rewrite (group_inv_r (inv a)) in Hconj_n.
+      setoid_rewrite (monoid_ident_r equiv op ident) in Hconj_n.
+      assumption. } }
   { intros n HPn a.
     apply Hexact.
     assumption. }
@@ -654,20 +580,16 @@ Proof.
   split;
     [intros Hcongru | intros Hconj].
   { intros n HPn a.
-    assert (a <o> n <o> inv a ~ a <o> inv (a <o> inv n)).
-    { transitivity (a <o> (n <o> inv a));
-        [apply group_assoc | apply group_op_l].
-      symmetry.
-      transitivity (inv (inv n) <o> inv a); 
-        [apply group_inv_op | apply group_op_r].
-      apply group_inv_involute. }
+    assert (a <o> n <o> inv a == a <o> inv (a <o> inv n)).
+    { setoid_rewrite group_inv_op.
+      setoid_rewrite group_inv_involute.
+      apply (semigroup_assoc equiv op). }
     { apply P_proper in H.
       apply H.
       apply Hcongru.
-      assert (inv a <o> (a <o> inv n) ~ inv n).
-      { transitivity (inv a <o> a <o> inv n);
-          [symmetry; apply group_assoc |].
-        apply group_op_r_solo.
+      assert (inv a <o> (a <o> inv n) == inv n).
+      { setoid_rewrite <- (semigroup_assoc equiv op).
+        apply (monoid_op_r_solo equiv op ident).
         apply group_inv_l. }
       { apply P_proper in H0.
         apply H0.
@@ -677,23 +599,22 @@ Proof.
     split;
       [intros Hlcongru | intros Hrcongru].
     { specialize (Hconj (inv a <o> b) Hlcongru b).
-      assert (b <o> (inv a <o> b) <o> inv b ~ b <o> inv a).
-      { transitivity (b <o> inv a <o> b <o> inv b);
-          [apply group_op_r; symmetry; apply group_assoc |].
-        transitivity (b <o> inv a <o> (b <o> inv b));
-          [apply group_assoc | apply group_op_l_solo].
+      assert (b <o> (inv a <o> b) <o> inv b == b <o> inv a).
+      { setoid_rewrite (semigroup_assoc equiv op).
+        apply (semigroup_op_l equiv op).
+        setoid_rewrite (semigroup_assoc equiv op).
+        apply (monoid_op_l_solo equiv op ident).
         apply group_inv_r. }
       { apply P_proper in H.
         symmetry.
         apply H.
         assumption. } } 
     { specialize (Hconj (a <o> inv b) Hrcongru (inv b)).
-      assert (inv b <o> (a <o> inv b) <o> inv (inv b) ~ inv b <o> a).
-      { transitivity (inv b <o> a <o> inv b <o> inv (inv b));
-          [apply group_op_r; symmetry; apply group_assoc |].
-        transitivity (inv b <o> a <o> (inv b <o> inv (inv b)));
-          [apply group_assoc |].
-        apply group_op_l_solo.
+      assert (inv b <o> (a <o> inv b) <o> inv (inv b) == inv b <o> a).
+      { setoid_rewrite (semigroup_assoc equiv op).
+        apply (semigroup_op_l equiv op).
+        setoid_rewrite (semigroup_assoc equiv op).
+        apply (monoid_op_l_solo equiv op ident).
         apply group_inv_r. }
       { apply P_proper in H.
         symmetry.
@@ -791,26 +712,17 @@ Lemma quotient_op_proper:
   Proper (left_congru ==> left_congru ==> left_congru) op.
 Proof.
   intros congru_coincide a0 a1 Ha b0 b1 Hb.
-  assert (inv (a0 <o> b0) <o> (a1 <o> b1) ~ inv b0 <o> (inv a0 <o> a1 <o> b1)).
-  { transitivity (inv (a0 <o> b0) <o> a1 <o> b1);
-      [symmetry; apply group_assoc |].
-    transitivity (inv b0 <o> inv a0 <o> a1 <o> b1);
-      [repeat apply group_op_r; apply group_inv_op |].
-    transitivity (inv b0 <o> inv a0 <o> (a1 <o> b1));
-      [apply group_assoc |].
-    transitivity (inv b0 <o> (inv a0 <o> (a1 <o> b1)));
-      [apply group_assoc |].
-    apply group_op_l.
-    symmetry.
-    apply group_assoc. }
+  assert (inv (a0 <o> b0) <o> (a1 <o> b1) == inv b0 <o> (inv a0 <o> a1 <o> b1)).
+  { setoid_rewrite group_inv_op.
+    setoid_rewrite (semigroup_assoc equiv op).
+    reflexivity. }
   { apply P_proper in H.
     apply H; clear H.
     apply congru_coincide.
-    assert (b0 <o> inv (inv a0 <o> a1 <o> b1) ~ b0 <o> inv b1 <o> inv (inv a0 <o> a1)).
-    { transitivity (b0 <o> (inv b1 <o> inv (inv a0 <o> a1)));
-        [| symmetry; apply group_assoc].
-      apply group_op_l.
-      apply group_inv_op. }
+    assert (b0 <o> inv (inv a0 <o> a1 <o> b1) == b0 <o> inv b1 <o> inv (inv a0 <o> a1)).
+    { repeat setoid_rewrite group_inv_op.
+      setoid_rewrite (semigroup_assoc equiv op).
+      reflexivity. }
     { apply P_proper in H.
       apply H; clear H.
       apply subgroup_op_closed;
@@ -823,7 +735,7 @@ Lemma quotient_inv_proper:
   Proper (left_congru ==> left_congru) inv.
 Proof.
   intros congru_coincide a0 a1 Ha.
-  assert (inv (inv a0) <o> inv a1 ~ a0 <o> inv a1).
+  assert (inv (inv a0) <o> inv a1 == a0 <o> inv a1).
   { apply group_op_r.
     apply group_inv_involute. }
   { apply P_proper in H.
@@ -839,12 +751,12 @@ Proof.
   intros congru_coincide.
   constructor.
   intros a b c.
-  assert (inv (a <o> b <o> c) <o> (a <o> (b <o> c)) ~ ident);
+  assert (inv (a <o> b <o> c) <o> (a <o> (b <o> c)) == ident);
     [| apply P_proper in H; apply H; apply subgroup_ident].
   symmetry.
   apply group_move_l.
-  transitivity (a <o> b <o> c);
-    [apply group_ident_r | apply group_assoc].
+  setoid_rewrite (monoid_ident_r equiv op ident).
+  apply (semigroup_assoc equiv op).
 Qed.
 
 Lemma quotient_monoid:
@@ -856,19 +768,19 @@ Proof.
     [ apply quotient_semigroup;
       apply congru_coincide | |];
     intros a.
-  { assert (inv (ident <o> a) <o> a ~ ident).
+  { assert (inv (ident <o> a) <o> a == ident).
     { symmetry.
       apply group_move_l.
-      transitivity (ident <o> a);
-        [apply group_ident_r | apply group_ident_l]. }
+      setoid_rewrite (monoid_ident_r equiv op ident).
+      apply (monoid_ident_l equiv op ident). }
     { apply P_proper in H.
       apply H.
       apply subgroup_ident. } }
-  { assert (inv (a <o> ident) <o> a ~ ident).
+  { assert (inv (a <o> ident) <o> a == ident).
     { symmetry.
       apply group_move_l.
-      transitivity (a <o> ident);
-        apply group_ident_r. }
+      repeat setoid_rewrite (monoid_ident_r equiv op ident).
+      reflexivity. }
     { apply P_proper in H.
       apply H.
       apply subgroup_ident. } }
@@ -891,7 +803,7 @@ Context (P: Carrier -> Prop).
 Context {P_proper: Proper (equiv ==> iff) P}.
 Context {subgroup: Subgroup op ident inv P}.
 
-Infix "~" := equiv (at level 60, no associativity).
+Infix "==" := equiv (at level 60, no associativity).
 Infix "<o>" := op (at level 40, left associativity).
 
 Let normal_subgroup_congru_coincide :=
@@ -908,20 +820,18 @@ Proof.
     [apply (quotient_monoid equiv op ident inv P P_proper);
       apply congru_coincide | |];
     intros a.
-  { assert (inv (inv a <o> a) <o> ident ~ ident).
+  { assert (inv (inv a <o> a) <o> ident == ident).
     { symmetry.
       apply (group_move_l equiv op ident inv).
-      transitivity (inv a <o> a);
-        [apply (group_ident_r equiv op ident inv) |].
+      setoid_rewrite (monoid_ident_r equiv op ident).
       apply (group_inv_l equiv op ident inv). }
     { apply P_proper in H.
       apply H.
       apply (subgroup_ident op ident inv P). } }
-  { assert (inv (a <o> inv a) <o> ident ~ ident).
+  { assert (inv (a <o> inv a) <o> ident == ident).
     { symmetry.
       apply (group_move_l equiv op ident inv).
-      transitivity (a <o> inv a);
-        [apply (group_ident_r equiv op ident inv) |].
+      setoid_rewrite (monoid_ident_r equiv op ident).
       apply (group_inv_r equiv op ident inv). }
     { apply P_proper in H.
       apply H.

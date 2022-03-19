@@ -2,6 +2,7 @@
 theories/Semigroups.v
 theories/Monoids.v
 theories/Groups.v
+theories/GroupIter.v
 theories/AbelianGroups.v
 theories/GroupHoms.v
 theories/Rings.v
