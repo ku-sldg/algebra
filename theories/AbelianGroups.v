@@ -28,7 +28,7 @@ Context (P: Carrier -> Prop).
 Context {P_proper: Proper (equiv ==> iff) P}.
 Context {subgroup: Subgroup op ident inv P}.
 
-Theorem subgroup_cosets_coincide:
+Theorem subagroup_cosets_coincide:
   forall (m: Carrier),
     P m ->
     (forall (a: Carrier),
@@ -41,50 +41,50 @@ Proof.
     [assumption | apply abelian_comm].
 Qed.
 
-Corollary subgroup_congru_coincide:
+Corollary subagroup_congru_coincide:
   forall (a b: Carrier),
    left_congru op inv P a b <->
    right_congru op inv P a b.
 Proof.
   apply (normal_subgroup_equiv_congru_cosets equiv op ident inv);
     try assumption.
-  apply subgroup_cosets_coincide.
+  apply subagroup_cosets_coincide.
 Qed.
 
-Corollary subgroup_coset_eq_coincide:
+Corollary subagroup_coset_eq_coincide:
   forall (a b: Carrier),
     left_cosets_eq equiv op P a b <->
     right_cosets_eq equiv op P a b.
 Proof.
   apply (normal_subgroup_equiv_cosets_eq_cosets equiv op ident inv);
     try assumption.
-  apply subgroup_cosets_coincide.
+  apply subagroup_cosets_coincide.
 Qed.
 
-Corollary subgroup_conj_closed:
+Corollary subagroup_conj_closed:
   forall (n: Carrier),
     P n ->
     forall (a: Carrier), P (a <o> n <o> inv a).
 Proof.
   apply (normal_subgroup_equiv_cosets_conj equiv op ident inv);
     try assumption.
-  apply subgroup_cosets_coincide.
+  apply subagroup_cosets_coincide.
 Qed.
 
-Corollary subgroup_conj_closed_exact:
+Corollary subagroup_conj_closed_exact:
   forall (n a: Carrier),
     P n <-> P (a <o> n <o> inv a).
 Proof.
   apply (normal_subgroup_equiv_cosets_conj_exact equiv op ident inv).
     try assumption.
-  apply subgroup_cosets_coincide.
+  apply subagroup_cosets_coincide.
 Qed.
 
-Theorem quotient_subgroup_group:
-  Group (left_congru op inv P) op ident inv.
+#[global]
+Instance quotient_subagroup_group: Group (left_congru op inv P) op ident inv.
 Proof.
   apply (quotient_normal_subgroup_group equiv op ident inv P).
-  apply subgroup_congru_coincide.
+  apply subagroup_congru_coincide.
 Qed.
 End Subgroups.
 End AbelianGroups.
@@ -105,11 +105,11 @@ Context (P: Carrier -> Prop).
 Context {P_proper: Proper (equiv ==> iff) P}.
 Context {subgroup: Subgroup op ident inv P}.
 
-Theorem quotient_subgroup_abelian:
-  AbelianGroup (left_congru op inv P) op ident inv.
+#[global]
+Instance quotient_subagroup: AbelianGroup (left_congru op inv P) op ident inv.
 Proof.
   constructor.
-  { apply (quotient_subgroup_group equiv op ident inv P). }
+  { apply (quotient_subagroup_group equiv op ident inv P). }
   { constructor.
     intros a b.
     assert (inv (a <o> b) <o> (b <o> a) == ident).

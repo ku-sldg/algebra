@@ -8,3 +8,4 @@ theories/GroupHoms.v
 theories/Rings.v
 theories/CommRings.v
 theories/Modules.v
+theories/ModuleHoms.v
