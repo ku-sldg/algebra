@@ -7,5 +7,7 @@ theories/AbelianGroups.v
 theories/GroupHoms.v
 theories/Rings.v
 theories/CommRings.v
+theories/Vectors.v
 theories/Modules.v
+theories/Nakayama.v
 theories/ModuleHoms.v

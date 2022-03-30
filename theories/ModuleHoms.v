@@ -49,8 +49,6 @@ Infix "<+2>" := M2add (at level 50, left associativity).
 Infix "<.1>" := action1 (at level 40, no associativity).
 Infix "<.2>" := action2 (at level 40, no associativity).
 
-Check GroupHom.
-
 Class ModuleHom := {
     module_hom_group_hom :> GroupHom M1add M2equiv M2add hom;
     module_hom_action: forall (r: R)(a: M1), hom (r <.1> a) =M2= r <.2> hom a;
