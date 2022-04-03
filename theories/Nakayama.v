@@ -111,36 +111,70 @@ Proof.
   intros n.
   induction basis as [| u1 n basis'];
     intros M_fingen Hideal_mod.
-  { intros a.
+  { (* Base case: basis is empty, module is zero *)
+    intros a.
     specialize (M_fingen a).
     inversion_clear M_fingen as [coeffs Ha].
     dependent destruction coeffs.
     simpl in Ha.
     assumption. }
-  { apply IHbasis';
+  { (* Ind case: basis = u1::basis' *)
+    apply IHbasis';
       [| assumption].
-    intros u.
     specialize (Hideal_mod u1).
-    inversion_clear Hideal_mod as [m [coeffs_u [vectors_u [Hcoeffs_u Hu]]]].
+    inversion_clear Hideal_mod as [m [coeffs_u [vectors_u [Hcoeffs_u Hu1]]]].
     pose proof (module_fin_gen_ideal_module (cons M u1 n basis') M_fingen coeffs_u vectors_u Hcoeffs_u).
-
-(* 
-  induction basis as [| u1 n basis'];
-    intros Hideal_mod.
-  { intros a.
-    specialize (M_fingen a).
-    inversion_clear M_fingen as [coeffs H].
-    dependent destruction coeffs.
-    simpl in H.
+    inversion_clear H as [coeffs' [Hu1_basis Hcoeffs']].
+    setoid_rewrite Hu1_basis in Hu1.
+    dependent destruction coeffs'.
+    rename h into x1.
+    simpl in Hu1.
+    (* u1 = x1 u1 + coeffs' . basis' *)
+    assert ((Rone [+] Rminus x1) <.> u1 =M= linear_combin Madd Mzero action coeffs' basis').
+    { setoid_rewrite (module_distrib_Radd Radd Rmul Rone Mequiv Madd Mzero Mminus action).
+      setoid_rewrite (module_Rone Radd Rmul Rone Mequiv Madd Mzero Mminus action).
+      setoid_rewrite (module_minus_l Requiv Radd Rzero Rminus Rmul Rone Mequiv Madd Mzero Mminus action).
+      symmetry.
+      apply (group_move_r Mequiv Madd Mzero Mminus).
+      symmetry.
+      assumption. }
+    (* (1 - x1) u1 = coeffs' . basis' *)
+    inversion Hcoeffs';
+      subst.
+    inversion_sigma.
+    let H := match goal with H: n = n |- _ => H end in
+      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H.
+    simpl in H1.
+    subst v.
+    (* x1 is in the maximal ideal *)
+    pose proof (comm_ring_maximal_ideal_nonunits Requiv Radd Rzero Rminus Rmul Rone P P_maxideal x1 H3) as Hx1_nonunit.
+    (* x1 cannot be a unit *)
+    pose proof (local_comm_ring_sub_1_nonunit Requiv Radd Rzero Rminus Rmul Rone R_local x1 Hx1_nonunit) as H1mx1_unit.
+    (* 1 - x1 must be a unit with y as its inverse *)
+    inversion_clear H1mx1_unit as [y Hy].
+    setoid_rewrite (commutative Requiv Rmul) in Hy.
+    apply (module_op_l Requiv Mequiv action) with (r:=y) in H.
+    setoid_rewrite <- (module_distrib_Rmul Radd Rmul Rone Mequiv Madd Mzero Mminus action) in H.
+    setoid_rewrite Hy in H.
+    setoid_rewrite (module_Rone Radd Rmul Rone Mequiv Madd Mzero Mminus action) in H.
+    setoid_rewrite <- (module_linear_combin_mul_l Requiv Radd Rmul Rone Mequiv Madd Mzero Mminus action) in H.
+    (* u1 = (y coeffs') . basis *)
+    intros v.
+    pose proof (M_fingen v) as Hv.
+    inversion_clear Hv as [coeffs_v Hcoeffs_v].
+    dependent destruction coeffs_v.
+    rename h into v1.
+    simpl in Hcoeffs_v.
+    (* v = v1 u1 + coeffs_v . basis'
+     *   = v1 y coeffs' . basis' + coeffs_v . basis'
+     *   = (v1 y coeffs' + coeffs_v) . basis'
+     *)
+    setoid_rewrite H in Hcoeffs_v.
+    setoid_rewrite <- (module_linear_combin_mul_l Requiv Radd Rmul Rone Mequiv Madd Mzero Mminus action) in Hcoeffs_v.
+    setoid_rewrite <- (module_linear_combin_zipWith_add_l Radd Rmul Rone Mequiv Madd Mzero Mminus action) in Hcoeffs_v.
+    exists (zipWith Radd coeffs_v
+      (map (fun coeff : R => v1 [*] coeff)
+        (map (fun coeff : R => y [*] coeff) coeffs'))).
     assumption. }
-  { specialize (IHbasis' basis').
-    pose proof (Hideal_mod u1) as Hu1.
-    inversion_clear Hu1 as [m [coeffs_u1 [vectors_u1 [Hcoeffs_u1 _]]]].
-    pose proof (module_fin_gen_ideal_module coeffs_u1 vectors_u1 Hcoeffs_u1).
-    dependent destruction coeffs.
-    rename h into x1, coeffs into coeffs'.
-    simpl in Hu1'.
-    assert ((Rone [+] Rminus x1) <.> u1 =M= linear_combin Madd Mzero action coeffs' t).
- *)
-Admitted.
+Qed.
 End NakayamaLemma.

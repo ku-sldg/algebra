@@ -300,6 +300,22 @@ Proof.
   apply HPr'.
   assumption.
 Qed.
+
+Lemma comm_ring_maximal_ideal_nonunits:
+  maximal_ideal ->
+  forall (x: Carrier),
+    P x ->
+    ~is_unit equiv mul one x.
+Proof.
+  intros [r [Hr' Hmax_ideal]].
+  intros x Hx Hcontra.
+  assert (exists (u: Carrier), P u /\ is_unit equiv mul one u).
+  { exists x.
+    split;
+      assumption. }
+  { apply (ideal_unit_entire equiv add zero minus mul one P) with (r := r) in H.
+    contradiction. }
+Qed.
 End Ideals.
 
 Section LocalRing.
