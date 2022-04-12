@@ -171,10 +171,10 @@ Proof.
      *)
     setoid_rewrite H in Hcoeffs_v.
     setoid_rewrite <- (module_linear_combin_mul_l Requiv Radd Rmul Rone Mequiv Madd Mzero Mminus action) in Hcoeffs_v.
+    rewrite <- vector_map_composed in Hcoeffs_v.
     setoid_rewrite <- (module_linear_combin_zipWith_add_l Radd Rmul Rone Mequiv Madd Mzero Mminus action) in Hcoeffs_v.
     exists (zipWith Radd coeffs_v
-      (map (fun coeff : R => v1 [*] coeff)
-        (map (fun coeff : R => y [*] coeff) coeffs'))).
+      (map (fun x : R => v1 [*] (y [*] x)) coeffs')).
     assumption. }
 Qed.
 End NakayamaLemma.

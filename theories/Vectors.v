@@ -187,3 +187,15 @@ Proof.
     { apply IHv0;
         assumption. } }
 Qed.
+
+Theorem vector_map_composed {A B C: Type}(f: A -> B)(g: B -> C):
+  forall {n: nat}(v: t A n),
+    map (fun x => g (f x)) v =
+      map g (map f v).
+Proof.
+  intros n.
+  induction v;
+    simpl;
+    [| rewrite IHv];
+    reflexivity.
+Qed.
