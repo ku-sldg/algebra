@@ -44,6 +44,11 @@ Context {R_local: local_ring Requiv Radd Rzero Rminus Rmul}.
 
 Let ideal_module_pred := ideal_module Mequiv Madd Mzero action P.
 
+(* For finitely generated module \(M\) with basis
+  \(basis\) and an ideal \(P\), any element of
+  \(P M\) can be written as a linear combination of
+  the basis and coefficients from \(P\).
+ *)
 Lemma module_fin_gen_ideal_module:
   forall {n: nat}(basis: t M n),
     finitely_generated Mequiv Madd Mzero action basis ->
@@ -73,9 +78,8 @@ Proof.
     subst.
     inversion_sigma.
     let H := match goal with H: m = m |- _ => H end in
-      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H.
-    simpl in H4.
-    subst.
+      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H;
+      simpl in *; subst.
     specialize (IHvectors coeffs H3).
     inversion_clear IHvectors as [coeffs' [Hlincomb Hcoeffs']].
     pose proof (M_fingen vector) as H4.
@@ -119,8 +123,9 @@ Proof.
     simpl in Ha.
     assumption. }
   { (* Ind case: basis = u1::basis' *)
-    apply IHbasis';
+    apply IHbasis'; (* apply induction hypothesis *)
       [| assumption].
+    (* u1 = x1 u1 + coeffs' . basis' *)
     specialize (Hideal_mod u1).
     inversion_clear Hideal_mod as [m [coeffs_u [vectors_u [Hcoeffs_u Hu1]]]].
     pose proof (module_fin_gen_ideal_module (cons M u1 n basis') M_fingen coeffs_u vectors_u Hcoeffs_u).
@@ -129,7 +134,7 @@ Proof.
     dependent destruction coeffs'.
     rename h into x1.
     simpl in Hu1.
-    (* u1 = x1 u1 + coeffs' . basis' *)
+    (* (1 - x1) u1 = coeffs' . basis' *)
     assert ((Rone [+] Rminus x1) <.> u1 =M= linear_combin Madd Mzero action coeffs' basis').
     { setoid_rewrite (module_distrib_Radd Radd Rmul Rone Mequiv Madd Mzero Mminus action).
       setoid_rewrite (module_Rone Radd Rmul Rone Mequiv Madd Mzero Mminus action).
@@ -138,19 +143,18 @@ Proof.
       apply (group_move_r Mequiv Madd Mzero Mminus).
       symmetry.
       assumption. }
-    (* (1 - x1) u1 = coeffs' . basis' *)
+    (* x1 is in the maximal ideal *)    
     inversion Hcoeffs';
       subst.
     inversion_sigma.
     let H := match goal with H: n = n |- _ => H end in
-      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H.
-    simpl in H1.
-    subst v.
-    (* x1 is in the maximal ideal *)
-    pose proof (comm_ring_maximal_ideal_nonunits Requiv Radd Rzero Rminus Rmul Rone P P_maxideal x1 H3) as Hx1_nonunit.
+      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H;
+      simpl in *; subst v.
     (* x1 cannot be a unit *)
-    pose proof (local_comm_ring_sub_1_nonunit Requiv Radd Rzero Rminus Rmul Rone R_local x1 Hx1_nonunit) as H1mx1_unit.
+    pose proof (comm_ring_maximal_ideal_nonunits Requiv Radd Rzero Rminus Rmul Rone P P_maxideal x1 H3) as Hx1_nonunit.
     (* 1 - x1 must be a unit with y as its inverse *)
+    pose proof (local_comm_ring_sub_1_nonunit Requiv Radd Rzero Rminus Rmul Rone R_local x1 Hx1_nonunit) as H1mx1_unit.
+    (* u1 = (y coeffs') . basis *)
     inversion_clear H1mx1_unit as [y Hy].
     setoid_rewrite (commutative Requiv Rmul) in Hy.
     apply (module_op_l Requiv Mequiv action) with (r:=y) in H.
@@ -158,17 +162,16 @@ Proof.
     setoid_rewrite Hy in H.
     setoid_rewrite (module_Rone Radd Rmul Rone Mequiv Madd Mzero Mminus action) in H.
     setoid_rewrite <- (module_linear_combin_mul_l Requiv Radd Rmul Rone Mequiv Madd Mzero Mminus action) in H.
-    (* u1 = (y coeffs') . basis *)
+    (* v = v1 u1 + coeffs_v . basis'
+     *   = v1 y coeffs' . basis' + coeffs_v . basis'
+     *   = (v1 y coeffs' + coeffs_v) . basis'
+     *)
     intros v.
     pose proof (M_fingen v) as Hv.
     inversion_clear Hv as [coeffs_v Hcoeffs_v].
     dependent destruction coeffs_v.
     rename h into v1.
     simpl in Hcoeffs_v.
-    (* v = v1 u1 + coeffs_v . basis'
-     *   = v1 y coeffs' . basis' + coeffs_v . basis'
-     *   = (v1 y coeffs' + coeffs_v) . basis'
-     *)
     setoid_rewrite H in Hcoeffs_v.
     setoid_rewrite <- (module_linear_combin_mul_l Requiv Radd Rmul Rone Mequiv Madd Mzero Mminus action) in Hcoeffs_v.
     rewrite <- vector_map_composed in Hcoeffs_v.
@@ -178,3 +181,4 @@ Proof.
     assumption. }
 Qed.
 End NakayamaLemma.
+(* Print Assumptions nakayama. *)

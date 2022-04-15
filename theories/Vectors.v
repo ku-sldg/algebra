@@ -25,9 +25,8 @@ Proof.
     { constructor;
         [assumption |].
       let H := match goal with H : m + n = m + n |- _ => H end in
-        pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H.
-      simpl in H5.
-      subst.
+        pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H;
+        simpl in *; subst.
       apply IHu in H3.
       inversion_clear H3 as [Hu Hv].
       assumption. }
@@ -43,9 +42,8 @@ Proof.
       subst.
     inversion_sigma.
     let H := match goal with H : m = m |- _ => H end in
-      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H.
-    simpl in H4.
-    subst.
+      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H;
+      simpl in *; subst.
     constructor;
       [assumption |].
     apply IHu.
@@ -94,9 +92,8 @@ Proof.
     subst.
     inversion_sigma.
     let H := match goal with H: n = n |- _ => H end in
-      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H.
-    simpl in H4.
-    subst.
+      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H;
+      simpl in *; subst.
     constructor.
     { apply Hclosed.
       assumption. }
@@ -171,16 +168,14 @@ Proof.
     subst.
     inversion_sigma.
     let H := match goal with H: n = n |- _ => H end in
-      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H.
-    simpl in H4.
-    subst v.
+      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H;
+      simpl in *; subst v.
     inversion Hv1.
     subst.
     inversion_sigma.
     let H := match goal with H: n = n |- _ => H end in
-      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H.
-    simpl in H6.
-    subst v.
+      pose proof (Eqdep_dec.UIP_refl_nat _ H); subst H;
+      simpl in *; subst v.
     constructor.
     { apply Hclosed;
         assumption. }
