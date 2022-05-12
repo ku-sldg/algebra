@@ -319,10 +319,6 @@ Qed.
 End Ideals.
 
 Section LocalRing.
-(* Context (P: Carrier -> Prop).
-Context {P_proper: Proper (equiv ==> iff) P}.
-Context {ideal: Ideal add zero minus mul P}. *)
-
 Definition local_ring :=
   exists (P: Carrier -> Prop)(P_proper: Proper (equiv ==> iff) P)(P_ideal: Ideal add zero minus mul P),
       maximal_ideal P /\
