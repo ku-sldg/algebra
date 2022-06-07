@@ -34,3 +34,4 @@ nra.cache
 
 # VS Code worksapce files
 *.code-workspace
+.vscode/*
