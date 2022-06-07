@@ -1,16 +1,21 @@
-% !TeX document-id = {34714a8d-170f-4947-a4b9-b8812e4a094a}
-% !TeX TXS-program:compile = txs:///pdflatex/[--shell-escape]
 \RequirePackage[l2tabu,orthodox]{nag}
 \documentclass{article}
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{minted}
 \begin{document}
+
+% Mention an attempt with modules
+% Formalizing algebra => crypto
+% Interesting steps of the proof
+% ssreflect still looks to only deal with finite/discrete objects
+
 We started by defining a semigroup class, which declares a binary operation to
 be associative. From here, we build up through monoids, which introduce
 identities, to groups, which introduce inverses. Note the double equals in
 these definitions is notation for an arbitrary equivalence relation over the
 group's carrier set.
+% \begin{verbatim}  
 \begin{minted}{coq}
   Infix "==" := equiv (at level 60, no associativity).
   Class Semigroup := {
@@ -33,23 +38,29 @@ group's carrier set.
       forall (a: Carrier), a <o> inv a == ident;
   }.
 \end{minted}
+% \end{verbatim}
+The lines like \verb|monoid_semigroup :> Semigroup equiv op;| simply coerce
+the monoid typeclass into a semigroup.
 
 While we found later on that we did not need quotients, it is worth remarking
 that we got quotients working rather nicely in Coq using typeclasses. An
 algebraic quotient are an equivalence relation on the algebraic structure which
 preserve that structure. For example, quotient groups are formed by taking a
 subgroup and making every element of that subgroup equivalent to the identity.
-With \(P\) being the predicate for the subgroup, there are two ways to make an
-equivalence relation from this description.
+With \texttt{P} being the predicate for the subgroup, there are two ways to
+make an equivalence relation from this description.
+% \begin{verbatim}
 \begin{minted}{coq}
   Definition left_congru (a b: Carrier) :=
     P (inv a <o> b).
   Definition right_congru (a b: Carrier) :=
     P (a <o> inv b).
 \end{minted}
+% \end{verbatim}
 When these two relations coincide, then we can prove that the equivalence
 relation(s) actually preserve the group structure. Subgroups which have this
 property are called \emph{normal subgroups}.
+% \begin{verbatim}
 \begin{minted}{coq}
   Let normal_subgroup_congru_coincide :=
     forall (a b: Carrier),
@@ -60,6 +71,16 @@ property are called \emph{normal subgroups}.
     normal_subgroup_congru_coincide ->
     Group (left_congru op inv P) op ident inv.
 \end{minted}
+% \end{verbatim}
+
+It is because of quotients that we used equivalence relations to define the
+components of group structure. If we were to use the regular Leibniz equality,
+this would make it very difficult to say that a quotient group is another
+group. But by having the definition of a group depend upon an arbitrary
+equivalence relation, we enable our theory to state that a quotient group is
+simply a group with under a different equivalence. We didn't loose much as we
+could still rely upon Coq's setoid rewrite tactics. Setoids are types equipped
+with an equivalence relation.
 
 Moving onwards, we then defined structures for rings, which have two binary
 operations: a commutative plus \(+\) and a non-commutative times \(\cdot\), and
@@ -70,46 +91,58 @@ the ideal whenever \(a\) is in the ideal and \(r\) is any element of the ring.
 Again, we defined quotient rings but found them unnecessary in the end. Maximal
 ideals were defined next. These are ideals that are proper subsets of the ring
 while having no larger ideal except for the ring itself. Below is the
-definition in Coq, which uses \(P\) as the predicate for the ideal.
+definition in Coq, which uses \texttt{P} as the predicate for the ideal.
+% \begin{verbatim}
 \begin{minted}{coq}
   Definition maximal_ideal :=
     exists (r: Carrier), (not (P r) /\
-      forall (Q: Carrier -> Prop)(Q_proper: Proper (equiv ==> iff) Q)
+      forall (Q: Carrier -> Prop)
+          (Q_proper: Proper (equiv ==> iff) Q)
           (Q_ideal: Ideal add zero minus mul Q),
         (forall (r: Carrier), P r -> Q r) ->
         (forall (r: Carrier), Q r) \/
           (forall (r: Carrier), Q r -> P r)).
 \end{minted}
+% \end{verbatim}
 We could then define a local ring, which is a ring with a single maximal ideal.
+% \begin{verbatim}
 \begin{minted}{coq}
   Definition local_ring :=
-    exists (P: Carrier -> Prop)(P_proper: Proper (equiv ==> iff) P)
+    exists (P: Carrier -> Prop)
+        (P_proper: Proper (equiv ==> iff) P)
         (P_ideal: Ideal add zero minus mul P),
       maximal_ideal P /\
-      (forall (Q: Carrier -> Prop)(Q_proper: Proper (equiv ==> iff) Q)
+      (forall (Q: Carrier -> Prop)
+          (Q_proper: Proper (equiv ==> iff) Q)
           (Q_ideal: Ideal add zero minus mul Q),
         maximal_ideal Q -> forall (r: Carrier), P r <-> Q r).
 \end{minted}
+% \end{verbatim}
 
 Here we had to include an axiom that in commutative ring, any non-unit \(x\) is
 contained in some maximal ideal. This was made into an axiom as the standard
 mathematical argument is a proof with potentially infinitely many steps. The
 standard argument goes as follows.
 \begin{quote}
-    Set \(I_{1}\coloneqq (x)\) to be the principal ideal for \(x\). If
-    \(I_{1}\) is not maximal, then there exists a strictly larger ideal
-    \(I_{2}\), i.e. \(x\in I_{1}\subsetneq I_{2}\). If \(I_{2}\) is not
-    maximal, then there exists another strictly larger ideal \(I_{3}\).
-    Continue these arguments infinitely many times if necessary in order to get
-    an infinite chain of ideals containing \(x\).
+    Set \(I_{1}\coloneqq (x)\) to be the principal ideal for \(x\), i.e. the
+    ideal generated by the single element \(x\). If \(I_{1}\) is not maximal,
+    then there exists a strictly larger ideal \(I_{2}\), i.e.
+    \(x\in I_{1}\subsetneq I_{2}\). If \(I_{2}\) is not maximal, then there
+    exists another strictly larger ideal \(I_{3}\). Continue these arguments
+    infinitely many times if necessary in order to get an infinite chain of
+    ideals containing \(x\).
     \[x\in I_{1}\subsetneq I_{2}\subsetneq I_{3}\subsetneq\cdots\subsetneq R\]
     It is a simple matter to show that \(\bigcup_{k=1}^{\infty} I_{k}\) is also
     an ideal containing in \(x\). So by Zorn's lemma, there exists a maximal
     ideal in \(R\) which contains \(x\).
 \end{quote}
+Zorn's lemma is equivalent to the axiom of choice. So we had to add at least
+one axiom here in order to proceed. By adding the axiom that we did, not only
+will we encapsulate an infinite argument, but we will also avoid the need for
+the axiom of choice.
 
-We used classical logic to prove that \(1 - x\) is a unit where \(x\) is a
-non-unit in any local ring. The proof used the rule \(\neg\neg P\rightarrow
+Also, we used classical logic to prove that \(1 - x\) is a unit where \(x\) is
+a non-unit in any local ring. The proof used the rule \(\neg\neg P\rightarrow
 P\) in order to do a proof by contradiction.
 
 The next structure defined were modules over rings which generalize vector
@@ -124,14 +157,16 @@ vectors which can generate all other vectors, for \(\mathbf{R}^{n}\) one such
 collection of generators are \(\mathbf{e}_{1} = \begin{pmatrix} 1 & 0 & 0 &
   \cdots & 0\end{pmatrix}^{T}\), \(\mathbf{e}_{2} = \begin{pmatrix} 0 & 1 & 0 &
   \cdots & 0\end{pmatrix}^{T}\), \textellipsis, \(\mathbf{e}_{n} =
-  \begin{pmatrix} 0 & 0 & 0 & \cdots & 1\end{pmatrix}^{T}\). In our code, \(M\)
-is the type of module elements, \(R\) is the type of ring elements which act
-as coefficients, and \(t A n\) is a list whose elements are of type \(A\) and
-whose length is \(n\).
+  \begin{pmatrix} 0 & 0 & 0 & \cdots & 1\end{pmatrix}^{T}\). In our code,
+\texttt{M} is the type of module elements, \texttt{R} is the type of ring
+elements which act as coefficients, and \texttt{t A n} is a list whose elements
+are of type \texttt{A} and whose length is \texttt{n}.
+% \begin{verbatim}
 \begin{minted}{coq}
   Definition finitely_generated {n: nat}(basis: t M n) :=
     forall (vector: M),
       exists (coeffs: t R n),
         vector =M= linear_combin coeffs basis.
 \end{minted}
+% \end{verbatim}
 \end{document}
