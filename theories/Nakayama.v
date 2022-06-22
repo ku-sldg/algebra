@@ -61,19 +61,27 @@ Lemma module_fin_gen_ideal_module:
 Proof.
   intros n basis M_fingen m coeffs vectors.
   induction vectors as [| vector m vectors].
-  { dependent destruction coeffs.
+  { (* vectors := nil *)
+    dependent destruction coeffs.
+    (* so coeffs = nil *)
     simpl.
     intros Hcoeffs.
+    (* coeffs' is a list of \(n\) zeros *)
     exists (const_seq Rzero n).
     setoid_rewrite (module_linear_combin_0_l Requiv Radd Rzero Rminus Rmul Rone Mequiv Madd Mzero Mminus action).
     split;
       [reflexivity |].
+    (* Forall P (const_seq Rzero n) -> P RZero -> True *)
     apply vector_forall_const_seq.
     right.
     apply (subgroup_ident Radd Rzero Rminus P). }
-  { dependent destruction coeffs.
+  { (* vectors := cons vector vectors *)
+    (* `coeffs: t R (S m)` breaks up into `cons coeff coeffs` *)
+    dependent destruction coeffs.
     rename h into coeff.
     intros Hcoeffs.
+    (* induction hypothesis applies to `coeffs . vectors` 
+       so `coeffs . vectors = coeffs' . basis` *)
     inversion Hcoeffs.
     subst.
     inversion_sigma.
@@ -82,11 +90,11 @@ Proof.
       simpl in *; subst.
     specialize (IHvectors coeffs H3).
     inversion_clear IHvectors as [coeffs' [Hlincomb Hcoeffs']].
+    (* vector = linear_combin coeffs'' basis *)
     pose proof (M_fingen vector) as H4.
     inversion_clear H4 as [coeffs'' Hvector].
     exists (zipWith Radd coeffs' (map (Rmul coeff) coeffs'')).
-    (* coeffs . vectors = coeffs' . basis
-     * coeff * vector + coeffs . vectors
+    (* coeff * vector + coeffs . vectors
      *   = coeff * (coeffs'' . basis) + coeffs' . basis
      *   = (coeff * coeffs'' + coeffs') . basis
      *)
@@ -98,6 +106,7 @@ Proof.
       setoid_rewrite (module_linear_combin_mul_l Requiv Radd Rmul Rone Mequiv Madd Mzero Mminus action).
       setoid_rewrite Hvector.
       reflexivity. }
+    (* proving the coefficients belong to the ideal *)
     { apply vector_forall_zipwith_binary_op.
       { apply (subgroup_op_closed Radd Rzero Rminus P). }
       { assumption. }
@@ -163,7 +172,7 @@ Proof.
     setoid_rewrite (module_Rone Radd Rmul Rone Mequiv Madd Mzero Mminus action) in H.
     setoid_rewrite <- (module_linear_combin_mul_l Requiv Radd Rmul Rone Mequiv Madd Mzero Mminus action) in H.
     (* v = v1 u1 + coeffs_v . basis'
-     *   = v1 y coeffs' . basis' + coeffs_v . basis'
+     *   = v1 (y coeffs' . basis') + coeffs_v . basis'
      *   = (v1 y coeffs' + coeffs_v) . basis'
      *)
     intros v.

@@ -1,8 +1,12 @@
 \RequirePackage[l2tabu,orthodox]{nag}
 \documentclass{article}
+\usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{minted}
+
+\newtheorem*{theorem}{Theorem}
+
 \begin{document}
 
 % Mention an attempt with modules
@@ -14,8 +18,8 @@ We started by defining a semigroup class, which declares a binary operation to
 be associative. From here, we build up through monoids, which introduce
 identities, to groups, which introduce inverses. Note the double equals in
 these definitions is notation for an arbitrary equivalence relation over the
-group's carrier set.
-% \begin{verbatim}  
+group's carrier set which acts as equality.
+% \begin{verbatim}
 \begin{minted}{coq}
   Infix "==" := equiv (at level 60, no associativity).
   Class Semigroup := {
@@ -88,10 +92,14 @@ structures for commutative rings, where multiplication is commutative and has
 an identity. Here we define \emph{ideals} which are normal subgroups under
 addition and are absorbing with regards to multiplication, i.e. \(r a\) is in
 the ideal whenever \(a\) is in the ideal and \(r\) is any element of the ring.
-Again, we defined quotient rings but found them unnecessary in the end. Maximal
-ideals were defined next. These are ideals that are proper subsets of the ring
-while having no larger ideal except for the ring itself. Below is the
-definition in Coq, which uses \texttt{P} as the predicate for the ideal.
+Again, we defined quotient rings but found them unnecessary in the end. Note
+that should an ideal \(I\) contain a unit, an element \(x\) with a
+multiplicative inverse \(x^{-1}\), then \(I\) would be the entire ring by the
+absorbing property: given any element \(a\) of the ring, then \(a x^{-1}\) is
+also in the ring, and \(a x^{-1} x = a 1 = a\in I\). Maximal ideals were
+defined next. These are ideals that are proper subsets of the ring while having
+no larger ideal except for the ring itself. Below is the definition in Coq,
+which uses \texttt{P} as the predicate for the ideal.
 % \begin{verbatim}
 \begin{minted}{coq}
   Definition maximal_ideal :=
@@ -104,7 +112,9 @@ definition in Coq, which uses \texttt{P} as the predicate for the ideal.
           (forall (r: Carrier), Q r -> P r)).
 \end{minted}
 % \end{verbatim}
-We could then define a local ring, which is a ring with a single maximal ideal.
+Almost by definition, maximal ideals can contain no units, otherwise they would
+fail to be a proper subset of the ring. We could then define a local ring,
+which is a ring with a single maximal ideal.
 % \begin{verbatim}
 \begin{minted}{coq}
   Definition local_ring :=
@@ -169,4 +179,80 @@ are of type \texttt{A} and whose length is \texttt{n}.
         vector =M= linear_combin coeffs basis.
 \end{minted}
 % \end{verbatim}
+
+Next, we defined the product of an ideal \(I\) and a module \(M\), denoted as
+\(I M\), which is defined to be all linear combinations of vectors from \(M\)
+and coefficients from \(I\). This can be easily shown to be a submodule of
+\(M\). We represented this in Coq as a predicate over \(M\).
+% \begin{verbatim}
+\begin{minted}{coq}
+  Context (P: R -> Prop).
+  Context {P_proper: Proper (Requiv ==> iff) P}.
+  Context {P_ideal: Ideal Radd Rzero Rminus Rmul P}.
+  
+  Definition ideal_module (x: M): Prop :=
+    exists (n: nat)(coeffs: t R n)(vectors: t M n),
+      Forall P coeffs /\
+      x =M= linear_combin Madd Mzero action coeffs vectors.
+\end{minted}
+% \end{verbatim}
+The \verb|Forall P coeffs| ensures that every element of the coefficient list
+\texttt{coeffs} satisfies the predicate \texttt{P}. From here, we can move to
+stating Nakayama's lemma.
+
+\begin{theorem}[Nakayama's lemma]
+  Let \(M\) be a finitely generated module over a local ring \(R\) with maximal
+  ideal \(\mathfrak{m}\). If \(\mathfrak{m} M = M\), then \(M = 0\), which is
+  to say that \(M\) is the zero module which consists of exactly one element,
+  that being the zero vector.
+\end{theorem}
+
+We needed a lemma before moving on to prove the main theorem which states that
+for a finitely generated module \(M\) with a basis
+\(b_{1}, b_{2}, \dots, b_{n}\), any element \(x\in I M\) where \(I\) is an
+ideal can be written as a linear combination of the basis vectors with
+coefficients coming from \(I\). The proof of this lemma is straightforward and
+follows the standard, informal mathematical argument which inductively goes
+through the vectors needed to generate \(x\) and shows that each vector can be
+rewritten in terms of the basis vectors times elements of the ideal \(I\) as
+follows.
+\begin{align*}
+  x & = \sum_{k=1}^{m} u_{k} a_{k} \\
+    & = \sum_{k=1}^{m} u_{k} (r_{k1} b_{1} + \cdots + r_{kn} b_{n}) \\
+    & = \sum_{j=1}^{n} (u_{1} r_{1j} + \cdots + u_{m} r_{mj}) b_{j}
+\end{align*}
+Since each \(u_{k}\) comes from the ideal \(I\), the absorbing property of
+ideals guarantees that \(u_{k} r_{k j}\) is also contained in \(I\). As ideals
+are also closed under addition, it follows that \(u_{1} r_{1j} + \cdots +
+u_{m} r_{m j}\) are all elements of \(I\). Thus, \(x\) can be written as a
+linear combination of the basis vectors with the coefficients coming from
+\(I\).
+
+For the proof of Nakayama's lemma, it too follows the standard, informal
+mathematical argument. Do induction on the number of vectors needed to generate
+the module \(M\). The base case where \(M\) is generated by 0 vectors is by
+definition true since an empty linear combination is conventionally taken to be
+the zero vector. The inductive case where \(M\) is generated by the vectors
+\(b_{1}, \dots, b_{m}, b_{m+1}\). By assumption \(M = \mathfrak{m} M\) with
+\(b_{1}\in M\). Then \(b_{1}\in\mathfrak{m} M\) meaning that by our lemma,
+there exists a linear combination for \(b_{1}\), say
+\[b_{1} = u_{1} b_{1} + \cdots + u_{m+1} b_{m+1}\]
+for some \(u_{1}, \dots, u_{m+1}\in\mathfrak{m}\). Collect the \(b_{1}\) terms
+on the left-hand side of the equation to get that
+\[(1 - u_{1}) b_{1} = u_{2} b_{2} + \cdots + u_{m+1} b_{m+1}\text{.}\]
+As mentioned when defining maximal ideals, \(\mathfrak{m}\) can only contain
+non-units. Namely, \(u_{1}\) must be a non-unit. Then we had already proven
+that \(1 - u_{1}\) is a unit as we are in a local ring. Let \(v_{1}\) be the
+multiplicative inverse of \(1 - u_{1}\), and multiply it on both sides of the
+equation.
+\begin{align*}
+  v_{1} (1 - u_{1}) b_{1}
+    & = v_{1} u_{2} b_{2} + \cdots + v_{1} u_{m+1} b_{m+1} \\
+  1 b_{1} & = \\
+  b_{1} & = v_{1} u_{2} b_{2} + \cdots + v_{1} u_{m+1} b_{m+1} \\
+\end{align*}
+We have thus found that one of the basis vectors is not needed to generate this
+module. Using the induction hypothesis, we have that \(M = 0\). Showing that
+the induction hypothesis holds in Coq takes more work than in an informal
+proof, but this extra work is just a lot of bookkeeping.
 \end{document}
