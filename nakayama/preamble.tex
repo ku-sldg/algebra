@@ -1,0 +1,93 @@
+\usepackage[colorlinks=true,pagebackref,hyperindex,citecolor=myblue,linkcolor=mygreen]{hyperref}
+\usepackage[top=1in, bottom=1in, left=1.25in, right=1.25in]{geometry}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+%\definecolor{myblue}{rgb}{0.16, 0.32, 0.75}
+\definecolor{myblue}{rgb}{0.0, 0.45, 0.73}
+\definecolor{mygreen}{rgb}{0.05, 0.5, 0.06}
+
+\usepackage{mathrsfs}
+\usepackage[mathcal]{euscript}
+\usepackage{mathtools}
+
+\usepackage{enumitem}
+
+\usepackage{float}
+\usepackage[center]{caption}
+
+%\usepackage{setspace}
+%\singlespacing
+%\onehalfspacing
+%\doublespacing
+%\setstretch{1.1}
+\parskip 0.1cm
+
+
+%%%%%%%%%%%%%%%%%% Clever Ref %%%%%%%%%%%%%%%%%%
+\usepackage{cleveref}
+\crefname{equation}{Eq.}{Eqs.}
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{lemma}{Lemma}{Lemmata}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{definition}{Definition}{Definitions}
+\crefname{rem}{Remark}{Remarks}
+\crefname{example}{Example}{Examples}
+\crefname{conventions}{Conventions}{Conventions}
+\crefname{setup}{Setup}{Setup}
+\crefname{question}{Question}{Question}
+\crefname{figure}{Figure}{Figures}
+
+
+%THEOREM ENVIRONMENTS
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\newtheorem*{maintheorem*}{Main Theorem}
+
+
+%DEFINITION STYLE ENVIRONMENTS
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition-theorem}[theorem]{Definition/Theorem}
+\newtheorem{setup}[theorem]{Setup}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{conventions}[theorem]{Conventions}
+\newtheorem{example}[theorem]{Example}
+
+%REMARK STYLE ENVIRONMENTS 
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{convention}{Convention}
+
+\numberwithin{equation}{section} %Can replace {subsection} with {theorem} if you want
+\numberwithin{figure}{theorem} %Can replace {subsection} with {theorem} if you want
+
+%%%%%%%%
+
+%\newcommand{\pagebreak}{\newpage}
+\renewcommand{\pagebreak}{ }
+
+
+\mathchardef\ordinarycolon\mathcode`\:
+\mathcode`\:=\string"8000
+\begingroup \catcode`\:=\active
+  \gdef:{\mathrel{\mathop\ordinarycolon}}
+\endgroup
+
+%%%%%%%%%%%%%%%%%% To-Do %%%%%%%%%%%%%%%%%%
+\usepackage[textwidth=2.5 cm,textsize=small,shadow,
+%disable
+%%option disable removes the notes
+]{todonotes}
+\newcommand{\drew}[2][]
+{\todo[linecolor=green,backgroundcolor=green!10,caption={}, #1]{#2}}
+\newcommand{\emily}[2][]
+{\todo[linecolor=gray,backgroundcolor=purple!20,caption={}, #1]{#2}}
