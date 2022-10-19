@@ -5,7 +5,7 @@
 \usepackage{mathtools}
 \usepackage{minted}
 
-\newtheorem*{theorem}{Theorem}
+\input{preamble.tex}
 
 \begin{document}
 
@@ -13,6 +13,59 @@
 % Formalizing algebra => crypto
 % Interesting steps of the proof
 % ssreflect still looks to only deal with finite/discrete objects
+
+
+
+\title{Formalizing Theoretical Commutative Algebra in Coq: \\ Nakayama's Lemma}
+
+%\thanks{}
+\date{}
+
+%\author{}
+%\address{}
+%\email{}
+
+\maketitle
+
+
+%\begin{abstract}
+%	Abstract here
+%\end{abstract}
+
+
+
+\section{Introduction}
+
+A number of structures from abstract algebra have been formalized using the proof assistant Coq \cite{the_coq_development_team_2019_3476303}.  
+That said, for higher-level algebra, there currently appears to be a computational emphasis. 
+For instance, the commutative-algebraic notion of a Gr\"obner basis, a special type of generating set for an ideal in a ring of polynomials, and which has cryptographic applications, has gathered significant attention (e.g., see \cite{thery-buchberger}).
+
+The mathematical field of commutative algebra not only has further applications to cryptography, but also in other areas of science and technology such as data science and the study of the human genome.
+Commutative algebra stems from the study of polynomial equations, and now centers around commutative rings--rings whose multiplication satisfies the commutative law, ideals of these rings, and modules over them.  It has powerful connections with other areas of theoretical mathematics including number theory and algebraic geometry.
+
+We create a formal proof of Nakayama's lemma, a classical theorem in commutative algebra, in Coq. 
+%
+% ``lemma'' appearing in its name 
+%\footnote{},
+%
+In doing so, we formalize, from scratch, certain algebraic structures that are essential to higher-level algebra, including local rings and modules over commutative rings. 
+%
+The notion of a module over a ring is an extension of the linear-algebraic notion of a vector space over a field, ubiquitous in mathematics and its applications. 
+Nakayama's lemma exhibits one way that a finitely generated module over a commutative ring behaves like a vector space over a field.
+
+
+
+
+\begin{nak*}
+Let $R$ be a commutative local ring with maximal ideal $\mathfrak{m}$, and suppose that $M$ is a finitely generated $R$-module.  If $M = \mathfrak{m} M$, then $M = 0$.
+\end{nak*}
+
+
+\section{Mathematical Basis and Motivation}
+
+
+
+\section{Formalization}
 
 We started by defining a semigroup class, which declares a binary operation to
 be associative. From here, we build up through monoids, which introduce
@@ -255,4 +308,12 @@ We have thus found that one of the basis vectors is not needed to generate this
 module. Using the induction hypothesis, we have that \(M = 0\). Showing that
 the induction hypothesis holds in Coq takes more work than in an informal
 proof, but this extra work is just a lot of bookkeeping.
+
+
+
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+
 \end{document}
