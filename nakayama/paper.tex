@@ -37,14 +37,19 @@ Theoretical Commutative Algebra in Coq: \\ Nakayama's Lemma}
 
 \section{Introduction}
 
-A number of structures from abstract algebra have been formalized using the proof assistant Coq \cite{the_coq_development_team_2019_3476303}.  
-That said, there currently appears to be a computational emphasis with regard to higher-level algebra, with more formalization of discrete objects and algorithmic processes rather than the verification of more abstract theorems.   
-For instance, the commutative-algebraic notion of a Gr\"obner basis, a special type of generating set for an ideal in a ring of polynomials, and which has cryptographic applications, has gathered significant attention (e.g., see \cite{thery-buchberger}).
+The mathematical field of \emph{commutative algebra} stems from the study of solutions to polynomial equations, and now centers around \emph{commutative rings}, i.e., rings whose multiplication satisfies the commutative law, \emph{ideals} of these rings, and \emph{modules} over them. 
+Commutative algebra has broad applications to science and technology, including in the field of robotics, and the study of the human genome.
+The commutative-algebraic notion of a Gr\"obner basis, a special type of generating set for an ideal in a ring of polynomials, has become a fundamental computational tool in 
+coding theory and cryptography (e.g., see  \cite{grobner-bases-cryptography}).
+A implementation of Buchberger's algorithm \cite{buchberger} for determining 
+Gr\'obner bases of ideals in polynomial rings has been proved correct within the proof assistant Coq \cite{the_coq_development_team_2019_3476303,thery-buchberger}, and an integrated formal development of the algorithm in Coq has also been carried out \cite{persson2001integrated} (see also \cite{grobner-type-theory}). 
 
-The mathematical field of commutative algebra not only has further applications to cryptography, but also in other areas of science and technology such as data science, and the study of the human genome.
-The field stems from the study of polynomial equations, and now centers around commutative rings, i.e., those whose multiplication satisfies the commutative law, along with ideals of these rings, and modules over them.  Commutative algebra has meaningful connections with other areas of theoretical mathematics, including number theory and algebraic geometry.
+In a more theoretical direction, 
+we formally prove \emph{Nakayama's lemma} \cite{nakayama-1951, azumaya}, a fundamental theorem in the field of commutative algebra, in Coq.  
 
-We construct a formal proof of \emph{Nakayama's lemma} \cite{nakayama-1951, azumaya}, a fundamental theorem in the field of commutative algebra, in Coq. 
+
+
+
 Sometimes also called the Krull-Azumaya theorem\footnote{Hideyuki Matsumura explains in his text \emph{Commutative Algebra} \cite{matsumura}:  \emph{This simple but important lemma is due to T.\ Nakayama, G.\ Azumaya
 and W.\ Krull. Priority is obscure, and although it is usually called the Lemma of Nakayama, late Prof.\ 
 Nakayama did not like the name.}}  \cite{nagata}, Nakayama's lemma is typically introduced in a first graduate course in commutative algebra \cite{atiyah-macdonald, matsumura, eisenbud}, and is applied widely in the field.   
