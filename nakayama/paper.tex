@@ -29,10 +29,13 @@ Theoretical Commutative Algebra in Coq: \\ Nakayama's Lemma}
 \maketitle
 
 
-%\begin{abstract}
-%	Abstract here
-%\end{abstract}
+\begin{abstract}
+\emily[inline]{	Abstract here }
+\end{abstract}
 
+
+\emily[inline]{Any suggested changes to the current title are welcome.  Moreover, different fields have different standards for style, etc., so feel free to update prose/citations as appropriate. }
+\emily[inline]{Add link to github for code?}
 
 
 \section{Introduction}
@@ -44,36 +47,49 @@ coding theory and cryptography (e.g., see  \cite{grobner-bases-cryptography}).
 A implementation of Buchberger's algorithm \cite{buchberger} for determining 
 Gr\'obner bases of ideals in polynomial rings has been proved correct within the proof assistant Coq \cite{the_coq_development_team_2019_3476303,thery-buchberger}, and an integrated formal development of the algorithm in Coq has also been carried out \cite{persson2001integrated} (see also \cite{grobner-type-theory}). 
 
-In a more theoretical direction, 
-we formally prove \emph{Nakayama's lemma} \cite{nakayama-1951, azumaya}, a fundamental theorem in the field of commutative algebra, in Coq.  
+Our goal is to newly formalize theoretical, rather than computational, commutative algebra in Coq.  We formally prove \emph{Nakayama's lemma} \cite{nakayama-1951, azumaya}, a fundamental theorem in the field. 
+In the process of doing so,  we formalize certain algebraic structures  essential to higher-level algebra, including \emph{local rings} and \emph{modules over commutative rings}. 
 
+The notion of a module over a ring is an extension of the linear-algebraic notion of a vector space over a field, ubiquitous in mathematics and its applications. 
+Less frequently referred to as the \emph{Krull-Azumaya theorem}\footnote{Hideyuki Matsumura explains in his text \emph{Commutative Algebra} \cite{matsumura}:  ``{This simple but important lemma is due to T.\ Nakayama, G.\ Azumaya
+and W.\ Krull. Priority is obscure, and although it is usually called the Lemma of Nakayama, late Prof.\  Nakayama did not like the name.''}}\,\cite{nagata}, Nakayama's lemma 
+describes one way that a finitely generated module over an arbitrary commutative ring acts like a vector space over a field.  
+True to the convention that ``lemma'' often refers to a result serving as a stepping stone toward another goal, Nakayama's lemma is applied widely throughout the field, and the result is typically introduced in a first graduate course in commutative algebra \cite{atiyah-macdonald, matsumura, eisenbud}.   
 
-
-
-Sometimes also called the Krull-Azumaya theorem\footnote{Hideyuki Matsumura explains in his text \emph{Commutative Algebra} \cite{matsumura}:  \emph{This simple but important lemma is due to T.\ Nakayama, G.\ Azumaya
-and W.\ Krull. Priority is obscure, and although it is usually called the Lemma of Nakayama, late Prof.\ 
-Nakayama did not like the name.}}  \cite{nagata}, Nakayama's lemma is typically introduced in a first graduate course in commutative algebra \cite{atiyah-macdonald, matsumura, eisenbud}, and is applied widely in the field.   
-%It is widely applied throughout algebra. %, true to the convention that ``lemma'' often refers to a result serving as a stepping stone toward another.  However, Nakayama's lemma 
+%It is widely applied throughout algebra. %, true to .  However, Nakayama's lemma 
 %is also an important result in its own right, and can be thought of as one of the fundamental theorems of 
 %commutative algebra, not unlike the fundamental theorems of calculus describing the inverse relationship between derivatives and integrals or the fundamental theorem of arithmetic that makes precise the notion of unique factorization. 
 %, or the fundamental theorem of algebra (or \emph{d'Alembert's theorem}) on the roots of complex polynomials.  
 
-In order to prove Nakayama's lemma,  we formalize certain algebraic structures that are essential to higher-level algebra, including \emph{local rings} and \emph{modules over commutative rings}. 
-%
-The notion of a module over a ring is an extension of the linear-algebraic notion of a vector space over a field, ubiquitous in mathematics and its applications. 
-Nakayama's lemma exhibits one way that a finitely generated module over a commutative ring behaves like a vector space over a field.
 
 
-\emily[inline]{Add link to github for code?}
 
 
 \section{Mathematical basis and motivation}
 
+In abstract algebra, the quintessential example of a \emph{commutative ring} is the collection of all integers \[\mathbb{Z} = \{ \ldots, -3, 2, -1, 0, 1, 2, 3, \ldots \}\]
+One can add or multiply any two integers to obtain another, both of these binary operations satisfy the associative and commutative laws, and the distributive law governing their compatibility holds. 
+
+
+
+
+
+In general, a ring is a set $R$ with two binary operations, which we call \emph{addition} and \emph{mutiplication}, typically denoted $\cdot$ and $+$, respectively.  Under addition, $R$ must be an abelian group, meaning that addition satisfies the associative and commutative laws, and $R$ must contain an additive identity and negatives, i.e., there exists an element $0 \in R$ such that for all $r \in R$,  $r+0 = r$  and there exists an element denoted $-r$ in $R$ for which $r + (-r) = 0$.
+Moreover, multiplication must satisfy the associative law, and the distributive law on the compatibility of addition and multiplication must hold, i.e., for all $r, s, t \in R$, $r \cdot (s+t) = (r \cdot s)  + (r \cdot t)$ and $(r+s)\cdot t = (r \cdot t) + (s \cdot t)$. 
+
+%$R$ must have an multiplicative identity, an element $1 \in R$ such that $1 \cdot r = r \cdot 1 = r$ for every $r \in R$, .  Finally, the 
+
+The  
+
+An \emph{ideal} of commutative ring $R$ is a subset $I$ of $R$ that is itself 
+ 
 
 \begin{nak*}
 Let $R$ be a commutative local ring with maximal ideal $\mathfrak{m}$, and suppose that $M$ is a finitely generated $R$-module.  If $M = \mathfrak{m} M$, then $M = 0$.
 \end{nak*}
 
+
+\emily[inline]{Add description of alternate statements of Nakayama.}
 
 \section{Formalization}
 
