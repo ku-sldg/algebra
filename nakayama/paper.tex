@@ -16,15 +16,30 @@
 
 
 
-\title{%Formalizing 
-Theoretical Commutative Algebra in Coq: \\ Nakayama's Lemma}
+\title{ 
+Formal Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code for this work is available on the following site: \url{https://github.com/ku-sldg/algebra}}
+}
 
-%\thanks{}
+
 \date{}
 
 %\author{}
-%\address{}
+\author{ 
+	
+	Authors 
+	
+	\vspace{.2cm}
+		
+	\\ 
+	
+	Institute for Information Sciences \\
+	The University of Kansas \\
+	Lawrence, KS 66045}
 %\email{}
+
+%\thanks{Witt acknowledges support from NSF CAREER Award DMS-1945611 and the 2022-23 Ruth I.\, Michler Memorial Prize from the Association for Women in Mathematics.}
+
+
 
 \maketitle
 
@@ -33,19 +48,25 @@ Theoretical Commutative Algebra in Coq: \\ Nakayama's Lemma}
 \emily[inline]{	Abstract here }
 \end{abstract}
 
-
-\emily[inline]{Any suggested changes to the current title are welcome.  Moreover, different fields have different standards for style, etc., so feel free to update prose/citations as appropriate. }
-\emily[inline]{Add link to github for code?}
+\noindent \textbf{Keywords:}
+Formalization of Mathematics,
+Formal Proof,
+Commutative Algebra,
+Commutative Ring,
+Ideal,
+Module over a Ring. 
 
 
 \section{Introduction}
 
-The mathematical field of \emph{commutative algebra} stems from the study of solutions to polynomial equations, and now centers around \emph{commutative rings}, i.e., rings whose multiplication satisfies the commutative law, \emph{ideals} of these rings, and \emph{modules} over them. 
-Commutative algebra has broad applications to science and technology, including in the field of robotics, and the study of the human genome.
+The mathematical field of \emph{commutative algebra} stems from the study of solutions to polynomial equations.  Research in the field now centers around \emph{commutative rings}--rings in which order does not affect multiplication, i.e., $x \cdot y = y \cdot x$ for any ring elements $x$ and $y$--and fundamental algebraic objects associated to them:  \emph{ideals} of these rings, and \emph{modules} over them. 
+Commutative algebra has deep connections with other areas of theoretical mathematics, including number theory and algebraic geometry. 
+
+Commutative algebra also has broad applications to science and technology.  For instance, it has been integral to advances in robotics \cite{cox-little-oshea}, and has helped form our current understanding of the human genome \cite{genetic-algebra}. 
 The commutative-algebraic notion of a Gr\"obner basis, a special type of generating set for an ideal in a ring of polynomials, has become a fundamental computational tool in 
 coding theory and cryptography (e.g., see  \cite{grobner-bases-cryptography}).
 A implementation of Buchberger's algorithm \cite{buchberger} for determining 
-Gr\'obner bases of ideals in polynomial rings has been proved correct within the proof assistant Coq \cite{the_coq_development_team_2019_3476303,thery-buchberger}, and an integrated formal development of the algorithm in Coq has also been carried out \cite{persson2001integrated} (see also \cite{grobner-type-theory}). 
+Gr\"obner bases of ideals in polynomial rings has been proved correct within the proof assistant Coq \cite{the_coq_development_team_2019_3476303,thery-buchberger}, and an integrated formal development of the algorithm in Coq has also been carried out \cite{persson2001integrated} (see also \cite{grobner-type-theory}). 
 
 Our goal is to newly formalize theoretical, rather than computational, commutative algebra in Coq.  We formally prove \emph{Nakayama's lemma} \cite{nakayama-1951, azumaya}, a fundamental theorem in the field. 
 In the process of doing so,  we formalize certain algebraic structures  essential to higher-level algebra, including \emph{local rings} and \emph{modules over commutative rings}. 
@@ -65,24 +86,56 @@ True to the convention that ``lemma'' often refers to a result serving as a step
 
 
 
-\section{Mathematical basis and motivation}
+\section{Mathematical Basis and Motivation}
 
-In abstract algebra, the quintessential example of a \emph{commutative ring} is the collection of all integers \[\mathbb{Z} = \{ \ldots, -3, 2, -1, 0, 1, 2, 3, \ldots \}\]
-One can add or multiply any two integers to obtain another, both of these binary operations satisfy the associative and commutative laws, and the distributive law governing their compatibility holds. 
+\subsection{The Fundamental Algebraic Objects}
+
+\emily[inline]{Something about building up a lot}
+
+\paragraph{Commutative rings.}
+In abstract algebra, the quintessential example of a commutative ring is the set of integers
+\[\mathbb{Z} = \{ \ldots, -3, -2, -1, 0, 1, 2, 3, \ldots \}.\]
+using the natural definitions of addition and multiplication.  
+
+Adding two integers produces another, and the associative and commutative laws hold for addition.  The integers form an \emph{abelian group} under addition since $0 \in \mathbb{Z}$ is the \emph{additive identity} in the sense that adding zero has no effect on any integer, and given any integer $n$, the integer $-n$ is its \emph{additive inverse} in the sense that the sum of $n$ and $-n$ is the additive identity $0$. 
+
+The set of integers also forms a \emph{ring} because it is closed under multiplication, which again satisfies associativity, and the distributive law governing the compatibility of addition and multiplication holds. 
+Even more, the integers form a 
+\emph{commutative ring} since $n \cdot m = m \cdot n$ for all integers $n$ and $m$.  Moreover,  the integer $1$ is the ring's \emph{multiplicative identity}, since for any  $n \in \mathbb{Z}$ one has $n \cdot 1 = 1 \cdot n = n$, $\mathbb{Z}$ is, furthermore, a \emph{commutative ring with identity}. 
+
+In general, a \emph{ring} is a set $R$ with two binary operations, which we call \emph{addition} and \emph{mutiplication}, typically denoted $\cdot$ and $+$, respectively.  As motivated by the properties of the ring of integers, addition, $R$ must be an abelian group, multiplication must be associative, and the distributive law must hold, i.e., for all $x, y, z \in R$, $(x+y)\cdot z = x \cdot z + y \cdot z$ and $x \cdot (y+z) = x \cdot y + x \cdot z$.   
 
 
 
+\emily[inline]{Quickly mention familiar examples}
 
+We will use $0$ to refer to an additive identity, and $1$ will represent a multiplicative identity.
 
-In general, a ring is a set $R$ with two binary operations, which we call \emph{addition} and \emph{mutiplication}, typically denoted $\cdot$ and $+$, respectively.  Under addition, $R$ must be an abelian group, meaning that addition satisfies the associative and commutative laws, and $R$ must contain an additive identity and negatives, i.e., there exists an element $0 \in R$ such that for all $r \in R$,  $r+0 = r$  and there exists an element denoted $-r$ in $R$ for which $r + (-r) = 0$.
-Moreover, multiplication must satisfy the associative law, and the distributive law on the compatibility of addition and multiplication must hold, i.e., for all $r, s, t \in R$, $r \cdot (s+t) = (r \cdot s)  + (r \cdot t)$ and $(r+s)\cdot t = (r \cdot t) + (s \cdot t)$. 
+Rather than call upon the \emph{Mathematical Components Library} 
+ for Coq \cite{mathcomp}
 
-%$R$ must have an multiplicative identity, an element $1 \in R$ such that $1 \cdot r = r \cdot 1 = r$ for every $r \in R$, .  Finally, the 
-
-The  
-
+\paragraph{Ideals.}
+The concept of an {ideal} of a ring can be thought of as an extension of the notion of an integer $x$ in the ring of integers $\mathbb{Z}$. 
 An \emph{ideal} of commutative ring $R$ is a subset $I$ of $R$ that is itself 
- 
+an abelian group under addition,  
+which satisfies the following ``absorption'' property: Given any element $a$ of $I$, 
+the product  $x \cdot a$ is again in $I$ for any ring element $x \in R$. 
+
+One can verify that given any integer $n$, the set $n\mathbb{Z}$ of its multiples forms an ideal of $\mathbb{Z}$.  For instance, $2 \mathbb{Z}$ consists of all even numbers, and is an abelian group under addition: the sum of two even numbers is even, the additive identity $0$ is eve, and the negative of an even number is even.
+Moreover, the absorption property holds since the product of any integer and an even number is again even. 
+In fact, every ideal of the ring of integers has this form $n\mathbb{Z}$ for some integer $n$, though ideals in general commutative rings can have more complicated properties. 
+
+Since every integer $n$ can be written as $1 \cdot n$, the ideal $1 \mathbb{Z}$ is the entire ring $\mathbb{Z}$.   One can see that given a commutative ring $R$ itself satisfies the axioms required to be an ideal of $R$.  We call an ideal $I$ of $R$ \emph{proper} if it is strictly contained in $R$.  Every commutative ring with unity contains the proper ideal consisting solely of the additive identity $0$. 
+
+A \emph{maximal ideal} of a commutative ring is a proper ideal that is maximal with respect to inclusion, i.e., no other proper ideal strictly contains it. 
+Going back to the ring of integers, $6 \mathbb{Z} \subsetneq 2 \mathbb{Z}$ since every multiple of $6$ is even, 
+so $6 \mathbb{Z}$ is not a maximal ideal of $\mathbb{Z}$. 
+However, no proper ideal $I$ contains $2 \mathbb{Z}$:  If $2 \mathbb{Z}\subsetneq I \subsetneq \mathbb{Z}$, then $I$  would necessarily contain an odd number $n$.  Writing $n=2k+1$ for some integer $k$, we notice that since $-2k = 2 \cdot -k$  is in $2\mathbb{Z}$, it is also an element of the larger set $I$, and since $I$ is an abelian group under addition, $(2k+1) + $
+
+In fact, $3 \mathbb{Z}$
+
+
+\subsection{Nakayama's Lemma, Informally}
 
 \begin{nak*}
 Let $R$ be a commutative local ring with maximal ideal $\mathfrak{m}$, and suppose that $M$ is a finitely generated $R$-module.  If $M = \mathfrak{m} M$, then $M = 0$.
@@ -91,7 +144,10 @@ Let $R$ be a commutative local ring with maximal ideal $\mathfrak{m}$, and suppo
 
 \emily[inline]{Add description of alternate statements of Nakayama.}
 
+
 \section{Formalization}
+
+\subsection{Our Algebraic Hierarchy}
 
 We started by defining a semigroup class, which declares a binary operation to
 be associative. From here, we build up through monoids, which introduce
@@ -278,6 +334,9 @@ and coefficients from \(I\). This can be easily shown to be a submodule of
 The \verb|Forall P coeffs| ensures that every element of the coefficient list
 \texttt{coeffs} satisfies the predicate \texttt{P}. From here, we can move to
 stating Nakayama's lemma.
+
+\section{Formally Proving Nakayama's Lemma}
+
 
 \begin{theorem}[Nakayama's lemma]
   Let \(M\) be a finitely generated module over a local ring \(R\) with maximal
