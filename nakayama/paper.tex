@@ -25,16 +25,15 @@ Formal Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code for th
 
 %\author{}
 \author{ 
-	
-	Authors 
-	
-	\vspace{.2cm}
-		
+	Authors  
+%	
+	\vspace{.2cm}		
 	\\ 
-	
+%	
 	Institute for Information Sciences \\
 	The University of Kansas \\
-	Lawrence, KS 66045}
+	Lawrence, KS 66045
+	}
 %\email{}
 
 %\thanks{Witt acknowledges support from NSF CAREER Award DMS-1945611 and the 2022-23 Ruth I.\, Michler Memorial Prize from the Association for Women in Mathematics.}
@@ -45,7 +44,7 @@ Formal Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code for th
 
 
 \begin{abstract}
-\emily[inline]{	Abstract here }
+\emily[inline]{Abstract here }
 \end{abstract}
 
 \noindent \textbf{Keywords:}
@@ -53,8 +52,10 @@ Formalization of Mathematics,
 Formal Proof,
 Commutative Algebra,
 Commutative Ring,
+Local Ring,
 Ideal,
-Module over a Ring. 
+Module over a Ring,
+Finitely Generated Module. 
 
 
 \section{Introduction}
@@ -68,9 +69,14 @@ coding theory and cryptography (e.g., see  \cite{grobner-bases-cryptography}).
 A implementation of Buchberger's algorithm \cite{buchberger} for determining 
 Gr\"obner bases of ideals in polynomial rings has been proved correct within the proof assistant Coq \cite{the_coq_development_team_2019_3476303,thery-buchberger}, and an integrated formal development of the algorithm in Coq has also been carried out \cite{persson2001integrated} (see also \cite{grobner-type-theory}). 
 
-Our goal is to newly formalize theoretical, rather than computational, commutative algebra in Coq.  We formally prove \emph{Nakayama's lemma} \cite{nakayama-1951, azumaya}, a fundamental theorem in the field. 
-In the process of doing so,  we formalize certain algebraic structures  essential to higher-level algebra, including \emph{local rings} and \emph{modules over commutative rings}. 
-
+Our goal is to newly formalize theoretical, rather than computational, commutative algebra in Coq. 
+We formally prove \emph{Nakayama's lemma} \cite{nakayama-1951, azumaya}, an essential result in the field. 
+In doing so, we formalize algebraic structures that are fundamental to higher-level algebra, such as 
+\emph{local rings} and \emph{(finitely generated) modules over commutative rings}. 
+Rather than build upon some of the basic objects from abstract algebra, such as groups and rings, that have been formalized in Coq, e.g., in the  
+\emph{Mathematical Components Library} 
+\cite{mathcomp}, we start from scratch. 
+ 
 The notion of a module over a ring is an extension of the linear-algebraic notion of a vector space over a field, ubiquitous in mathematics and its applications. 
 Less frequently referred to as the \emph{Krull-Azumaya theorem}\footnote{Hideyuki Matsumura explains in his text \emph{Commutative Algebra} \cite{matsumura}:  ``{This simple but important lemma is due to T.\ Nakayama, G.\ Azumaya
 and W.\ Krull. Priority is obscure, and although it is usually called the Lemma of Nakayama, late Prof.\  Nakayama did not like the name.''}}\,\cite{nagata}, Nakayama's lemma 
@@ -88,9 +94,9 @@ True to the convention that ``lemma'' often refers to a result serving as a step
 
 \section{Mathematical Basis and Motivation}
 
-\subsection{The Fundamental Algebraic Objects}
+\subsection{The Fundamental Algebraic Structures}
 
-\emily[inline]{Something about building up a lot}
+Here, we touch upon the mathematical structures from commutative algebra that are formalized.
 
 \paragraph{Commutative rings.}
 In abstract algebra, the quintessential example of a commutative ring is the set of integers
@@ -99,20 +105,16 @@ using the natural definitions of addition and multiplication.
 
 Adding two integers produces another, and the associative and commutative laws hold for addition.  The integers form an \emph{abelian group} under addition since $0 \in \mathbb{Z}$ is the \emph{additive identity} in the sense that adding zero has no effect on any integer, and given any integer $n$, the integer $-n$ is its \emph{additive inverse} in the sense that the sum of $n$ and $-n$ is the additive identity $0$. 
 
-The set of integers also forms a \emph{ring} because it is closed under multiplication, which again satisfies associativity, and the distributive law governing the compatibility of addition and multiplication holds. 
+The set of integers also forms a \emph{ring} due to its properties of multiplication.  
+It is closed under this binary operation, which satisfies associativity.  
+The integer $1$ is a   \emph{multiplicative identity} since for any  $n \in \mathbb{Z}$ one has $n \cdot 1 = 1 \cdot n = n$.  Finally, the the distributive law governing the compatibility of addition and multiplication holds. 
 Even more, the integers form a 
-\emph{commutative ring} since $n \cdot m = m \cdot n$ for all integers $n$ and $m$.  Moreover,  the integer $1$ is the ring's \emph{multiplicative identity}, since for any  $n \in \mathbb{Z}$ one has $n \cdot 1 = 1 \cdot n = n$, $\mathbb{Z}$ is, furthermore, a \emph{commutative ring with identity}. 
+\emph{commutative ring} since $n \cdot m = m \cdot n$ for all integers $n$ and $m$.  
 
-In general, a \emph{ring} is a set $R$ with two binary operations, which we call \emph{addition} and \emph{mutiplication}, typically denoted $\cdot$ and $+$, respectively.  As motivated by the properties of the ring of integers, addition, $R$ must be an abelian group, multiplication must be associative, and the distributive law must hold, i.e., for all $x, y, z \in R$, $(x+y)\cdot z = x \cdot z + y \cdot z$ and $x \cdot (y+z) = x \cdot y + x \cdot z$.   
+In general, a commutative ring is a set $R$ with two binary operations, which we call \emph{addition} and \emph{mutiplication}, typically denoted $\cdot$ and $+$, respectively.  As motivated by the properties of the ring of integers, addition, $R$ must be an abelian group, multiplication must be associative, $R$ must have a multiplicative identity, and the distributive law must hold, i.e., for all $r, s, t \in R$, $(r+s)\cdot t = r \cdot t + s \cdot t$ and $r \cdot (s+t) = r \cdot s + r \cdot t$.   
 
+Other familiar examples of commutative rings include the integers modulo a fixed integer $n>0$, fields--commutative rings in which every nonzero element has a multiplicative inverse--such as the rings of rational numbers, real numbers, and complex numbers, and rings of polynomials in a variable $x$ with integer coefficients, or with coefficients in a field.
 
-
-\emily[inline]{Quickly mention familiar examples}
-
-We will use $0$ to refer to an additive identity, and $1$ will represent a multiplicative identity.
-
-Rather than call upon the \emph{Mathematical Components Library} 
- for Coq \cite{mathcomp}
 
 \paragraph{Ideals.}
 The concept of an {ideal} of a ring can be thought of as an extension of the notion of an integer $x$ in the ring of integers $\mathbb{Z}$. 
@@ -121,21 +123,55 @@ an abelian group under addition,
 which satisfies the following ``absorption'' property: Given any element $a$ of $I$, 
 the product  $x \cdot a$ is again in $I$ for any ring element $x \in R$. 
 
-One can verify that given any integer $n$, the set $n\mathbb{Z}$ of its multiples forms an ideal of $\mathbb{Z}$.  For instance, $2 \mathbb{Z}$ consists of all even numbers, and is an abelian group under addition: the sum of two even numbers is even, the additive identity $0$ is eve, and the negative of an even number is even.
+One can verify that given any integer $n$, the set $n\mathbb{Z}$ of its multiples forms an ideal of $\mathbb{Z}$.  For instance, $2 \mathbb{Z}$ consists of all even numbers, and is an abelian group under addition: the sum of two even numbers is even, the additive identity $0$ is even, and the negative of an even number is even.
 Moreover, the absorption property holds since the product of any integer and an even number is again even. 
 In fact, every ideal of the ring of integers has this form $n\mathbb{Z}$ for some integer $n$, though ideals in general commutative rings can have more complicated properties. 
 
 Since every integer $n$ can be written as $1 \cdot n$, the ideal $1 \mathbb{Z}$ is the entire ring $\mathbb{Z}$.   One can see that given a commutative ring $R$ itself satisfies the axioms required to be an ideal of $R$.  We call an ideal $I$ of $R$ \emph{proper} if it is strictly contained in $R$.  Every commutative ring with unity contains the proper ideal consisting solely of the additive identity $0$. 
 
 A \emph{maximal ideal} of a commutative ring is a proper ideal that is maximal with respect to inclusion, i.e., no other proper ideal strictly contains it. 
-Going back to the ring of integers, $6 \mathbb{Z} \subsetneq 2 \mathbb{Z}$ since every multiple of $6$ is even, 
+Returning to our example of the ring of integers, $6 \mathbb{Z} \subsetneq 2 \mathbb{Z}$ since every multiple of $6$ is even, 
 so $6 \mathbb{Z}$ is not a maximal ideal of $\mathbb{Z}$. 
-However, no proper ideal $I$ contains $2 \mathbb{Z}$:  If $2 \mathbb{Z}\subsetneq I \subsetneq \mathbb{Z}$, then $I$  would necessarily contain an odd number $n$.  Writing $n=2k+1$ for some integer $k$, we notice that since $-2k = 2 \cdot -k$  is in $2\mathbb{Z}$, it is also an element of the larger set $I$, and since $I$ is an abelian group under addition, $(2k+1) + $
+However, no proper ideal $I$ contains $2 \mathbb{Z}$:  If $2 \mathbb{Z}\subsetneq I \subsetneq \mathbb{Z}$, then $I$  would necessarily contain an odd number $n$.  Writing $n=2k+1$ for some integer $k$, we notice that since $-2k$ is in $2\mathbb{Z}$, it is also an element of the larger set $I$, and since $I$ is an abelian group under addition, $(2k+1) + (-2k) = 1$ is also in the ideal $I$. 
+However, in this case, every integer $n = n \cdot 1$ is in $I$ by absorption, so $I = \mathbb{Z}$ is not a proper ideal, a contradiction. 
 
-In fact, $3 \mathbb{Z}$
+In fact, $3 \mathbb{Z}$ is the only other maximal ideal of $\mathbb{Z}$ containing $6 \mathbb{Z}$, and in general, the prime ideals in the ring of integers besides the zero ideal are those of the form $p \mathbb{Z}$, where $p$ a prime number. 
+ 
+A commutative ring is \emph{local} if it has exactly one maximal ideal.  
+Every field is local since the only proper ideal of a field is the zero ideal. 
+By our observations above, the ring of integers is not local. 
+However, the set of all rational numbers that can be written with an odd denominator does form a subring of all rational numbers, and its unique maximal ideal consists of the elements with even numerator; in fact, this ring is the so-called \emph{localization} of $\mathbb{Z}$ at the maximal ideal $2 \mathbb{Z}$.  
+The ring of polynomials over a field in a variable $x$ is not local, but the ring of all formal power series is local; its maximal ideal consists of the power series with no constant term. 
+The ring of integers modulo $n>1$ is local if and only if $n$ is a power of a prime number $p$,  in which case the unique maximal ideal consists of all multiples of $p$. 
+
+%Hence the ring of integers is not local, but 
+%the ring of integers modulo an integer $n>1$,  often denoted $\mathbb{Z}/n\mathbb{Z}$ or $\mathbb{Z}_n$, are local 
+
+\paragraph{A module over a commutative ring.}  Let  $R$ be a commutative ring. 
+A \emph{module over $R$}, or \emph{$R$-module}, is an abelian group $M$ under a binary operation $+$, and a {scalar multiplication} $R \times M \to M$ denoted $\cdot$, satisfying the following compatibility properties for all $r, s \in R$ and $u, v \in M$.
+
+\begin{enumerate}[leftmargin=2cm,topsep=0cm,itemsep=0cm]
+\item  $r \cdot (u + v)  = r \cdot u + r \cdot v$
+\item $(r+s) \cdot u = r \cdot u + s \cdot u$
+\item $(rs) \cdot u = r \cdot (s \cdot u)$
+\item $1 \cdot u = u$ 
+\end{enumerate}
+
+From this definition, one can see that a module over a field $F$ is precisely an $F$-vector space, so the notion of a module over an arbitrary commutative ring extends that of a vector space over a field. 
+Finitely generated vector spaces form the foundation for matrix algebra, and the extension of this notion to module theory is needed to state Nakayama's Lemma.  We call an $R$-module $M$ \emph{finitely generated} if there exist a fixed finite number of elements $u_1, \ldots, u_n$ of $M$ with the following property:  Given any  $w \in M$, there exist $r_1, \ldots, r_n \in R$ for which  
+\[
+w = r_1 u_1 + r_1 u_2 + \cdots + r_n u_n.
+\]
+When $R=F$ is a field and $M=V$ is a finite-dimensional vector space over $F$, one can choose $u_1, \ldots, u_n$ to be a basis for $V$, i.e., $n = \dim V$.  In this case, the choice of scalar coefficients in the expression above for $w \in V$ is unique.  When $R$ is not a field, modules can have more subtle properties, and such expression is typically not unique. 
+
 
 
 \subsection{Nakayama's Lemma, Informally}
+
+In order to state Nakayama's Lemma, we clarify some notation:  If $I$ is an ideal of a commutative ring $R$ and 
+ $M$ is an $R$-module, then $IM$ is the set of elements of the form 
+	$a_1 u_1 + a_2 u_2 + \cdots + a_k u_k$, where $a_1, \ldots, a_k \in I$ and $u_1, \ldots, u_k \in M$.  
+Notice that by the absorption property of ideals, $IM$ is an $R$-module contained in $M$. 	
 
 \begin{nak*}
 Let $R$ be a commutative local ring with maximal ideal $\mathfrak{m}$, and suppose that $M$ is a finitely generated $R$-module.  If $M = \mathfrak{m} M$, then $M = 0$.
