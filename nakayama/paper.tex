@@ -17,7 +17,7 @@
 
 
 \title{ 
-Formal Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code for this work is available on the following site: \url{https://github.com/ku-sldg/algebra}}
+Formalizing Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code for this work is available on the following site: \url{https://github.com/ku-sldg/algebra}}
 }
 
 
@@ -25,26 +25,32 @@ Formal Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code for th
 
 %\author{}
 \author{ 
-	Authors  
-%	
-	\vspace{.2cm}		
-	\\ 
-%	
+	Andrew Cousino \\ {\tt acousino@ku.edu}
+	\and 
+	Emily E.\ Witt \\ {\tt witt@ku.edu}	
+	\and 
+	Perry Alexander \\ {\tt palexand@ku.edu}
+}	
+	%	
+	
+\maketitle	
+
+\vspace{-.3cm}
+
+{\large
+\begin{center}
 	Institute for Information Sciences \\
 	The University of Kansas \\
 	Lawrence, KS 66045
-	}
-%\email{}
+\end{center}
+}
 
 %\thanks{Witt acknowledges support from NSF CAREER Award DMS-1945611 and the 2022-23 Ruth I.\, Michler Memorial Prize from the Association for Women in Mathematics.}
 
-
-
-\maketitle
-
+\todo[inline]{To do:  Add to/alter author list, title, and/or abstract as necessary}
 
 \begin{abstract}
-\emily[inline]{Abstract here }
+We describe our formal proof of Nakayama's Lemma, a fundamental theorem in the mathematical field of commutative algebra. The statement and proof of this result involve several commutative-algebraic structures including commutative rings, ideals of these rings, and modules over them, and we also explain our process of formalizing these structures. 
 \end{abstract}
 
 \noindent \textbf{Keywords:}
@@ -75,7 +81,8 @@ In doing so, we formalize algebraic structures that are fundamental to higher-le
 \emph{local rings} and \emph{(finitely generated) modules over commutative rings}. 
 Rather than build upon some of the basic objects from abstract algebra, such as groups and rings, that have been formalized in Coq, e.g., in the  
 \emph{Mathematical Components Library} 
-\cite{mathcomp}, we start from scratch. 
+\cite{mathcomp}, we start from scratch. \todo{To do: Verify whether MathComp only formalized finite algebraic structures}
+ The theory, including the formalization of all algebraic structures, is approximately  $100$ kB and \textcolor{red}{??}\todo{To do:  Add number} lines of code.
  
 The notion of a module over a ring is an extension of the linear-algebraic notion of a vector space over a field, ubiquitous in mathematics and its applications. 
 Less frequently referred to as the \emph{Krull-Azumaya theorem}\footnote{Hideyuki Matsumura explains in his text \emph{Commutative Algebra} \cite{matsumura}:  ``{This simple but important lemma is due to T.\ Nakayama, G.\ Azumaya
@@ -97,6 +104,8 @@ True to the convention that ``lemma'' often refers to a result serving as a step
 \subsection{The Fundamental Algebraic Structures}
 
 Here, we give a brief description of the major mathematical structures from commutative algebra that are relevant to Nakayama's Lemma.
+
+\emily[inline]{Emily: It might be more consistent to require a ring to contain $1$ in general, instead of adding this to the axioms of a commutative ring.  Perhaps we could do this in the code, and then here, without too much effort? }
 
 \paragraph{Commutative rings.}
 In abstract algebra, the quintessential example of a commutative ring is the set of integers
@@ -151,7 +160,7 @@ On the other hand, the set of all formal power series  in $x$ over $F$ is a loca
 \paragraph{A module over a commutative ring.}  Let  $R$ be a commutative ring. 
 A \emph{module over $R$}, or \emph{$R$-module}, is an abelian group $M$ under a binary operation $+$, and a {scalar multiplication} $R \times M \to M$ denoted $\cdot$, satisfying the following compatibility properties for all $r, s \in R$ and $u, v \in M$.
 
-\begin{enumerate}[leftmargin=2cm,topsep=0cm,itemsep=0cm]
+\begin{enumerate}[leftmargin=6cm,topsep=0cm,itemsep=0cm]
 \item  $r \cdot (u + v)  = r \cdot u + r \cdot v$
 \item $(r+s) \cdot u = r \cdot u + s \cdot u$
 \item $(rs) \cdot u = r \cdot (s \cdot u)$
@@ -169,16 +178,16 @@ When $R=F$ is a field and $M=V$ is a finite-dimensional vector space over $F$, o
 
 \subsection{Nakayama's Lemma, Informal Statement}
 
-In order to state Nakayama's Lemma, we explain some notation:  If $I$ is an ideal of a commutative ring $R$ and 
+In order to state Nakayama's Lemma, we first explain some notation:  If $I$ is an ideal of a commutative ring $R$ and 
  $M$ is an $R$-module, then $IM$ is the set of elements of the form 
 	$a_1 u_1 + a_2 u_2 + \cdots + a_k u_k$, where, for some positive integer $k$, $a_1, \ldots, a_k \in I$ and $u_1, \ldots, u_k \in M$.  
 Notice that due to the absorption property of ideals, $IM$ is an $R$-module contained in $M$. 	
 
-If an $R$-module $M$ consists of only one element, this element must be its additive identity $0$ as an abelian group under addition.  We use the notation $M=0$ in this case. 
+If an $R$-module $M$ consists of only one element, this element must be its additive identity $0$ as an abelian group under addition.  The notation $M=0$ means that we are in this situtation. 
 
 \begin{nak*}
 Let $R$ be a commutative local ring, and let $\mathfrak{m}$ denote its unique maximal ideal. 
-If $M$ is a finitely generated $R$-module and $M = \mathfrak{m} M$, then $M = 0$.
+If $M$ is a finitely generated $R$-module and $M = \mathfrak{m} M$, then $M = 0$. 
 \end{nak*}
 
 When $R=F$ is a field, its unique maximal ideal is the zero ideal, and given any vector space $M=V$ over $F$, the only linear combination of vectors with coefficients in the zero ideal is the zero vector. Hence in this special case, the hypothesis that  $M = \mathfrak{m} M$ is equivalent to the conclusion that $M=0$. 
@@ -187,12 +196,21 @@ Hence Nakayama's lemma describes one way that finitely generated modules over co
 In general, the quotient $R/\mathfrak{m}$ of a local ring modulo its maximal ideal $\mathfrak{m}$ is a field, and the quotient of a module $M$ modulo the submodule $\mathfrak{m}M$ is an $R/\mathfrak{m}$-module, i.e., $M/\mathfrak{m}M$ is a vector space over $R/\mathfrak{m}$. Nakayama's lemma implies that if $M$ is finitely generated, then bases for $M/\mathfrak{m}M$ corresponds, via lifting, to minimal sets of generators of 
 $M$. 
 
-There are several alternate statements of Nakayama's Lemma that remove the hypothesis that $R$ must be local.  One can replace the unique maximal ideal with the Jacobson radical of the ring, which is the intersection of all maximal ideals. Alternatively, $I$ is an arbitrary proper ideal of a commutative ring $R$ and  
+There are alternate statements of Nakayama's Lemma that remove the hypothesis that $R$ must be local.  One can replace the unique maximal ideal with the Jacobson radical of the ring, which is the intersection of all maximal ideals. Alternatively, $I$ is an arbitrary proper ideal of a commutative ring $R$ and  
  $M$ is a finitely generated $R$-module for which $M=I M$, then this ensures the existence of a ring element $r$ congruent to $1$ modulo $I$ such that $rM = 0$, i.e., $r u = 0$ for every $u \in M$. 
 
 \section{Formalization}
 
+We start by describing the process of formalization of algebraic structures, and with that in hand, then move on to the formal proof of Nakayama's lemma.  
+
 \subsection{Our Algebraic Hierarchy}
+
+\begin{figure}[t]
+\caption{The hierarchy of our algebraic structures}
+\includegraphics[width=.4\textwidth]{algebraic-structures.pdf}
+\centering
+\todo[inline]{To do:  Check source code to verify whether the hierarchy figure should be altered (subgroups/other subobjects, quotients, finitely generated modules, etc.)}
+\end{figure}
 
 We started by defining a semigroup class, which declares a binary operation to
 be associative. From here, we build up through monoids, which introduce
@@ -385,7 +403,7 @@ The \verb|Forall P coeffs| ensures that every element of the coefficient list
 \texttt{coeffs} satisfies the predicate \texttt{P}. From here, we can move to
 stating Nakayama's lemma.
 
-\section{Formal Proof of Nakayama's Lemma}
+\subsection{Formal Proof of Nakayama's Lemma}
 
 
 \begin{theorem}[Nakayama's lemma]
