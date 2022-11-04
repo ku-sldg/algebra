@@ -96,7 +96,7 @@ True to the convention that ``lemma'' often refers to a result serving as a step
 
 \subsection{The Fundamental Algebraic Structures}
 
-Here, we touch upon the mathematical structures from commutative algebra that are formalized.
+Here, we give a brief description of the major mathematical structures from commutative algebra that are relevant to Nakayama's Lemma.
 
 \paragraph{Commutative rings.}
 In abstract algebra, the quintessential example of a commutative ring is the set of integers
@@ -127,7 +127,7 @@ One can verify that given any integer $n$, the set $n\mathbb{Z}$ of its multiple
 Moreover, the absorption property holds since the product of any integer and an even number is again even. 
 In fact, every ideal of the ring of integers has this form $n\mathbb{Z}$ for some integer $n$, though ideals in general commutative rings can have more complicated properties. 
 
-Since every integer $n$ can be written as $1 \cdot n$, the ideal $1 \mathbb{Z}$ is the entire ring $\mathbb{Z}$.   One can see that given a commutative ring $R$ itself satisfies the axioms required to be an ideal of $R$.  We call an ideal $I$ of $R$ \emph{proper} if it is strictly contained in $R$.  Every commutative ring with unity contains the proper ideal consisting solely of the additive identity $0$. 
+Since every integer $n$ can be written as $1 \cdot n$, the ideal $1 \mathbb{Z}$ is the entire ring $\mathbb{Z}$.   One can see that given a commutative ring $R$ itself satisfies the axioms required to be an ideal of $R$.  We call an ideal $I$ of $R$ \emph{proper} if it is strictly contained in $R$.  The \emph{zero ideal} consisting solely of its additive identity is a proper ideal of any commutative ring. 
 
 A \emph{maximal ideal} of a commutative ring is a proper ideal that is maximal with respect to inclusion, i.e., no other proper ideal strictly contains it. 
 Returning to our example of the ring of integers, $6 \mathbb{Z} \subsetneq 2 \mathbb{Z}$ since every multiple of $6$ is even, 
@@ -138,11 +138,12 @@ However, in this case, every integer $n = n \cdot 1$ is in $I$ by absorption, so
 In fact, $3 \mathbb{Z}$ is the only other maximal ideal of $\mathbb{Z}$ containing $6 \mathbb{Z}$, and in general, the prime ideals in the ring of integers besides the zero ideal are those of the form $p \mathbb{Z}$, where $p$ a prime number. 
  
 A commutative ring is \emph{local} if it has exactly one maximal ideal.  
-Every field is local since the only proper ideal of a field is the zero ideal. 
-By our observations above, the ring of integers is not local. 
+Every field is local since the only proper ideal of a field is the zero ideal, though by our observations above, the ring of integers is not local. 
 However, the set of all rational numbers that can be written with an odd denominator does form a subring of all rational numbers, and its unique maximal ideal consists of the elements with even numerator; in fact, this ring is the so-called \emph{localization} of $\mathbb{Z}$ at the maximal ideal $2 \mathbb{Z}$.  
-The ring of polynomials over a field in a variable $x$ is not local, but the ring of all formal power series is local; its maximal ideal consists of the power series with no constant term. 
 The ring of integers modulo $n>1$ is local if and only if $n$ is a power of a prime number $p$,  in which case the unique maximal ideal consists of all multiples of $p$. 
+
+The ring of polynomials over a field $F$ in a variable $x$ is not local; in fact, given any irreducible polynomial $f(x)$, the set of its multiples is a maximal ideal of the polynomial ring $F[x]$.
+On the other hand , the ring of formal power series over $F$ in $x$  is local; its maximal ideal consists of the power series with no constant term. 
 
 %Hence the ring of integers is not local, but 
 %the ring of integers modulo an integer $n>1$,  often denoted $\mathbb{Z}/n\mathbb{Z}$ or $\mathbb{Z}_n$, are local 
@@ -166,20 +167,28 @@ When $R=F$ is a field and $M=V$ is a finite-dimensional vector space over $F$, o
 
 
 
-\subsection{Nakayama's Lemma, Informally}
+\subsection{Nakayama's Lemma, Informal Statement}
 
-In order to state Nakayama's Lemma, we clarify some notation:  If $I$ is an ideal of a commutative ring $R$ and 
+In order to state Nakayama's Lemma, we explain some notation:  If $I$ is an ideal of a commutative ring $R$ and 
  $M$ is an $R$-module, then $IM$ is the set of elements of the form 
-	$a_1 u_1 + a_2 u_2 + \cdots + a_k u_k$, where $a_1, \ldots, a_k \in I$ and $u_1, \ldots, u_k \in M$.  
-Notice that by the absorption property of ideals, $IM$ is an $R$-module contained in $M$. 	
+	$a_1 u_1 + a_2 u_2 + \cdots + a_k u_k$, where, for some positive integer $k$, $a_1, \ldots, a_k \in I$ and $u_1, \ldots, u_k \in M$.  
+Notice that due to the absorption property of ideals, $IM$ is an $R$-module contained in $M$. 	
+
+If an $R$-module $M$ consists of only one element, this element must be its additive identity $0$ as an abelian group under addition.  We use the notation $M=0$ in this case. 
 
 \begin{nak*}
-Let $R$ be a commutative local ring with maximal ideal $\mathfrak{m}$, and suppose that $M$ is a finitely generated $R$-module.  If $M = \mathfrak{m} M$, then $M = 0$.
+Let $R$ be a commutative local ring, and let $\mathfrak{m}$ denote its unique maximal ideal. 
+If $M$ is a finitely generated $R$-module and $M = \mathfrak{m} M$, then $M = 0$.
 \end{nak*}
 
+When $R=F$ is a field, its unique maximal ideal is the zero ideal, and given any vector space $M=V$ over $F$, the only linear combination of vectors with coefficients in the zero ideal is the zero vector. Hence in this special case, the hypothesis that  $M = \mathfrak{m} M$ is equivalent to the conclusion that $M=0$. 
+Hence Nakayama's lemma describes one way that finitely generated modules over commutative local rings are similar to vector spaces. 
 
-\emily[inline]{Add description of alternate statements of Nakayama.}
+In general, the quotient $R/\mathfrak{m}$ of a local ring modulo its maximal ideal $\mathfrak{m}$ is a field, and the quotient of a module $M$ modulo the submodule $\mathfrak{m}M$ is an $R/\mathfrak{m}$-module, i.e., $M/\mathfrak{m}M$ is a vector space over $R/\mathfrak{m}$. Nakayama's lemma implies that if $M$ is finitely generated, then bases for $M/\mathfrak{m}M$ corresponds, via lifting, to minimal sets of generators of 
+$M$. 
 
+There are several alternate statements of Nakayama's Lemma that remove the hypothesis that $R$ must be local.  One can replace the unique maximal ideal with the Jacobson radical of the ring, which is the intersection of all maximal ideals. Alternatively, $I$ is an arbitrary proper ideal of a commutative ring $R$ and  
+ $M$ is a finitely generated $R$-module for which $M=I M$, then this ensures the existence of a ring element $r$ congruent to $1$ modulo $I$ such that $rM = 0$, i.e., $r u = 0$ for every $u \in M$. 
 
 \section{Formalization}
 
