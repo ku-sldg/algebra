@@ -106,10 +106,10 @@ using the natural definitions of addition and multiplication.
 Adding two integers produces another, and the associative and commutative laws hold for addition.  The integers form an \emph{abelian group} under addition since $0 \in \mathbb{Z}$ is the \emph{additive identity} in the sense that adding zero has no effect on any integer, and given any integer $n$, the integer $-n$ is its \emph{additive inverse} in the sense that the sum of $n$ and $-n$ is the additive identity $0$. 
 
 The set of integers also forms a \emph{ring} due to its properties of multiplication.  
-It is closed under this binary operation, which satisfies associativity.  
-The integer $1$ is a   \emph{multiplicative identity} since for any  $n \in \mathbb{Z}$ one has $n \cdot 1 = 1 \cdot n = n$.  Finally, the the distributive law governing the compatibility of addition and multiplication holds. 
-Even more, the integers form a 
-\emph{commutative ring} since $n \cdot m = m \cdot n$ for all integers $n$ and $m$.  
+It is closed under this binary operation, which satisfies associativity, and the distributive law governing the compatibility of addition and multiplication holds. 
+Even more, the integers form a \emph{commutative ring} 
+ since $n \cdot m = m \cdot n$ for all integers $n$ and $m$.  We require commutative rings to contain a \emph{multiplicative identity}, and $1 \in \mathbb{Z}$ is such an element since 
+   $n \in \mathbb{Z}$ one has $n \cdot 1 = 1 \cdot n = n$. 
 
 In general, a commutative ring is a set $R$ with two binary operations, which we call \emph{addition} and \emph{mutiplication}, typically denoted $\cdot$ and $+$, respectively.  As motivated by the properties of the ring of integers, addition, $R$ must be an abelian group, multiplication must be associative, $R$ must have a multiplicative identity, and the distributive law must hold, i.e., for all $r, s, t \in R$, $(r+s)\cdot t = r \cdot t + s \cdot t$ and $r \cdot (s+t) = r \cdot s + r \cdot t$.   
 
@@ -143,7 +143,7 @@ However, the set of all rational numbers that can be written with an odd denomin
 The ring of integers modulo $n>1$ is local if and only if $n$ is a power of a prime number $p$,  in which case the unique maximal ideal consists of all multiples of $p$. 
 
 The ring of polynomials over a field $F$ in a variable $x$ is not local; in fact, given any irreducible polynomial $f(x)$, the set of its multiples is a maximal ideal of the polynomial ring $F[x]$.
-On the other hand , the ring of formal power series over $F$ in $x$  is local; its maximal ideal consists of the power series with no constant term. 
+On the other hand, the set of all formal power series  in $x$ over $F$ is a local ring; its maximal ideal consists of the power series with no constant term. 
 
 %Hence the ring of integers is not local, but 
 %the ring of integers modulo an integer $n>1$,  often denoted $\mathbb{Z}/n\mathbb{Z}$ or $\mathbb{Z}_n$, are local 
@@ -196,10 +196,10 @@ There are several alternate statements of Nakayama's Lemma that remove the hypot
 
 We started by defining a semigroup class, which declares a binary operation to
 be associative. From here, we build up through monoids, which introduce
-identities, to groups, which introduce inverses. Note the double equals in
+identities, to groups, which introduce inverses. Note the double equals ``$==$'' in
 these definitions is notation for an arbitrary equivalence relation over the
-group's carrier set which acts as equality.
-% \begin{verbatim}
+group's carrier set, which acts as equality.
+
 \begin{minted}{coq}
   Infix "==" := equiv (at level 60, no associativity).
   Class Semigroup := {
@@ -222,18 +222,19 @@ group's carrier set which acts as equality.
       forall (a: Carrier), a <o> inv a == ident;
   }.
 \end{minted}
-% \end{verbatim}
-The lines like \verb|monoid_semigroup :> Semigroup equiv op;| simply coerce
+The lines of the form, e.g.,  ``\verb|monoid_semigroup :> Semigroup equiv op;|'' simply coerce
 the monoid typeclass into a semigroup.
 
-While we found later on that we did not need quotients, it is worth remarking
-that we got quotients working rather nicely in Coq using typeclasses. An
-algebraic quotient are an equivalence relation on the algebraic structure which
-preserve that structure. For example, quotient groups are formed by taking a
-subgroup and making every element of that subgroup equivalent to the identity.
-With \texttt{P} being the predicate for the subgroup, there are two ways to
+%While we found later on that we did not need quotients, 
+While in the end, our formal proof did not call upon quotients of algebraic structures, quotient rings and quotient modules are fundamental to commutative algebra, and one can use them to construct alternate proofs of Nakayama's lemma.
+It is worth pointing out that we have formalized quotients of algebraic objects  in Coq using typeclasses, which appear to work rather nicely. 
+
+An algebraic quotient is, roughly, the set of equivalence classes of an algebraic structure with respect to an equivalence relation on its elements, for which the set of equivalence classes inherit the same kind of algebraic structure. 
+For example, consider the quotient of a group modulo a subgroup, i.e. a subset of elements of the group that it itself a group under the group operations. 
+Under equivalence relation on the group, every element of the subgroup must be in the same equivalence class as the identity.  
+With \texttt{P} the predicate for the subgroup, there are two ways to
 make an equivalence relation from this description.
-% \begin{verbatim}
+
 \begin{minted}{coq}
   Definition left_congru (a b: Carrier) :=
     P (inv a <o> b).
@@ -241,8 +242,8 @@ make an equivalence relation from this description.
     P (a <o> inv b).
 \end{minted}
 % \end{verbatim}
-When these two relations coincide, then we can prove that the equivalence
-relation(s) actually preserve the group structure. Subgroups which have this
+When these two relations coincide, then we can prove that this common equivalence
+relation actually preserves the group structure. Subgroups which have this
 property are called \emph{normal subgroups}.
 % \begin{verbatim}
 \begin{minted}{coq}
@@ -255,23 +256,27 @@ property are called \emph{normal subgroups}.
     normal_subgroup_congru_coincide ->
     Group (left_congru op inv P) op ident inv.
 \end{minted}
-% \end{verbatim}
 
-It is because of quotients that we used equivalence relations to define the
-components of group structure. If we were to use the regular Leibniz equality,
-this would make it very difficult to say that a quotient group is another
-group. But by having the definition of a group depend upon an arbitrary
-equivalence relation, we enable our theory to state that a quotient group is
-simply a group with under a different equivalence. We didn't loose much as we
-could still rely upon Coq's setoid rewrite tactics. Setoids are types equipped
+The importance of quotients in commutative algebra motivates our use of equivalence relations to define the
+components of a group structure. 
+If one were to instead use the regular Leibniz equality,
+it would be very difficult to identify a quotient group with another
+group. 
+However, by  defining a group in terms of an arbitrary equivalence relation, we enable our theory to state that a quotient group is
+simply a group under a different equivalence. 
+Not much is lost,  as Coq's setoid rewrite tactics can still be called upon; 
+a setoid is a type equipped
 with an equivalence relation.
 
-Moving onwards, we then defined structures for rings, which have two binary
-operations: a commutative plus \(+\) and a non-commutative times \(\cdot\), and
-structures for commutative rings, where multiplication is commutative and has
-an identity. Here we define \emph{ideals} which are normal subgroups under
-addition and are absorbing with regards to multiplication, i.e. \(r a\) is in
-the ideal whenever \(a\) is in the ideal and \(r\) is any element of the ring.
+Moving onward, we formalized the structure of a ring, which has two binary
+operations:
+addition, which must be commutative, and multiplication, which need not be commutative in general.
+Next we defined the structure of a commutative ring, further requiring commutativity of multiplication, as well as a multiplicative identity. 
+At this point,, we define {ideals} of commutative rings as normal subgroups of the ring under
+addition that satisfy the absorption property under multiplication, i.e., \(r a\) is in
+the ideal for every element \(a\) of the ideal, and every element \(r\) of the commutative ring.
+
+
 Again, we defined quotient rings but found them unnecessary in the end. Note
 that should an ideal \(I\) contain a unit, an element \(x\) with a
 multiplicative inverse \(x^{-1}\), then \(I\) would be the entire ring by the
@@ -380,7 +385,7 @@ The \verb|Forall P coeffs| ensures that every element of the coefficient list
 \texttt{coeffs} satisfies the predicate \texttt{P}. From here, we can move to
 stating Nakayama's lemma.
 
-\section{Formally Proving Nakayama's Lemma}
+\section{Formal Proof of Nakayama's Lemma}
 
 
 \begin{theorem}[Nakayama's lemma]
