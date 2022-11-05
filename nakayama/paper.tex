@@ -359,11 +359,14 @@ a non-unit in any local ring. The proof used the rule \(\neg\neg P\rightarrow
 P\) in order to do a proof by contradiction.
 
 The next structure defined was a module over a commutative ring, the commutative-algebraic generalization of the notion of a vector
-spaces over a fields,.  Here we needed to capture the notion of linear combinations of
+space over a field.  
+
+Toward proving 
+Here we needed to formalize the notion of linear combinations of
 coefficients and module vectors. This was done by dependently typed vectors,
 i.e. lists parameterized by their length. Because there is an overload of the
 term ``vector'', we will use that term to refer to module vectors, and use the
-term ``list'' to mean length parameterized lists. As we don't use the simpler
+term ``list'' to mean length-parameterized lists. As we don't use the simpler
 kind of lists, this avoids any name collisions. A finitely generated module is
 like the vector space \(\mathbf{R}^{n}\) in that there are finitely many
 vectors which can generate all other vectors, for \(\mathbf{R}^{n}\) one such
