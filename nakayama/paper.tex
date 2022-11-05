@@ -35,7 +35,7 @@ Formalizing Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code f
 	
 \maketitle	
 
-\vspace{-.3cm}
+\vspace{-1cm}
 
 {\large
 \begin{center}
@@ -76,7 +76,7 @@ A implementation of Buchberger's algorithm \cite{buchberger} for determining
 Gr\"obner bases of ideals in polynomial rings has been proved correct within the proof assistant Coq \cite{the_coq_development_team_2019_3476303,thery-buchberger}, and an integrated formal development of the algorithm in Coq has also been carried out \cite{persson2001integrated} (see also \cite{grobner-type-theory}). 
 
 Our goal is to newly formalize theoretical, rather than computational, commutative algebra in Coq. 
-We formally prove \emph{Nakayama's lemma} \cite{nakayama-1951, azumaya}, an essential result in the field. 
+We formally prove \emph{Nakayama's Lemma} \cite{nakayama-1951, azumaya}, an essential result in the field. 
 In doing so, we formalize algebraic structures that are fundamental to higher-level algebra, such as 
 \emph{local rings} and \emph{(finitely generated) modules over commutative rings}. 
 Rather than build upon some of the basic objects from abstract algebra, such as groups and rings, that have been formalized in Coq, e.g., in the  
@@ -86,9 +86,9 @@ Rather than build upon some of the basic objects from abstract algebra, such as 
  
 The notion of a module over a ring is an extension of the linear-algebraic notion of a vector space over a field, ubiquitous in mathematics and its applications. 
 Less frequently referred to as the \emph{Krull-Azumaya theorem}\footnote{Hideyuki Matsumura explains in his text \emph{Commutative Algebra} \cite{matsumura}:  ``{This simple but important lemma is due to T.\ Nakayama, G.\ Azumaya
-and W.\ Krull. Priority is obscure, and although it is usually called the Lemma of Nakayama, late Prof.\  Nakayama did not like the name.''}}\,\cite{nagata}, Nakayama's lemma 
+and W.\ Krull. Priority is obscure, and although it is usually called the Lemma of Nakayama, late Prof.\  Nakayama did not like the name.''}}\,\cite{nagata}, Nakayama's Lemma 
 describes one way that a finitely generated module over an arbitrary commutative ring acts like a vector space over a field.  
-True to the convention that ``lemma'' often refers to a result serving as a stepping stone toward another goal, Nakayama's lemma is applied widely throughout the field, and the result is typically introduced in a first graduate course in commutative algebra \cite{atiyah-macdonald, matsumura, eisenbud}.   
+True to the convention that ``lemma'' often refers to a result serving as a stepping stone toward another goal, Nakayama's Lemma is applied widely throughout the field, and the result is typically introduced in a first graduate course in commutative algebra \cite{atiyah-macdonald, matsumura, eisenbud}.   
 
 %It is widely applied throughout algebra. %, true to .  However, Nakayama's lemma 
 %is also an important result in its own right, and can be thought of as one of the fundamental theorems of 
@@ -191,9 +191,9 @@ If $M$ is a finitely generated $R$-module and $M = \mathfrak{m} M$, then $M = 0$
 \end{nak*}
 
 When $R=F$ is a field, its unique maximal ideal is the zero ideal, and given any vector space $M=V$ over $F$, the only linear combination of vectors with coefficients in the zero ideal is the zero vector. Hence in this special case, the hypothesis that  $M = \mathfrak{m} M$ is equivalent to the conclusion that $M=0$. 
-Hence Nakayama's lemma describes one way that finitely generated modules over commutative local rings are similar to vector spaces. 
+Hence Nakayama's Lemma describes one way that finitely generated modules over commutative local rings are similar to vector spaces. 
 
-In general, the quotient $R/\mathfrak{m}$ of a local ring modulo its maximal ideal $\mathfrak{m}$ is a field, and the quotient of a module $M$ modulo the submodule $\mathfrak{m}M$ is an $R/\mathfrak{m}$-module, i.e., $M/\mathfrak{m}M$ is a vector space over $R/\mathfrak{m}$. Nakayama's lemma implies that if $M$ is finitely generated, then bases for $M/\mathfrak{m}M$ corresponds, via lifting, to minimal sets of generators of 
+In general, the quotient $R/\mathfrak{m}$ of a local ring modulo its maximal ideal $\mathfrak{m}$ is a field, and the quotient of a module $M$ modulo the submodule $\mathfrak{m}M$ is an $R/\mathfrak{m}$-module, i.e., $M/\mathfrak{m}M$ is a vector space over $R/\mathfrak{m}$. Nakayama's Lemma implies that if $M$ is finitely generated, then bases for $M/\mathfrak{m}M$ corresponds, via lifting, to minimal sets of generators of 
 $M$. 
 
 There are alternate statements of Nakayama's Lemma that remove the hypothesis that $R$ must be local.  One can replace the unique maximal ideal with the Jacobson radical of the ring, which is the intersection of all maximal ideals. Alternatively, $I$ is an arbitrary proper ideal of a commutative ring $R$ and  
@@ -201,7 +201,7 @@ There are alternate statements of Nakayama's Lemma that remove the hypothesis th
 
 \section{Formalization}
 
-We start by describing the process of formalization of algebraic structures, and with that in hand, then move on to the formal proof of Nakayama's lemma.  
+We start by describing the process of formalization of algebraic structures, and with that in hand, then move on to the formal proof of Nakayama's Lemma.  
 
 \subsection{Our Algebraic Hierarchy}
 
@@ -240,11 +240,11 @@ group's carrier set, which acts as equality.
       forall (a: Carrier), a <o> inv a == ident;
   }.
 \end{minted}
-The lines of the form, e.g.,  ``\verb|monoid_semigroup :> Semigroup equiv op;|'' simply coerce
+The lines such as  ``\verb|monoid_semigroup :> Semigroup equiv op;|'' simply coerce
 the monoid typeclass into a semigroup.
 
 %While we found later on that we did not need quotients, 
-While in the end, our formal proof did not call upon quotients of algebraic structures, quotient rings and quotient modules are fundamental to commutative algebra, and one can use them to construct alternate proofs of Nakayama's lemma.
+While in the end, our formal proof did not call upon quotients of algebraic structures, quotient rings and quotient modules are fundamental to commutative algebra, and one can use them to construct alternate proofs of Nakayama's Lemma.
 It is worth pointing out that we have formalized quotients of algebraic objects  in Coq using typeclasses, which appear to work rather nicely. 
 
 An algebraic quotient is, roughly, the set of equivalence classes of an algebraic structure with respect to an equivalence relation on its elements, for which the set of equivalence classes inherit the same kind of algebraic structure. 
@@ -259,11 +259,11 @@ make an equivalence relation from this description.
   Definition right_congru (a b: Carrier) :=
     P (a <o> inv b).
 \end{minted}
-% \end{verbatim}
+
 When these two relations coincide, then we can prove that this common equivalence
 relation actually preserves the group structure. Subgroups which have this
 property are called \emph{normal subgroups}.
-% \begin{verbatim}
+
 \begin{minted}{coq}
   Let normal_subgroup_congru_coincide :=
     forall (a b: Carrier),
@@ -290,20 +290,23 @@ Moving onward, we formalized the structure of a ring, which has two binary
 operations:
 addition, which must be commutative, and multiplication, which need not be commutative in general.
 Next we defined the structure of a commutative ring, further requiring commutativity of multiplication, as well as a multiplicative identity. 
-At this point,, we define {ideals} of commutative rings as normal subgroups of the ring under
+At this point, we formalized the notion of an ideal of a commutative rings as a normal subgroup  \emily{Emily:  Drew, this is what I read when I mentioned  ideals as normal subgroups.  We should check if this should be rewritten}
+of the ring under
 addition that satisfy the absorption property under multiplication, i.e., \(r a\) is in
 the ideal for every element \(a\) of the ideal, and every element \(r\) of the commutative ring.
+We also defined quotient rings. 
 
-
-Again, we defined quotient rings but found them unnecessary in the end. Note
+Note
 that should an ideal \(I\) contain a unit, an element \(x\) with a
 multiplicative inverse \(x^{-1}\), then \(I\) would be the entire ring by the
 absorbing property: given any element \(a\) of the ring, then \(a x^{-1}\) is
-also in the ring, and \(a x^{-1} x = a 1 = a\in I\). Maximal ideals were
-defined next. These are ideals that are proper subsets of the ring while having
-no larger ideal except for the ring itself. Below is the definition in Coq,
+also in the ring, and \(a x^{-1} x = a 1 = a\in I\). 
+\todo{To do: Check whether we need this paragraph}
+
+Next, we formally defined maximal ideals.  Recall that a maximal ideal is a proper ideal that are maximal with respect to inclusion, i.e., if it is strictly contained in another ideal, this larger ideal must be the entire ring. 
+Below is the definition in Coq,
 which uses \texttt{P} as the predicate for the ideal.
-% \begin{verbatim}
+
 \begin{minted}{coq}
   Definition maximal_ideal :=
     exists (r: Carrier), (not (P r) /\
@@ -314,12 +317,12 @@ which uses \texttt{P} as the predicate for the ideal.
         (forall (r: Carrier), Q r) \/
           (forall (r: Carrier), Q r -> P r)).
 \end{minted}
-% \end{verbatim}
+
 Almost by definition, maximal ideals can contain no units, otherwise they would
-fail to be a proper subset of the ring. We could then define a local ring,
-which is a ring with a single maximal ideal.
-% \begin{verbatim}
-\begin{minted}{coq}
+fail to be a proper subset of the ring. \todo{To do:  Similar to above, do we need the first sentence here?}
+ Using the definition of a maximal ideal, we could then define a local ring, i.e., a commutative ring with a single maximal ideal.
+ 
+ \begin{minted}{coq}
   Definition local_ring :=
     exists (P: Carrier -> Prop)
         (P_proper: Proper (equiv ==> iff) P)
@@ -330,7 +333,6 @@ which is a ring with a single maximal ideal.
           (Q_ideal: Ideal add zero minus mul Q),
         maximal_ideal Q -> forall (r: Carrier), P r <-> Q r).
 \end{minted}
-% \end{verbatim}
 
 Here we had to include an axiom that in commutative ring, any non-unit \(x\) is
 contained in some maximal ideal. This was made into an axiom as the standard
@@ -358,8 +360,8 @@ Also, we used classical logic to prove that \(1 - x\) is a unit where \(x\) is
 a non-unit in any local ring. The proof used the rule \(\neg\neg P\rightarrow
 P\) in order to do a proof by contradiction.
 
-The next structure defined were modules over rings which generalize vector
-spaces over fields. We needed to capture the notion of linear combinations of
+The next structure defined was a module over a commutative ring, the commutative-algebraic generalization of the notion of a vector
+spaces over a fields,.  Here we needed to capture the notion of linear combinations of
 coefficients and module vectors. This was done by dependently typed vectors,
 i.e. lists parameterized by their length. Because there is an overload of the
 term ``vector'', we will use that term to refer to module vectors, and use the
@@ -383,9 +385,8 @@ are of type \texttt{A} and whose length is \texttt{n}.
 \end{minted}
 % \end{verbatim}
 
-Next, we defined the product of an ideal \(I\) and a module \(M\), denoted as
-\(I M\), which is defined to be all linear combinations of vectors from \(M\)
-and coefficients from \(I\). This can be easily shown to be a submodule of
+Next, given an ideal \(I\) of a commutative ring $R$ and and an $R$-module \(M\), 
+we defined the submodule $IM$, the set consisting of all scalar combinations of elements of \(M\) whose coefficients are in  \(I\). This can be easily shown to be a submodule of
 \(M\). We represented this in Coq as a predicate over \(M\).
 % \begin{verbatim}
 \begin{minted}{coq}
@@ -399,19 +400,19 @@ and coefficients from \(I\). This can be easily shown to be a submodule of
       x =M= linear_combin Madd Mzero action coeffs vectors.
 \end{minted}
 % \end{verbatim}
-The \verb|Forall P coeffs| ensures that every element of the coefficient list
-\texttt{coeffs} satisfies the predicate \texttt{P}. From here, we can move to
-stating Nakayama's lemma.
+The use of  ``\verb|Forall P coeffs|'' ensures that every element of the coefficient list
+\texttt{coeffs} satisfies the predicate \texttt{P}.  
 
 \subsection{Formal Proof of Nakayama's Lemma}
 
+Finally, we turn to our formal proof of Nakayama's Lemma, our ultimate goal.
 
-\begin{theorem}[Nakayama's lemma]
-  Let \(M\) be a finitely generated module over a local ring \(R\) with maximal
-  ideal \(\mathfrak{m}\). If \(\mathfrak{m} M = M\), then \(M = 0\), which is
-  to say that \(M\) is the zero module which consists of exactly one element,
-  that being the zero vector.
-\end{theorem}
+\begin{nak*}
+Let $R$ be a commutative local ring, and let $\mathfrak{m}$ denote its maximal ideal. 
+Suppose that $M$ is a finitely generated $R$-module. 
+If $M = \mathfrak{m} M$, then $M = 0$, i.e., $M$ must be the $R$-module containing only one element, its identity as an additive abelian group. 
+\end{nak*}
+
 
 We needed a lemma before moving on to prove the main theorem which states that
 for a finitely generated module \(M\) with a basis
@@ -434,7 +435,7 @@ u_{m} r_{m j}\) are all elements of \(I\). Thus, \(x\) can be written as a
 linear combination of the basis vectors with the coefficients coming from
 \(I\).
 
-For the proof of Nakayama's lemma, it too follows the standard, informal
+For the proof of Nakayama's Lemma, it too follows the standard, informal
 mathematical argument. Do induction on the number of vectors needed to generate
 the module \(M\). The base case where \(M\) is generated by 0 vectors is by
 definition true since an empty linear combination is conventionally taken to be
