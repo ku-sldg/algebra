@@ -10,8 +10,6 @@
 \begin{document}
 
 % Mention an attempt with modules
-% Formalizing algebra => crypto
-% Interesting steps of the proof
 % ssreflect still looks to only deal with finite/discrete objects
 
 
@@ -66,7 +64,7 @@ Finitely Generated Module.
 
 \section{Introduction}
 
-The mathematical field of \emph{commutative algebra} stems from the study of solutions to polynomial equations.  Research in the field now centers around \emph{commutative rings}--rings in which order does not affect multiplication, i.e., $x \cdot y = y \cdot x$ for any ring elements $x$ and $y$--and fundamental algebraic objects associated to them:  \emph{ideals} of these rings, and \emph{modules} over them. 
+The mathematical field of \emph{commutative algebra} stems from the study of solutions to polynomial equations.  Research in the field now centers around \emph{commutative rings}---rings in which order does not affect multiplication, i.e., $x \cdot y = y \cdot x$ for any ring elements $x$ and $y$---and fundamental algebraic objects associated to them:  \emph{ideals} of these rings, and \emph{modules} over them. 
 Commutative algebra has deep connections with other areas of theoretical mathematics, including number theory and algebraic geometry. 
 
 Commutative algebra also has broad applications to science and technology.  For instance, it has been integral to advances in robotics \cite{cox-little-oshea}, and has helped form our current understanding of the human genome \cite{genetic-algebra}. 
@@ -122,7 +120,7 @@ Even more, the integers form a \emph{commutative ring}
 
 In general, a commutative ring is a set $R$ with two binary operations, which we call \emph{addition} and \emph{mutiplication}, typically denoted $\cdot$ and $+$, respectively.  As motivated by the properties of the ring of integers, addition, $R$ must be an abelian group, multiplication must be associative, $R$ must have a multiplicative identity, and the distributive law must hold, i.e., for all $r, s, t \in R$, $(r+s)\cdot t = r \cdot t + s \cdot t$ and $r \cdot (s+t) = r \cdot s + r \cdot t$.   
 
-Other familiar examples of commutative rings include the integers modulo a fixed integer $n>0$, fields--commutative rings in which every nonzero element has a multiplicative inverse--such as the rings of rational numbers, real numbers, and complex numbers, and rings of polynomials in a variable $x$ with integer coefficients, or with coefficients in a field.
+Other familiar examples of commutative rings include the integers modulo a fixed integer $n>0$, fields---commutative rings in which every nonzero element has a multiplicative inverse---such as the rings of rational numbers, real numbers, and complex numbers, and rings of polynomials in a variable $x$ with integer coefficients, or with coefficients in a field.
 
 
 \paragraph{Ideals.}
@@ -404,8 +402,6 @@ The \verb|Forall P coeffs| ensures that every element of the coefficient list
 stating Nakayama's lemma.
 
 \subsection{Formal Proof of Nakayama's Lemma}
-
-
 \begin{theorem}[Nakayama's lemma]
   Let \(M\) be a finitely generated module over a local ring \(R\) with maximal
   ideal \(\mathfrak{m}\). If \(\mathfrak{m} M = M\), then \(M = 0\), which is
