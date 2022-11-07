@@ -292,20 +292,18 @@ Moving onward, we formalized the structure of a ring, which has two binary
 operations:
 addition, which must be commutative, and multiplication, which need not be commutative in general.
 Next we defined the structure of a commutative ring, further requiring commutativity of multiplication, as well as a multiplicative identity. 
-At this point, we formalized the notion of an ideal of a commutative rings as a normal subgroup  \emily{Emily:  Drew, this is what I read when I mentioned  ideals as normal subgroups.  We should check if this should be rewritten}
+At this point, we formalized the notion of an ideal of a commutative ring, a subgroup 
 of the ring under
-addition that satisfy the absorption property under multiplication, i.e., \(r a\) is in
+addition that satisfies the absorption property under multiplication, i.e., \(r a\) is in
 the ideal for every element \(a\) of the ideal, and every element \(r\) of the commutative ring.
-We also defined quotient rings. 
+We also used this to formalize the notion of a quotient ring $R/I$, where $I$ is an ideal of a commutative ring $R$.
 
-Note
-that should an ideal \(I\) contain a unit, an element \(x\) with a
-multiplicative inverse \(x^{-1}\), then \(I\) would be the entire ring by the
-absorbing property: given any element \(a\) of the ring, then \(a x^{-1}\) is
-also in the ring, and \(a x^{-1} x = a 1 = a\in I\). 
-\todo{To do: Check whether we need this paragraph}
+We proved that an ideal $I$ of a commutative rings that contains a unit, then it must be the entire ring.  A unit is 
+an element $x$ with a multiplicative inverse $x^{-1}$, i.e., the for which the product $x \cdot x^{-1}$ is the multiplicative identity $1$.  By the absorption property, since $x \in I$, we have that $x \cdot x^{-1} = 1 \in I$, and so for every element $r$ of $R$, $r = r \cdot 1$ is also in $I$, i.e., $I=R$. 
 
-Next, we formally defined maximal ideals.  Recall that a maximal ideal is a proper ideal that are maximal with respect to inclusion, i.e., if it is strictly contained in another ideal, this larger ideal must be the entire ring. 
+
+
+Next, we formally defined a maximal ideal, a proper ideal that are maximal with respect to inclusion, i.e., if it is strictly contained in another ideal, this larger ideal must be the entire ring. 
 Below is the definition in Coq,
 which uses \texttt{P} as the predicate for the ideal.
 
@@ -320,9 +318,7 @@ which uses \texttt{P} as the predicate for the ideal.
           (forall (r: Carrier), Q r -> P r)).
 \end{minted}
 
-Almost by definition, maximal ideals can contain no units, otherwise they would
-fail to be a proper subset of the ring. \todo{To do:  Similar to above, do we need the first sentence here?}
- Using the definition of a maximal ideal, we could then define a local ring, i.e., a commutative ring with a single maximal ideal.
+Using the definition of a maximal ideal, we then were able to define a local ring, i.e., a commutative ring with a single maximal ideal.
  
  \begin{minted}{coq}
   Definition local_ring :=
@@ -335,6 +331,9 @@ fail to be a proper subset of the ring. \todo{To do:  Similar to above, do we ne
           (Q_ideal: Ideal add zero minus mul Q),
         maximal_ideal Q -> forall (r: Carrier), P r <-> Q r).
 \end{minted}
+
+
+\emily[inline]{Emily:  I'm thinking this discussion could possibly be moved.  I'll think about it a bit more.}
 
 Here we had to include an axiom that in commutative ring, any non-unit \(x\) is
 contained in some maximal ideal. This was made into an axiom as the standard
@@ -369,7 +368,7 @@ P\) in order to do a proof by contradiction.
 We'll also need to update the code.  I think {\tt Vectors} should be something like {\tt ScalarCombinations}. 
 }
 
-Finally, we formalized the definition of a module over a commutative ring, the  commutative-algebraic generalization of the notion of a vector
+At this point we formalized the definition of a module over a commutative ring, the  commutative-algebraic generalization of the notion of a vector
 space over a field.  Nakayama's Lemma is a statement about finitely generated modules, and hence we must formalize the notion of a scalar combination of a fixed finite collection of elements $u_1, \ldots, u_n$ of an $R$-module $M$, i.e., expressions of the form  
 $r_1 u_1 + r_1 u_2 + \cdots + r_n u_n$, where each $r_i \in R$.
 
@@ -408,9 +407,8 @@ are of type \texttt{A} and whose length is \texttt{n}.
 
 
 Next, given an ideal \(I\) of a commutative ring $R$ and and an $R$-module \(M\), 
-we defined the submodule $IM$, the set consisting of all scalar combinations of elements of \(M\) whose coefficients are in  \(I\). This can be easily shown to be a submodule of
-\(M\). We represented this in Coq as a predicate over \(M\).
-% \begin{verbatim}
+we defined the submodule $IM$, the set consisting of all scalar combinations of elements of \(M\) whose coefficients are in  \(I\). We represented this in Coq as a predicate over \(M\).
+
 \begin{minted}{coq}
   Context (P: R -> Prop).
   Context {P_proper: Proper (Requiv ==> iff) P}.
@@ -421,11 +419,13 @@ we defined the submodule $IM$, the set consisting of all scalar combinations of 
       Forall P coeffs /\
       x =M= linear_combin Madd Mzero action coeffs vectors.
 \end{minted}
-% \end{verbatim}
+
 The use of  ``\verb|Forall P coeffs|'' ensures that every element of the coefficient list
 \texttt{coeffs} satisfies the predicate \texttt{P}.  
 
 \subsection{Formally Proving of Nakayama's Lemma}
+
+\emily[inline]{I think we need to include more code here!  There are a lot of pieces of formal proof that would be illustrative.}
 
 Finally, we turn to our formal proof of Nakayama's Lemma, our ultimate goal.
 
