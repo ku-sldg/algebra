@@ -25,8 +25,8 @@ Formalizing Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code f
 \author{ 
 	Andrew Cousino \\ {\ttfamily acousino@ku.edu}
 	\and 
-	Emily E.\ Witt \\ {\ttfamily witt@ku.edu}	
-	\and 
+	Emily E.\ Witt\thanks{Witt acknowledges support from NSF CAREER Award DMS-1945611 and the 2022-23 Ruth I.\, Michler Memorial Prize from the Association for Women in Mathematics.}
+ \\ {\ttfamily witt@ku.edu} \and 
 	Perry Alexander \\ {\ttfamily palexand@ku.edu}
 }	
 	%	
@@ -43,9 +43,8 @@ Formalizing Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code f
 \end{center}
 }
 
-%\thanks{Witt acknowledges support from NSF CAREER Award DMS-1945611 and the 2022-23 Ruth I.\, Michler Memorial Prize from the Association for Women in Mathematics.}
 
-\todo[inline]{To do:  Add to/alter author list, title, and/or abstract as necessary}
+\todo[inline]{To do:  Add to/alter author list, funding acknowledgments, title, and/or abstract as needed}
 
 \begin{abstract}
 We describe our formal proof of Nakayama's Lemma, a fundamental theorem in the mathematical field of commutative algebra. The statement and proof of this result involve several commutative-algebraic structures including commutative rings, ideals of these rings, and modules over them, and we also explain our process of formalizing these structures. 
@@ -76,11 +75,11 @@ Gr\"obner bases of ideals in polynomial rings has been proved correct within the
 Our goal is to newly formalize theoretical, rather than computational, commutative algebra in Coq. 
 We formally prove \emph{Nakayama's Lemma} \cite{nakayama-1951, azumaya}, an essential result in the field. 
 In doing so, we formalize algebraic structures that are fundamental to higher-level algebra, such as 
-\emph{local rings} and \emph{(finitely generated) modules over commutative rings}. 
+\emph{local rings} and \emph{modules over commutative rings}, and \emph{quotient rings and modules}.  
 Rather than build upon some of the basic objects from abstract algebra, such as groups and rings, that have been formalized in Coq, e.g., in the  
 \emph{Mathematical Components Library} 
 \cite{mathcomp}, we start from scratch. \todo{To do: Verify whether MathComp only formalized finite algebraic structures}
- The theory, including the formalization of all algebraic structures, is approximately  $100$ kB and \textcolor{red}{??}\todo{To do:  Add number} lines of code.
+ The theory, including the formalization of all algebraic structures, makes up approximately $100$ kB and 3300 lines of code.
  
 The notion of a module over a ring is an extension of the linear-algebraic notion of a vector space over a field, ubiquitous in mathematics and its applications. 
 Less frequently referred to as the \emph{Krull-Azumaya theorem}\footnote{Hideyuki Matsumura explains in his text \emph{Commutative Algebra} \cite{matsumura}:  ``{This simple but important lemma is due to T.\ Nakayama, G.\ Azumaya
@@ -103,7 +102,7 @@ True to the convention that ``lemma'' often refers to a result serving as a step
 
 Here, we give a brief description of the major mathematical structures from commutative algebra that are relevant to Nakayama's Lemma.
 
-\emily[inline]{Emily: It might be more consistent to require a ring to contain $1$ in general, instead of adding this to the axioms of a commutative ring. After thinking for a while, I think it is a good idea to make this change in the code, and then here to match.  Drew, does this sound OK?}
+\emily[inline]{Emily: It would be more consistent to require a ring to contain $1$ in general, instead of adding this to the axioms of a commutative ring.  After thinking for a while, I think it is a good idea to make this change in the code, and then here to match.  Drew, does this sound OK?}
 
 \paragraph{Commutative rings.}
 In abstract algebra, the quintessential example of a commutative ring is the set of integers
@@ -209,7 +208,7 @@ We start by describing our process of formalizing the required algebraic structu
 \caption{The hierarchy of our algebraic structures}
 \includegraphics[width=.4\textwidth]{algebraic-structures.pdf}
 \centering
-\todo[inline]{To do:  Check source code to verify whether the hierarchy figure should be altered (subobjects, quotients, finitely generated modules, local rings, etc.)}
+\todo[inline]{To do:  Double check source code to verify whether the hierarchy figure should be altered (subobjects, quotients, finitely generated modules, local rings, etc.)}
 \end{figure}
 
 Our foundation begins by defining a semigroup class, which declares a binary operation to
@@ -298,14 +297,13 @@ addition that satisfies the absorption property under multiplication, i.e., \(r 
 the ideal for every element \(a\) of the ideal, and every element \(r\) of the commutative ring.
 We also used this to formalize the notion of a quotient ring $R/I$, where $I$ is an ideal of a commutative ring $R$.
 
-We proved that an ideal $I$ of a commutative rings that contains a unit, then it must be the entire ring.  A unit is 
-an element $x$ with a multiplicative inverse $x^{-1}$, i.e., the for which the product $x \cdot x^{-1}$ is the multiplicative identity $1$.  By the absorption property, since $x \in I$, we have that $x \cdot x^{-1} = 1 \in I$, and so for every element $r$ of $R$, $r = r \cdot 1$ is also in $I$, i.e., $I=R$. 
 
 
-
+\emily[inline]{It would be nice to differentiate between our structures that are typeclasses (e.g., {\tt Ideal}), and other definitions (e.g., {\tt maximal ideal})}
 Next, we formally defined a maximal ideal, a proper ideal that are maximal with respect to inclusion, i.e., if it is strictly contained in another ideal, this larger ideal must be the entire ring. 
 Below is the definition in Coq,
 which uses \texttt{P} as the predicate for the ideal.
+
 
 \begin{minted}{coq}
   Definition maximal_ideal :=
@@ -332,40 +330,10 @@ Using the definition of a maximal ideal, we then were able to define a local rin
         maximal_ideal Q -> forall (r: Carrier), P r <-> Q r).
 \end{minted}
 
-
-\emily[inline]{Emily:  I'm thinking this discussion could possibly be moved.  I'll think about it a bit more.}
-
-Here we had to include an axiom that in commutative ring, any non-unit \(x\) is
-contained in some maximal ideal. This was made into an axiom as the standard
-mathematical argument is a proof with potentially infinitely many steps. The
-standard argument goes as follows.
-\begin{quote}
-    Set \(I_{1}\coloneqq (x)\) to be the principal ideal for \(x\), i.e. the
-    ideal generated by the single element \(x\). If \(I_{1}\) is not maximal,
-    then there exists a strictly larger ideal \(I_{2}\), i.e.
-    \(x\in I_{1}\subsetneq I_{2}\). If \(I_{2}\) is not maximal, then there
-    exists another strictly larger ideal \(I_{3}\). Continue these arguments
-    infinitely many times if necessary in order to get an infinite chain of
-    ideals containing \(x\).
-    \[x\in I_{1}\subsetneq I_{2}\subsetneq I_{3}\subsetneq\cdots\subsetneq R\]
-    It is a simple matter to show that \(\bigcup_{k=1}^{\infty} I_{k}\) is also
-    an ideal containing in \(x\). So by Zorn's lemma, there exists a maximal
-    ideal in \(R\) which contains \(x\).
-\end{quote}
-Zorn's lemma is equivalent to the axiom of choice. So we had to add at least
-one axiom here in order to proceed. By adding the axiom that we did, not only
-will we encapsulate an infinite argument, but we will also avoid the need for
-the axiom of choice.
-
-Also, we used classical logic to prove that \(1 - x\) is a unit where \(x\) is
-a non-unit in any local ring. The proof used the rule \(\neg\neg P\rightarrow
-P\) in order to do a proof by contradiction.
-
-
-\emily[inline]{Emily:  Unfortunately, I think we need to update naming conventions since in mathematics ``vector'' is reserved for an element of a vector space over a field, rather than an element of an arbitrary module, causing confusion.  Similar with ``basis,'' which is especially tricking since two different generating sets of a finitely generated module can have different sizes, but all bases of a vector space have the same cardinality, and an element of a module can typically be written as a scalar combination in multiple ways, while bases are linearly independent.  I've proposed a rewrite of the blue paragraph above it.  Drew, can you check it for accuracy with respect to the code? 
+\emily[inline]{Emily:  Unfortunately, I think we need to update naming conventions since in mathematics, ``vector'' is reserved for an element of a vector space over a field, rather than an element of an arbitrary module.  So this could cause confusion.  Similar with ``basis,'' which is especially tricking since two different generating sets of a finitely generated module can have different sizes, but all bases of a vector space have the same cardinality, and an element of a module can typically be written as a scalar combination in multiple ways, while bases are linearly independent.  I've proposed a rewrite of the blue paragraph right above it.  Drew, can you double check it for accuracy with respect to the code? 
 }
 \emily[inline]{
-We'll also need to update the code.  I think {\tt Vectors} should be something like {\tt ScalarCombinations}. 
+We'll also need to update the code.  I think {\tt vectors} should be something like {\tt scalar-combinations}, and {\tt basis} something like {\tt generating-set}. 
 }
 
 At this point we formalized the definition of a module over a commutative ring, the  commutative-algebraic generalization of the notion of a vector
@@ -423,9 +391,54 @@ we defined the submodule $IM$, the set consisting of all scalar combinations of 
 The use of  ``\verb|Forall P coeffs|'' ensures that every element of the coefficient list
 \texttt{coeffs} satisfies the predicate \texttt{P}.  
 
-\subsection{Formally Proving of Nakayama's Lemma}
+\subsection{Building the Formal Proof}
 
 \emily[inline]{I think we need to include more code here!  There are a lot of pieces of formal proof that would be illustrative.}
+
+
+Beyond formalizing the relevant structures from higher algebra, we also formally establish some basic theory. 
+For instance, a \emph{unit} of a commutative ring $R$ is an element $x \in R$ with a multiplicative inverse, i.e., an element $x^{-1} \in R$ for which $x \cdot x^{-1}$ is the multiplicative identity $1 \in R$.  
+ 
+We formally proved that an ideal $I$ of a commutative ring $R$ that contains a unit $x$, then $I$ must be the trivial ideal, i.e., the entire ring.  The informal logic is as follows:  By the absorption property, since $x \in I$, we have that $x \cdot x^{-1} = 1 \in I$.  Hence for every element $r$ of $R$, $r = r \cdot 1$ is also in $I$, i.e., $I=R$. 
+
+Every non-unit element of a commutative ring is contained in some maximal ideal. 
+This fact relies on the Axiom of Choice. 
+The following standard informal proof calls upon Zorn's lemma, which is equivalent to the Axiom of Choice, and says that given a partially ordered set $S$, if every chain in $S$ has an upper bound, then $S$ must have at least one maximal element. 
+
+\begin{quote}
+    Set \(I_{1}\) to be the principal ideal generated by an element \(x\) of a commutative ring $R$, i.e. the
+    smallest ideal containing the element $x$, which consists of all $R$-multiples of $x$. 
+   
+    If \(I_{1}\) is not a maximal ideal,
+    then there exists a strictly larger proper ideal \(I_{2}\) of $R$, i.e.
+    $x\in I_{1}\subsetneq I_{2} \subsetneq R$.
+    Moreover, if  \(I_{2}\) is not maximal, then there
+    exists a strictly larger proper ideal $I_{3} \supsetneq I_2$.
+    
+    Continuing this process, if it terminates at some step, we have found a maximal ideal, and if not, 
+    one obtains an infinite chain of
+    ideals containing \(x\).
+    \[x\in I_{1}\subsetneq I_{2}\subsetneq I_{3}\subsetneq\cdots\subsetneq R\]
+    
+    It is straightfoward to show that \(\bigcup_{k=1}^{\infty} I_{k}\) satisfies the definition of an ideal of $R$, 
+    and this union certainly contains \(x\). So by Zorn's lemma, since every ascending chain of ideals containing $x$ 
+    with respect to inclusion has its union as an upper bound, there exists a maximal
+    ideal of \(R\) containing \(x\).
+\end{quote}
+
+This argument has potentially infinitely many steps, 
+and chose to avoid this issue by including an axiom that in 
+ any non-unit \(x\) is
+contained in some maximal ideal. 
+
+\todo[inline]{Include some relevant code}
+
+We also used classical logic to prove that \(1 - x\) is a unit where \(x\) is
+a non-unit in any local ring. The proof used the rule \(\neg\neg P\rightarrow
+P\) in order to do a proof by contradiction.
+
+\todo[inline]{Include some relevant code}
+
 
 Finally, we turn to our formal proof of Nakayama's Lemma, our ultimate goal.
 
@@ -435,12 +448,18 @@ Suppose that $M$ is a finitely generated $R$-module.
 If $M = \mathfrak{m} M$, then $M = 0$, i.e., $M$ must be the $R$-module containing only one element, its identity as an additive abelian group. 
 \end{nak*}
 
+
+
+
+
+
 We needed a lemma before moving on to prove the main theorem which states that
-for a finitely generated module \(M\) with a basis
-\(b_{1}, b_{2}, \dots, b_{n}\), any element \(x\in I M\) where \(I\) is an
-ideal can be written as a linear combination of the basis vectors with
-coefficients coming from \(I\). The proof of this lemma is straightforward and
-follows the standard, informal mathematical argument which inductively goes
+for a finitely generated $R$-module \(M\) with generating set\emily{Changed ``basis'' to ``generating set'' here}
+\(u_{1}, u_{2}, \dots, u_{n}\), any element \(x\in I M\), where \(I\) is an
+ideal of $R$, can be written as a linear combination of the basis vectors with
+coefficients coming from \(I\). \emily{I'm confused:  Isn't this how we defined $IM$?}
+ The proof of this lemma is straightforward and
+follows the standard, informal mathematical argument, which inductively goes
 through the vectors needed to generate \(x\) and shows that each vector can be
 rewritten in terms of the basis vectors times elements of the ideal \(I\) as
 follows.
