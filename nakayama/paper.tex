@@ -8,20 +8,12 @@
 \input{preamble.tex}
 
 \begin{document}
-
-% Mention an attempt with modules
-% ssreflect still looks to only deal with finite/discrete objects
-
-
-
 \title{ 
 Formalizing Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code for this work is available on the following site: \url{https://github.com/ku-sldg/algebra}}
 }
 
-
 \date{}
 
-%\author{}
 \author{ 
 	Andrew Cousino \\ {\ttfamily acousino@ku.edu}
 	\and 
@@ -29,7 +21,6 @@ Formalizing Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code f
  \\ {\ttfamily witt@ku.edu} \and 
 	Perry Alexander \\ {\ttfamily palexand@ku.edu}
 }	
-	%	
 	
 \maketitle	
 
@@ -42,7 +33,6 @@ Formalizing Commutative Algebra in Coq: \\ Nakayama's Lemma\thanks{Source code f
 	Lawrence, KS 66045
 \end{center}
 }
-
 
 \todo[inline]{To do:  Add to/alter author list, funding acknowledgments, title, and/or abstract as needed}
 
@@ -299,7 +289,7 @@ We also used this to formalize the notion of a quotient ring $R/I$, where $I$ is
 
 
 
-\emily[inline]{It would be nice to differentiate between our structures that are typeclasses (e.g., {\tt Ideal}), and other definitions (e.g., {\tt maximal ideal})}
+\emily[inline]{It would be nice to differentiate between our structures that are typeclasses (e.g., {\ttfamily Ideal}), and other definitions (e.g., {\ttfamily maximal ideal})}
 Next, we formally defined a maximal ideal, a proper ideal that are maximal with respect to inclusion, i.e., if it is strictly contained in another ideal, this larger ideal must be the entire ring. 
 Below is the definition in Coq,
 which uses \texttt{P} as the predicate for the ideal.
@@ -333,7 +323,7 @@ Using the definition of a maximal ideal, we then were able to define a local rin
 \emily[inline]{Emily:  Unfortunately, I think we need to update naming conventions since in mathematics, ``vector'' is reserved for an element of a vector space over a field, rather than an element of an arbitrary module.  So this could cause confusion.  Similar with ``basis,'' which is especially tricking since two different generating sets of a finitely generated module can have different sizes, but all bases of a vector space have the same cardinality, and an element of a module can typically be written as a scalar combination in multiple ways, while bases are linearly independent.  I've proposed a rewrite of the blue paragraph right above it.  Drew, can you double check it for accuracy with respect to the code? 
 }
 \emily[inline]{
-We'll also need to update the code.  I think {\tt vectors} should be something like {\tt scalar-combinations}, and {\tt basis} something like {\tt generating-set}. 
+We'll also need to update the code.  I think {\ttfamily vectors} should be something like {\ttfamily scalar-combinations}, and {\ttfamily basis} something like {\ttfamily generating-set}. 
 }
 
 At this point we formalized the definition of a module over a commutative ring, the  commutative-algebraic generalization of the notion of a vector
