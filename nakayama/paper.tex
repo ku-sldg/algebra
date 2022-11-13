@@ -127,11 +127,6 @@ eisenbud}.
 Here, we give a brief description of the major mathematical structures from
 commutative algebra that are relevant to Nakayama's Lemma.
 
-\emily[inline]{Emily: It would be more consistent to require a ring to contain
-$1$ in general, instead of adding this to the axioms of a commutative ring.
-After thinking for a while, I think it is a good idea to make this change in
-the code, and then here to match. Drew, does this sound OK?}
-
 \paragraph{Commutative rings.}
 In abstract algebra, the quintessential example of a commutative ring is the
 set of integers
@@ -148,11 +143,12 @@ and $-n$ is the additive identity $0$.
 The set of integers also forms a \emph{ring} due to its properties of
 multiplication. It is closed under this binary operation, which satisfies
 associativity, and the distributive law governing the compatibility of addition
-and multiplication holds. Even more, the integers form a
-\emph{commutative ring} since $n \cdot m = m \cdot n$ for all integers $n$ and
-$m$. We require commutative rings to contain a \emph{multiplicative identity},
+and multiplication holds.  We require rings to contain a \emph{multiplicative identity},
 and $1 \in \mathbb{Z}$ is such an element since $n \in \mathbb{Z}$ one has
 $n \cdot 1 = 1 \cdot n = n$. 
+Even more, the integers form a
+\emph{commutative ring} since $n \cdot m = m \cdot n$ for all integers $n$ and
+$m$. 
 
 In general, a commutative ring is a set $R$ with two binary operations, which
 we call \emph{addition} and \emph{mutiplication}, typically denoted $\cdot$ and
@@ -313,15 +309,12 @@ We start by describing our process of formalizing the required algebraic
 structures detailed in the previous section. Then, with that in hand, we move
 on to the formal proof of Nakayama's Lemma.
 
-\subsection{Our Algebraic Hierarchy}
+\subsection{Building our Algebraic Hierarchy}
 \begin{figure}[t]
   \caption{The hierarchy of our algebraic structures}
   \includegraphics[width=.4\textwidth]{algebraic-structures.pdf}
   \centering
 \end{figure}
-\todo[inline]{To do:  Double check source code to verify whether the hierarchy
-figure should be altered (subobjects, quotients, finitely generated modules,
-local rings, etc.) It looks good to Drew.}
 
 Our foundation begins by defining a semigroup class, which declares a binary
 operation to be associative. From here, we build up through monoids, which
@@ -402,9 +395,9 @@ a quotient group is simply a group under a different equivalence. Not much is
 lost, as Coq's setoid rewrite tactics can still be called upon; a setoid is a
 type equipped with an equivalence relation.
 
-Moving onward, we formalized the structure of a ring, which has two binary
+Moving onward, rings are the next step in our algebraic heirarchy; a ring has two binary
 operations: addition, which must be commutative, and multiplication, which need
-not be commutative in general. Next we defined the structure of a commutative
+not be commutative in general. Next, we formalized the definition of a commutative
 ring, further requiring commutativity of multiplication, as well as a
 multiplicative identity. At this point, we formalized the notion of an ideal of
 a commutative ring, a subgroup of the ring under addition that satisfies the
@@ -413,9 +406,6 @@ every element \(a\) of the ideal, and every element \(r\) of the commutative
 ring. We also used this to formalize the notion of a quotient ring $R/I$, where
 $I$ is an ideal of a commutative ring $R$.
 
-\emily[inline]{It would be nice to differentiate between our structures that
-  are typeclasses (e.g., {\ttfamily Ideal}), and other definitions (e.g.,
-  {\ttfamily maximal ideal})}
 
 Next, we formally defined a maximal ideal, a proper ideal that are maximal with
 respect to inclusion, i.e., if it is strictly contained in another ideal, this
@@ -448,21 +438,21 @@ ring, i.e., a commutative ring with a single maximal ideal.
         maximal_ideal Q -> forall (r: Carrier), P r <-> Q r).
 \end{minted}
 
-\emily[inline]{Emily:  Unfortunately, I think we need to update naming
-  conventions since in mathematics, ``vector'' is reserved for an element of a
-  vector space over a field, rather than an element of an arbitrary module.  So
-  this could cause confusion.  Similar with ``basis,'' which is especially
-  tricking since two different generating sets of a finitely generated module
-  can have different sizes, but all bases of a vector space have the same
-  cardinality, and an element of a module can typically be written as a scalar
-  combination in multiple ways, while bases are linearly independent.  I've
-  proposed a rewrite of the blue paragraph right above it.  Drew, can you
-  double check it for accuracy with respect to the code? 
-}
-\emily[inline]{We'll also need to update the code.  I think {\ttfamily vectors}
-  should be something like {\ttfamily scalar-combinations}, and
-  {\ttfamily basis} something like {\ttfamily generating-set}. 
-}
+%\emily[inline]{Emily:  Unfortunately, I think we need to update naming
+%  conventions since in mathematics, ``vector'' is reserved for an element of a
+%  vector space over a field, rather than an element of an arbitrary module.  So
+%  this could cause confusion.  Similar with ``basis,'' which is especially
+%  tricking since two different generating sets of a finitely generated module
+%  can have different sizes, but all bases of a vector space have the same
+%  cardinality, and an element of a module can typically be written as a scalar
+%  combination in multiple ways, while bases are linearly independent.  I've
+%  proposed a rewrite of the blue paragraph right above it.  Drew, can you
+%  double check it for accuracy with respect to the code? 
+%}
+%\emily[inline]{We'll also need to update the code.  I think {\ttfamily vectors}
+%  should be something like {\ttfamily scalar-combinations}, and
+%  {\ttfamily basis} something like {\ttfamily generating-set}. 
+%}
 
 At this point we formalized the definition of a module over a commutative ring,
 the commutative-algebraic generalization of the notion of a vector space over a
@@ -480,23 +470,6 @@ are no name collisions. In our code, \texttt{M} is the type of module elements,
 is \texttt{n}.
 
 
-\textcolor{blue}{Here we needed to formalize the notion of linear combinations
-  of coefficients and module vectors. This was done by dependently typed
-  vectors, i.e., lists parameterized by their length. Because there is an
-  overload of the term ``vector'', we will use that term to refer to module
-  vectors, and use the term ``list'' to mean length-parameterized lists. As we
-  don't use the simpler kind of lists, this avoids any name collisions. A
-  finitely generated module is like the vector space \(\mathbf{R}^{n}\) in that
-  there are finitely many vectors which can generate all other vectors, for
-  \(\mathbf{R}^{n}\) one such collection of generators are
-  \(\mathbf{e}_{1} = \begin{pmatrix} 1 & 0 & 0 & \cdots & 0\end{pmatrix}^{T}\),
-  \(\mathbf{e}_{2} = \begin{pmatrix} 0 & 1 & 0 & \cdots & 0\end{pmatrix}^{T}\),
-  \textellipsis,
-  \(\mathbf{e}_{n} = \begin{pmatrix} 0 & 0 & 0 & \cdots & 1\end{pmatrix}^{T}\).
-  In our code, \texttt{M} is the type of module elements, \texttt{R} is the
-  type of ring elements which act as coefficients, and \texttt{t A n} is a list
-  whose elements are of type \texttt{A} and whose length is \texttt{n}.
-}
 
 \begin{minted}{coq}
   Definition finitely_generated {n: nat}(basis: t M n) :=
@@ -524,7 +497,7 @@ represented this in Coq as a predicate over \(M\).
 The use of  ``\verb|Forall P coeffs|'' ensures that every element of the
 coefficient list \texttt{coeffs} satisfies the predicate \texttt{P}.  
 
-\subsection{Building the Formal Proof}
+\subsection{Constructing the Formal Proof}
 Beyond formalizing the relevant structures from higher algebra, we also
 formally establish some basic theory. For instance, a \emph{unit} of a
 commutative ring $R$ is an element $x \in R$ with a multiplicative inverse,
