@@ -167,7 +167,7 @@ integer coefficients, or with coefficients in a field.
 
 \paragraph{Ideals of commutative rings.}
 The concept of an {ideal} of a ring can be thought of as an extension of the
-notion of an integer $x$ in the ring of integers $\mathbb{Z}$. An \emph{ideal}
+notion of an integer $n$ in the ring of integers $\mathbb{Z}$. An \emph{ideal}
 of commutative ring $R$ is a subset $I$ of $R$ that is itself an abelian group
 under addition, which also satisfies the following ``absorption'' property:
 Given any element $a$ of $I$, the product  $x \cdot a$ is again in $I$ for any
@@ -190,6 +190,11 @@ ideal $I$ of $R$ \emph{proper} if it is strictly contained in $R$. The
 \emph{zero ideal} consisting solely of its additive identity is a proper ideal
 of any commutative ring. 
 
+A \emph{prime ideal} of a commutative ring is a proper ideal $I$ with the following property:  
+If the product $x \cdot y$ of ring elements $x$ and $y$ is in $I$, then $x \in I$ or $y \in I$.
+The naming convention is motivated by the ring of integers, where the prime ideals are precisely those 
+of the form $p\mathbb{Z}$, where $p$ is a prime number, along with the zero ideal. 
+
 A \emph{maximal ideal} of a commutative ring is a proper ideal that is maximal
 with respect to inclusion, i.e., no other proper ideal strictly contains it. 
 Returning to our example of the ring of integers,
@@ -205,8 +210,11 @@ not a proper ideal, a contradiction.
 
 In fact, $3 \mathbb{Z}$ is the only other maximal ideal of $\mathbb{Z}$
 containing $6 \mathbb{Z}$, and in general, the prime ideals in the ring of
-integers besides the zero ideal are those of the form $p \mathbb{Z}$, where $p$
+integers besides the zero ideal are  $p \mathbb{Z}$, where $p$
 a prime number. 
+It is not a coincidence that every maximal ideal of the ring of integers is also a prime 
+ideal; the analogous statement can be proved in arbitrary commutative rings. 
+
 
 \paragraph{Local rings.}
 A commutative ring is \emph{local} if it has exactly one maximal ideal. 
@@ -230,11 +238,11 @@ consists of the power series with no constant term.
 % integer $n>1$, often denoted $\mathbb{Z}/n\mathbb{Z}$ or $\mathbb{Z}_n$, are
 % local 
 
-\paragraph{Module over commutative rings.}
+\paragraph{Modules over commutative rings.}
 Let  $R$ be a commutative ring. 
 A \emph{module over $R$}, or \emph{$R$-module}, is an abelian group $M$ under a
 binary operation $+$, and a {scalar multiplication} $R \times M \to M$ denoted
-$\cdot$, satisfying the following compatibility properties for all $r, s \in R$
+$\cdot$, satisfying the following properties for all $r, s \in R$
 and $u, v \in M$.
 
 \begin{enumerate}[leftmargin=5cm,topsep=0cm,itemsep=0cm]
@@ -309,7 +317,7 @@ We start by describing our process of formalizing the required algebraic
 structures detailed in the previous section. Then, with that in hand, we move
 on to the formal proof of Nakayama's Lemma.
 
-\subsection{Building our Algebraic Hierarchy}
+\subsection{Our Algebraic Hierarchy}
 \begin{figure}[t]
   \caption{The hierarchy of our algebraic structures}
   \includegraphics[width=.4\textwidth]{algebraic-structures.pdf}
@@ -348,7 +356,9 @@ Lines such as  ``\verb|monoid_semigroup :> Semigroup equiv op;|'' simply coerce
 the monoid typeclass into a semigroup.
 
 %While we found later on that we did not need quotients, 
-While in the end, our formal proof did not call upon quotients of algebraic
+While in the end, our formal proof
+does not require calling upon 
+ quotients of algebraic
 structures, quotient rings and quotient modules are fundamental to commutative
 algebra, and one can use them to construct alternate proofs of Nakayama's
 Lemma. It is worth pointing out that we have formalized quotients of algebraic
@@ -388,14 +398,15 @@ have this property are called \emph{normal subgroups}.
 
 The importance of quotients in commutative algebra motivates our use of
 equivalence relations to define the components of a group structure. If one
-were to instead use the regular Leibniz equality, it would be very difficult to
-identify a quotient group with another group. However, by  defining a group in
-terms of an arbitrary equivalence relation, we enable our theory to state that
-a quotient group is simply a group under a different equivalence. Not much is
-lost, as Coq's setoid rewrite tactics can still be called upon; a setoid is a
-type equipped with an equivalence relation.
+were to instead use the regular Leibniz equality, it would be difficult to
+identify a quotient group and another group. However, by  defining a group in
+terms of an arbitrary equivalence relation, in our theory a quotient group is 
+simply defined as a group, but under an equivalence relation that is not the usual 
+equality. 
+Not much is lost due to Coq's rewrite tactics for setoids--types equipped with an equivalence relation--
+can still be called upon.
 
-Moving onward, rings are the next step in our algebraic heirarchy; a ring has two binary
+Moving onward, rings form the next step in our algebraic hierarchy; a ring has two binary
 operations: addition, which must be commutative, and multiplication, which need
 not be commutative in general. Next, we formalized the definition of a commutative
 ring, further requiring commutativity of multiplication, as well as a
@@ -407,9 +418,9 @@ ring. We also used this to formalize the notion of a quotient ring $R/I$, where
 $I$ is an ideal of a commutative ring $R$.
 
 
-Next, we formally defined a maximal ideal, a proper ideal that are maximal with
-respect to inclusion, i.e., if it is strictly contained in another ideal, this
-larger ideal must be the entire ring. Below is the definition in Coq, which
+Next, we formalized the definition of a  prime ideal, and then 
+moved on to do the same for the notion of a maximal ideal, a proper ideal 
+that is maximal with respect to inclusion. Below is the definition in Coq, which
 uses \texttt{P} as the predicate for the ideal.
 
 \begin{minted}{coq}
@@ -423,7 +434,8 @@ uses \texttt{P} as the predicate for the ideal.
           (forall (r: Carrier), Q r -> P r)).
 \end{minted}
 
-Using the definition of a maximal ideal, we then were able to define a local
+We then were able to take advantage of the definition of a maximal ideal
+to formally define a local
 ring, i.e., a commutative ring with a single maximal ideal.
  
 \begin{minted}{coq}
@@ -457,8 +469,8 @@ ring, i.e., a commutative ring with a single maximal ideal.
 At this point we formalized the definition of a module over a commutative ring,
 the commutative-algebraic generalization of the notion of a vector space over a
 field. Nakayama's Lemma is a statement about finitely generated modules, and
-hence we must formalize the notion of a scalar combination of a fixed finite
-collection of elements $u_1, \ldots, u_n$ of an $R$-module $M$, i.e.,
+hence we must formalize the notion of a scalar combination of a finite
+collection of elements, $u_1, \ldots, u_n$, of an $R$-module $M$, i.e.,
 expressions of the form $r_1 u_1 + r_1 u_2 + \cdots + r_n u_n$, where each
 $r_i \in R$.
 
@@ -502,7 +514,7 @@ Beyond formalizing the relevant structures from higher algebra, we also
 formally establish some basic theory. For instance, a \emph{unit} of a
 commutative ring $R$ is an element $x \in R$ with a multiplicative inverse,
 i.e., an element $x^{-1} \in R$ for which $x \cdot x^{-1}$ is the
-multiplicative identity $1 \in R$.
+multiplicative identity $1 \in R$.  In fact, it $x$ is a unit, it has a unique  inverse. 
  
 We formally proved that an ideal $I$ of a commutative ring $R$ that contains a
 unit $x$, then $I$ must be the trivial ideal, i.e., the entire ring.  The
@@ -525,33 +537,39 @@ bound, then $S$ must have at least one maximal element.
     proper ideal \(I_{2}\) of $R$, i.e.,
     $x\in I_{1}\subsetneq I_{2} \subsetneq R$. Moreover, if  \(I_{2}\) is not
     maximal, then there exists a strictly larger proper ideal
-    $I_{3} \supsetneq I_2$.
+    $I_{3}$ containing $I_2$.
     
     Continuing this process, if it terminates at some step, we have found a
     maximal ideal, and if not, one obtains an infinite chain of ideals
     containing \(x\).
     \[x\in I_{1}\subsetneq I_{2}\subsetneq I_{3}\subsetneq\cdots\subsetneq R\]
     
-    It is straight-forward to show that \(\bigcup_{k=1}^{\infty} I_{k}\)
-    satisfies the definition of an ideal of $R$, and this union certainly
-    contains \(x\). So by Zorn's lemma, since every ascending chain of ideals
+    It is straightforward to verify that the increasing union of all $I_{k}$, $k \geq 1$, 
+    is by definition an ideal of $R$, and certainly
+    contains \(x\).  Hence by Zorn's lemma, since every ascending chain of ideals
     containing $x$ with respect to inclusion has its union as an upper bound,
     there exists a maximal ideal of \(R\) containing \(x\).
 \end{quote}
 
 This argument has potentially infinitely many steps, and chose to avoid this
-issue by including an axiom that in any non-unit \(x\) is contained in some
+issue by including an axiom that in any non-unit \(x\) of a ring is contained in some
 maximal ideal.
 
-\todo[inline]{Include some relevant code}
+\begin{minted}{coq}
+Axiom comm_ring_nonunit_maximal_ideal:
+  forall (x: Carrier),
+    ~ is_unit equiv mul one x ->
+    exists (P: Carrier -> Prop)(P_proper: Proper (equiv ==> iff) P)
+    	(P_ideal: Ideal add zero minus mul P),
+      P x /\ maximal_ideal P.
+\end{minted} 
 
-We also used classical logic to prove that \(1 - x\) is a unit where \(x\) is
-a non-unit in any local ring. The proof used the rule \(\neg\neg P\rightarrow
-P\) in order to do a proof by contradiction.
+We also used classical logic to prove that \(1 - x\) is a unit whenever \(x\) is
+an element of a local ring that is not a unit. The proof is completed by way of contradiction, and uses the rule that  
+ \(\neg\neg P\rightarrow
+P\). 
 
-\todo[inline]{Include some relevant code}
-
-Finally, we turn to our formal proof of Nakayama's Lemma, our ultimate goal.
+To start describing our proof, we formalize the statement of Nakayama's Lemma in Coq.
 
 \begin{nak*}
 Let $R$ be a commutative local ring, and let $\mathfrak{m}$ denote its maximal
@@ -560,64 +578,86 @@ $M = \mathfrak{m} M$, then $M = 0$, i.e., $M$ must be the $R$-module containing
 only one element, its identity as an additive abelian group. 
 \end{nak*}
 
-We needed a lemma before moving on to prove the main theorem which states that
-for a finitely generated $R$-module \(M\) with generating set
-\(b_{1}, b_{2}, \dots, b_{n}\), any element \(x\in I M\), where \(I\) is an
-ideal of $R$, can be written as a linear combination of the generating set with
-coefficients coming from \(I\).
-\emily{I'm confused:  Isn't this how we defined $I M$? Where are the $u$'s and
-  $a$'s coming from?}
-In other words, given \(x\in I M\), there is by definition a linear combination
-between elements \(u_{1}, \dots, u_{m}\in I\), and elements
-\(a_{1},\dots, a_{m}\in M\), we need a lemma that states \(x\) can be written
-as a linear combination between elements of \(I\) and the generating set
-\(b_{1},\dots, b_{n}\in M\). This follows the informal mathematical argument
-going inductively through the elements needed to generate \(x\) and shows that
-each vector can be rewritten in terms of the generating set times coefficients
-from the ideal \(I\) as follows.
+\begin{minted}{coq}
+Theorem nakayama:
+  forall {n: nat}(basis: t M n),
+    finitely_generated Mequiv Madd Mzero action basis ->
+  (forall a: M, ideal_module_pred a) ->
+  forall a: M, a =M= Mzero.
+\end{minted}
+
+To use as a building block in the formal proof of Nakayama's Lemma, we first formally stated and proved a lemma that gives a concrete description of the elements of the submodule $\mathfrak{m} M$  appearing in the statement of the the theorem.  
+This lemma applies more generally, to any finitely generated module $M$ over a (not necessarily local) commutative ring, and any submodule of the form $IM$, for $I$ an arbitrary ideal. 
+By definition, $IM$ consists of scalar combinations of elements of $M$ with coefficients in $I$. 
+The lemma states that the elements from $M$ appearing in the expression can be chosen to be from any 
+ fixed finite generating set for $M$. 
+In other words, given any generating set  $u_{1},\dots, u_{n} \in M$  of a  finitely generated $R$-module $M$, every element $x$ of $I M$ can be written as a scalar combination $a_1 \cdot u_1 + a_2  \cdot u_2 + \cdots + a_n  \cdot u_n$, where each $a_i \in I$. 
+
+\begin{minted}{coq}
+Lemma module_fin_gen_ideal_module:
+  forall {n: nat}(basis: t M n),
+    finitely_generated Mequiv Madd Mzero action basis ->
+    forall {m: nat}(coeffs: t R m)(vectors: t M m),
+      Forall P coeffs ->
+      exists (coeffs': t R n),
+        linear_combin Madd Mzero action coeffs vectors =M=
+          linear_combin Madd Mzero action coeffs' basis /\
+        Forall P coeffs'.
+\end{minted}        
+
+The proof follows from a straightforward argument based on definitions, by induction on the number of elements in a fixed generating set for $M$, which we informally describe:  By definition, $x \in I M$ can  be written, for some positive integer $k$ and elements $r_i \in R$ and $w_i \in M$,  $1 \leq i \leq k$, as   $x = r_1 \cdot w_1 + r_2 \cdot w_2 + \cdots + r_k \cdot w_k$.
+What's more, by definition of a finite generating set $u_{1},\dots, u_{n}$ for $M$,  each $w_i$ equals 
+$c_{i1} \cdot u_1 + c_{i2} \cdot u_2 + \cdots + c_{in} \cdot u_n$ for appropriate choices of $c_{ij} \in R$. 
+Hence, inductively applying associativity, 
 \begin{align*}
-  x & = \sum_{k=1}^{m} u_{k} a_{k} \\
-    & = \sum_{k=1}^{m} u_{k} (r_{k1} b_{1} + \cdots + r_{kn} b_{n}) \\
-    & = \sum_{j=1}^{n} (u_{1} r_{1j} + \cdots + u_{m} r_{mj}) b_{j}
+  x = \sum_{i=1}^{k} r_i  \cdot  w_i  =  \sum_{i=1}^{k} r_i  \cdot  \left(  \sum_{j=1}^n c_{ij}  \cdot  u_j \right) 
+  =   \sum_{j=1}^n  \sum_{i=1}^{k} r_i   \cdot  (c_{ij}  \cdot  u_j ) 
+=  \sum_{j=1}^n \left( \sum_{i=1}^{k}  c_{ij}  \cdot   r_i \right)   \cdot  u_j.   
 \end{align*}
-Since each \(u_{k}\) comes from the ideal \(I\), the absorbing property of
-ideals guarantees that \(u_{k} r_{k j}\) is also contained in \(I\). As ideals
-are also closed under addition, it follows that \(u_{1} r_{1j} + \cdots +
-u_{m} r_{m j}\) are all elements of \(I\). Thus, \(x\) can be written as a
-linear combination of the generating set with the coefficients coming from
-\(I\).
+By absorption in ideals, each  $c_{ij}  \cdot r_i$ is in $I$, and since ideals are closed under addition, we inductively conclude that 
+the coefficient $a_j := c_{1j} \cdot  r_1 +  c_{2j} \cdot  r_2 +  \cdots c_{kj}\cdot r_k$ of $u_j$ is also in $I$. 
 
-\emily[inline]{I think we need to include more code here!  There are a lot of
-  pieces of formal proof that would be illustrative.}
-
-Now we move to describe the skeleton of our formal proof of Nakayama's lemma.
+Now we move forward to outline the formal proof of Nakayama's lemma.
 We proceed by induction on the number of elements in a generating set for the
-finitely-generated module $M$. The base case where \(M\) is generated by 0
-elements is by definition true since an empty linear combination is
-conventionally taken to be the zero vector.
-\emily{I think we should consider using one generator for the base case.}
-The inductive case where \(M\) is generated by the vectors
-\(b_{1}, \dots, b_{m}, b_{m+1}\). By assumption \(M = \mathfrak{m} M\).
-With \(b_{1}\in M\), then \(b_{1}\in\mathfrak{m} M\) meaning that by our lemma,
-there exists a linear combination for \(b_{1}\), say
-\[b_{1} = u_{1} b_{1} + \cdots + u_{m+1} b_{m+1}\]
-for some \(u_{1}, \dots, u_{m+1}\in\mathfrak{m}\). Collect the \(b_{1}\) terms
-on the left-hand side of the equation to get that
-\[(1 - u_{1}) b_{1} = u_{2} b_{2} + \cdots + u_{m+1} b_{m+1}\text{.}\]
-As mentioned when defining maximal ideals, \(\mathfrak{m}\) can only contain
-non-units. Namely, \(u_{1}\) must be a non-unit. Then we had already proven
-that \(1 - u_{1}\) is a unit as we are in a local ring. Let \(v_{1}\) be the
-multiplicative inverse of \(1 - u_{1}\), and multiply it on both sides of the
-equation.
+$R$-module $M$. 
+The base case is the situation when \(M\) requires no generators, so 
+$M$ consists solely of the empty scalar combination, i.e., the empty sum, which, by convention, is the zero element.
+In other words, $M = 0$ by assumption, and this is also precisely the 
+conclusion of Nakayama's Lemma.  Hence the statement trivially, without using the hypothesis that $M = \mathfrak{m} M$.
+
+We turn to the inductive step.  Fixing an arbitrary nonnegative integer $n$, 
+we assume that Nakayama's Lemma holds in the case that $M$ has a generating set 
+consisting of $n$ elements. 
+
+Now, 
+fix an $R$-module $M$ generated by $u_1, \ldots, u_{n+1} \in M$. 
+By assumption, \(M = \mathfrak{m} M\), and in particular, 
+the generator $u_1$ is an element of the submodule $\mathfrak{m}M$.
+The lemma described above guarantees the existence of ring elements $a_1, \ldots, a_n \in \mathfrak{m}$
+for which 
+\[u_{1} = a_{1} \cdot u_{1} + a_2 \cdot u_2 + \cdots + a_{n+1} \cdot u_{n+1}. \]
+
+Collecting the \(u_{1}\) terms
+on the left-hand side of the equation, applying the existence of additive inverses in $R$, and
+ distributivity of scalar multiplication for modules, we see that
+\begin{equation} \label{equation1: e}
+(1 - a_{1}) \cdot u_{1} = a_{2} \cdot u_{2} + \cdots + a_{n+1} \cdot u_{n+1}\text{.}
+\end{equation}
+
+Since a proper ideal contains no units and $a_1$ is taken to be in $\mathfrak{m}$, it is not a unit.  
+Hence, by the formalized statement mentioned earlier, $1-a_1$ is a unit of $R$.    
+Let $b_{1} \in R$ denote its 
+multiplicative inverse, so that $b_1 \cdot  (1 - a_{1}) = 1$.
+Multiplying this element on the either side of \eqref{equation1: e}, we deduce the following.  
 \begin{align*}
-  v_{1} (1 - u_{1}) b_{1}
-    & = v_{1} u_{2} b_{2} + \cdots + v_{1} u_{m+1} b_{m+1} \\
-  1 b_{1} & = v_{1} u_{2} b_{2} + \cdots + v_{1} u_{m+1} b_{m+1} \\
-  b_{1} & = v_{1} u_{2} b_{2} + \cdots + v_{1} u_{m+1} b_{m+1} \\
+b_1 \cdot \left(  (1 - a_{1}) \cdot u_{1} \right)  & = b_1 \cdot  ( a_{2} \cdot u_{2} + \cdots + a_{n+1} \cdot u_{n+1} ) \\
+\left( b_1 \cdot  (1 - a_{1})\right) \cdot u_{1}   & = b_1 \cdot  ( a_{2} \cdot u_{2} ) + \cdots + b_1  \cdot   (a_{n+1} \cdot u_{n+1} )  \\
+u_1 = 1 \cdot u_{1}   & = ( b_1 \cdot  a_{2}  ) \cdot u_{2}  + \cdots + ( b_1  \cdot  a_{n+1} ) \cdot u_{n+1}  
 \end{align*}
-We have thus found that one of the basis vectors is not needed to generate this
-module. Using the induction hypothesis, we have that \(M = 0\). Showing that
-the induction hypothesis holds in Coq takes more work than in an informal
+In particular, the generator $u_1$ can be written as a scalar combination of the $n$ generators $u_2, \ldots, u_{n+1}$, and is superfluous. Hence $M$ can be generated by $n$ elements, and $M=0$ by the inductive hypothesis. 
+
+Showing that
+the inductive hypothesis holds in Coq is more work than in this informal
 proof, but this extra work is just a lot of bookkeeping.
 
 \bibliographystyle{plain}
