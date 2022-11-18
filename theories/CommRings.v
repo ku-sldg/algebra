@@ -22,47 +22,11 @@ Infix "<+>" := add (at level 50, left associativity).
 Infix "<*>" := mul (at level 40, left associativity).
 
 Class CommRing := {
-  comm_ring :> Ring equiv add zero minus mul;
-  comm_ring_mul_monoid :> Monoid equiv mul one;
+  comm_ring :> Ring equiv add zero minus mul one;
   comm_ring_mul_comm :> Commutative equiv mul;
 }.
 
 Context {cring: CommRing}.
-
-Definition is_unit (u: Carrier) :=
-  exists (uInv: Carrier), u <*> uInv == one.
-
-Theorem comm_ring_units_closed_mul (u0 u1: Carrier):
-  is_unit u0 ->
-  is_unit u1 ->
-  is_unit (u0 <*> u1).
-Proof.
-  unfold is_unit.
-  intros [u0Inv Hu0] [u1Inv Hu1].
-  exists (u1Inv <*> u0Inv).
-  setoid_rewrite <- (semigroup_assoc equiv mul).
-  transitivity (u0Inv <*> (u0 <*> u1 <*> u1Inv));
-    [apply comm_ring_mul_comm |].
-  repeat setoid_rewrite <- (semigroup_assoc equiv mul).
-  transitivity (u0 <*> u0Inv <*> u1 <*> u1Inv);
-    [repeat apply (semigroup_op_r equiv mul);
-      apply comm_ring_mul_comm |].
-  setoid_rewrite Hu0.
-  setoid_rewrite (monoid_ident_l equiv mul one).
-  apply Hu1.
-Qed.
-
-Theorem comm_ring_nonunits_absorb_mul (r: Carrier):
-  ~ is_unit r ->
-  forall (s: Carrier), ~ is_unit (r <*> s).
-Proof.
-  unfold is_unit.
-  intros Hnonunit s [rsInv Hcontra].
-  apply Hnonunit.
-  exists (s <*> rsInv).
-  setoid_rewrite <- (semigroup_assoc equiv mul).
-  apply Hcontra.
-Qed.
 
 Section Ideals.
 Context (P: Carrier -> Prop).
@@ -117,7 +81,7 @@ Qed.
 
 Theorem ideal_unit_entire:
   (exists (u: Carrier),
-    P u /\ is_unit u) ->
+    P u /\ is_unit equiv mul one u) ->
   forall (r: Carrier), P r.
 Proof.
   intros [u [Pu [uInv Hinv]]] r.
@@ -134,19 +98,20 @@ Lemma quotient_ideal_mul_proper:
   Proper (quot_congru ==> quot_congru ==> quot_congru) mul.
 Proof.
   intros a0 a1 Ha b0 b1 Hb.
-  assert (minus (a0 <*> b0) <+> a1 <*> b1 == (minus a0 <+> a1) <*> b0 <+> a1 <*> (minus b0 <+> b1)).
-  { setoid_rewrite <- (ring_mul_minus_l equiv add zero minus mul).
+  assert (minus (a0 <*> b0) <+> a1 <*> b1 ==
+    (minus a0 <+> a1) <*> b0 <+> a1 <*> (minus b0 <+> b1)).
+  { setoid_rewrite <- (ring_mul_minus_l equiv add zero minus mul one).
     transitivity (minus a0 <*> b0 <+> zero <+> a1 <*> b1);
       [symmetry;
         apply (semigroup_op_r equiv add);
         apply (monoid_ident_r equiv add zero) |].
     setoid_rewrite <- (group_inv_r equiv add zero minus (a1 <*> b0)).
     setoid_rewrite <- (semigroup_assoc equiv add).
-    setoid_rewrite <- (ring_distrib_r equiv add zero minus mul).
+    setoid_rewrite <- (ring_distrib_r equiv add zero minus mul one).
     setoid_rewrite (semigroup_assoc equiv add).
     apply (semigroup_op_l equiv add).
-    setoid_rewrite <- (ring_mul_minus_r equiv add zero minus mul).
-    setoid_rewrite <- (ring_distrib_l equiv add zero minus mul).
+    setoid_rewrite <- (ring_mul_minus_r equiv add zero minus mul one).
+    setoid_rewrite <- (ring_distrib_l equiv add zero minus mul one).
     reflexivity. }
   { apply P_proper in H.
     apply H.
@@ -192,7 +157,7 @@ Proof.
   { symmetry.
     apply (group_move_l equiv add zero minus).
     setoid_rewrite (monoid_ident_r equiv add zero).
-    apply (ring_distrib_l equiv add zero minus mul). }
+    apply (ring_distrib_l equiv add zero minus mul one). }
   { apply P_proper in H.
     apply H.
     apply (subgroup_ident add zero minus P). }
@@ -205,7 +170,7 @@ Lemma quotient_ideal_distrib_r (a b c: Carrier):
     { symmetry.
       apply (group_move_l equiv add zero minus).
       setoid_rewrite (monoid_ident_r equiv add zero).
-      apply (ring_distrib_r equiv add zero minus mul). }
+      apply (ring_distrib_r equiv add zero minus mul one). }
     { apply P_proper in H.
       apply H.
       apply (subgroup_ident add zero minus P). }
@@ -270,15 +235,20 @@ Proof.
   constructor.
   { constructor.
     apply (quotient_subagroup equiv add zero minus _ P).
+    constructor.
     apply (quotient_ideal_mul_semigroup equiv add zero minus mul one P).
+    apply (quotient_ideal_mul_1_l equiv add zero minus mul one P).
+    apply (quotient_ideal_mul_1_r equiv add zero minus mul one P).
     apply (quotient_ideal_distrib_l equiv add zero minus mul one P).
     apply (quotient_ideal_distrib_r equiv add zero minus mul one P). }
   { constructor.
-    apply (quotient_ideal_mul_semigroup equiv add zero minus mul one P).
-    apply (quotient_ideal_mul_1_l equiv add zero minus mul one P).
-    apply (quotient_ideal_mul_1_r equiv add zero minus mul one P). }
-  { constructor.
-    apply (quotient_ideal_mul_comm equiv add zero minus mul one P). }
+    intros a b.
+    unfold quot_congru, left_congru.
+    setoid_replace (a <*> b)
+      with (b <*> a)
+      by apply (commutative equiv mul).
+    setoid_rewrite (group_inv_l equiv add zero minus).
+    apply (subgroup_ident add zero minus P). }
 Qed.
 
 Definition prime_ideal :=
@@ -286,7 +256,8 @@ Definition prime_ideal :=
 
 Definition maximal_ideal :=
   exists (r: Carrier), (not (P r) /\
-    forall (Q: Carrier -> Prop)(Q_proper: Proper (equiv ==> iff) Q)(Q_ideal: Ideal add zero minus mul Q),
+    forall (Q: Carrier -> Prop)(Q_proper: Proper (equiv ==> iff) Q)
+        (Q_ideal: Ideal add zero minus mul Q),
       (forall (r: Carrier), P r -> Q r) ->
       (forall (r: Carrier), Q r) \/
         (forall (r: Carrier), Q r -> P r)).
@@ -296,7 +267,8 @@ Lemma comm_ring_maximal_ideal_omits_1:
   ~ P one.
 Proof.
   intros [r [HPr' Hother_ideals]] Hcontra.
-  apply (ideal_1_entire equiv add zero minus mul one P) with (r := r) in Hcontra.
+  apply (ideal_1_entire equiv add zero minus mul one P)
+    with (r := r) in Hcontra.
   apply HPr'.
   assumption.
 Qed.
@@ -313,22 +285,26 @@ Proof.
   { exists x.
     split;
       assumption. }
-  { apply (ideal_unit_entire equiv add zero minus mul one P) with (r := r) in H.
+  { apply (ideal_unit_entire equiv add zero minus mul one P)
+      with (r := r) in H.
     contradiction. }
 Qed.
 End Ideals.
 
 Section LocalRing.
 Definition local_ring :=
-  exists (P: Carrier -> Prop)(P_proper: Proper (equiv ==> iff) P)(P_ideal: Ideal add zero minus mul P),
-      maximal_ideal P /\
-      (forall (Q: Carrier -> Prop)(Q_proper: Proper (equiv ==> iff) Q)(Q_ideal: Ideal add zero minus mul Q),
-        maximal_ideal Q -> forall (r: Carrier), P r <-> Q r).
+  exists (P: Carrier -> Prop)(P_proper: Proper (equiv ==> iff) P)
+      (P_ideal: Ideal add zero minus mul P),
+    maximal_ideal P /\
+    (forall (Q: Carrier -> Prop)(Q_proper: Proper (equiv ==> iff) Q)
+        (Q_ideal: Ideal add zero minus mul Q),
+      maximal_ideal Q -> forall (r: Carrier), P r <-> Q r).
 
 Axiom comm_ring_nonunit_maximal_ideal:
   forall (x: Carrier),
     ~ is_unit equiv mul one x ->
-    exists (P: Carrier -> Prop)(P_proper: Proper (equiv ==> iff) P)(P_ideal: Ideal add zero minus mul P),
+    exists (P: Carrier -> Prop)(P_proper: Proper (equiv ==> iff) P)
+        (P_ideal: Ideal add zero minus mul P),
       P x /\ maximal_ideal P.
 
 Theorem local_comm_ring_sub_1_nonunit:
@@ -395,7 +371,7 @@ Proof.
   setoid_rewrite Hr.
   setoid_rewrite Hs.
   symmetry.
-  apply (ring_distrib_r equiv add zero minus mul).
+  apply (ring_distrib_r equiv add zero minus mul one).
 Qed.
 
 Lemma principal_ideal_minus_closed (a: Carrier):
@@ -406,7 +382,7 @@ Proof.
   exists (minus r).
   setoid_rewrite Hr.
   symmetry.
-  apply (ring_mul_minus_l equiv add zero minus mul).
+  apply (ring_mul_minus_l equiv add zero minus mul one).
 Qed.
 
 Lemma principal_ideal_zero:
@@ -414,7 +390,7 @@ Lemma principal_ideal_zero:
 Proof.
   exists zero.
   symmetry.
-  apply (ring_mul_0_l equiv add zero minus mul).
+  apply (ring_mul_0_l equiv add zero minus mul one).
 Qed.
 
 #[global]

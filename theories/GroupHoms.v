@@ -160,7 +160,8 @@ Corollary group_hom_kern_cosets_eq_coincide:
     left_cosets_eq Dequiv Dop kernelPred a b <->
     right_cosets_eq Dequiv Dop kernelPred a b.
 Proof.
-  apply (normal_subgroup_equiv_cosets_eq_conj Dequiv Dop Dident Dinv kernelPred).
+  apply (normal_subgroup_equiv_cosets_eq_conj Dequiv Dop Dident Dinv
+    kernelPred).
   { apply group_hom_kern_proper. }
   { apply group_hom_kern_subgroup. }
   { apply group_hom_kern_conj_closed. }

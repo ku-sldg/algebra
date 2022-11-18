@@ -719,7 +719,8 @@ Proof.
   { apply P_proper in H.
     apply H; clear H.
     apply congru_coincide.
-    assert (b0 <o> inv (inv a0 <o> a1 <o> b1) == b0 <o> inv b1 <o> inv (inv a0 <o> a1)).
+    assert (b0 <o> inv (inv a0 <o> a1 <o> b1) == b0 <o> inv b1 <o>
+      inv (inv a0 <o> a1)).
     { repeat setoid_rewrite group_inv_op.
       setoid_rewrite (semigroup_assoc equiv op).
       reflexivity. }

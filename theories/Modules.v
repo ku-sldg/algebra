@@ -1,6 +1,7 @@
 Require Import Coq.Relations.Relations.
 From Coq.Classes Require Import RelationClasses Morphisms.
-From algebra Require Import Semigroups Monoids Groups AbelianGroups CommRings Vectors.
+From algebra Require Import
+  Semigroups Monoids Groups AbelianGroups CommRings Vectors.
 Require Import Coq.Vectors.Vector.
 Require Import Coq.Program.Equality.
 
@@ -148,11 +149,12 @@ Proof.
   apply module_0_l.
 Qed.
 
-Lemma module_linear_combin_zipWith_add_l {n: nat}(coeffs0 coeffs1: t R n)(vectors: t M n):
-  linear_combin (zipWith Radd coeffs0 coeffs1) vectors =M=
-    linear_combin coeffs0 vectors <+> linear_combin coeffs1 vectors.
+Lemma module_linear_combin_zipWith_add_l
+    {n: nat}(coeffs0 coeffs1: t R n)(elts: t M n):
+  linear_combin (zipWith Radd coeffs0 coeffs1) elts =M=
+    linear_combin coeffs0 elts <+> linear_combin coeffs1 elts.
 Proof.
-  induction vectors as [| vector n vectors].
+  induction elts as [| elt n elts].
   { dependent destruction coeffs0.
     dependent destruction coeffs1.
     simpl.
@@ -163,7 +165,7 @@ Proof.
     dependent destruction coeffs1.
     rename h into coeff1.
     simpl.
-    setoid_rewrite IHvectors.
+    setoid_rewrite IHelts.
     setoid_rewrite (module_distrib_Radd).
     setoid_rewrite (semigroup_assoc Mequiv Madd).
     apply (semigroup_op_l Mequiv Madd).
@@ -172,10 +174,10 @@ Proof.
     apply (commutative Mequiv Madd). }
 Qed.
 
-Definition finitely_generated {n: nat}(basis: t M n) :=
-  forall (vector: M),
+Definition finitely_generated {n: nat}(generatingSet: t M n) :=
+  forall (elt: M),
     exists (coeffs: t R n),
-      vector =M= linear_combin coeffs basis.
+      elt =M= linear_combin coeffs generatingSet.
   
 Section Submodules.
 Context (P: M -> Prop).
@@ -292,11 +294,17 @@ Context {submodule: Submodule Madd Mzero Mminus action P}.
 Let lcongru := left_congru Madd Mminus P.
 #[global]
 Instance quotient_module: Module_ Radd Rmul Rone lcongru Madd Mzero Mminus action := {
-  module_agroup := (quotient_subagroup Mequiv Madd Mzero Mminus (module_agroup Radd Rmul Rone Mequiv Madd Mzero Mminus action) P);
-  module_distrib_Madd := (quotient_distrib_Madd Radd Rmul Rone Mequiv Madd Mzero Mminus action P);
-  module_distrib_Radd := (quotient_distrib_Radd Radd Rmul Rone Mequiv Madd Mzero Mminus action P);
-  module_distrib_Rmul := (quotient_distrib_Rmul Radd Rmul Rone Mequiv Madd Mzero Mminus action P);
-  module_Rone := (quotient_Rone Radd Rmul Rone Mequiv Madd Mzero Mminus action P); 
+  module_agroup :=
+    (quotient_subagroup Mequiv Madd Mzero Mminus
+      (module_agroup Radd Rmul Rone Mequiv Madd Mzero Mminus action) P);
+  module_distrib_Madd := (quotient_distrib_Madd Radd Rmul Rone
+    Mequiv Madd Mzero Mminus action P);
+  module_distrib_Radd := (quotient_distrib_Radd Radd Rmul Rone
+    Mequiv Madd Mzero Mminus action P);
+  module_distrib_Rmul := (quotient_distrib_Rmul Radd Rmul Rone
+    Mequiv Madd Mzero Mminus action P);
+  module_Rone :=
+    (quotient_Rone Radd Rmul Rone Mequiv Madd Mzero Mminus action P); 
 }.
 End QuotientModules.
 
@@ -306,9 +314,9 @@ Context {P_proper: Proper (Requiv ==> iff) P}.
 Context {P_ideal: Ideal Radd Rzero Rminus Rmul P}.
 
 Definition ideal_module (x: M): Prop :=
-  exists (n: nat)(coeffs: t R n)(vectors: t M n),
+  exists (n: nat)(coeffs: t R n)(elts: t M n),
     Forall P coeffs /\
-    x =M= linear_combin Madd Mzero action coeffs vectors.
+    x =M= linear_combin Madd Mzero action coeffs elts.
 
 Lemma module_ideal_module_proper:
   Proper (Mequiv ==> iff) ideal_module.
@@ -317,18 +325,18 @@ Proof.
   unfold ideal_module.
   split;
     intros H.
-  { inversion_clear H as [n [coeffs [vectors [Hcoeffs Hx0]]]].
+  { inversion_clear H as [n [coeffs [elts [Hcoeffs Hx0]]]].
     exists n.
     exists coeffs.
-    exists vectors.
+    exists elts.
     split;
       [assumption |].
     setoid_rewrite Hx in Hx0.
     assumption. }
-  { inversion_clear H as [n [coeffs [vectors [Hcoeffs Hx0]]]].
+  { inversion_clear H as [n [coeffs [elts [Hcoeffs Hx0]]]].
     exists n.
     exists coeffs.
-    exists vectors.
+    exists elts.
     split;
       [assumption |].
     setoid_rewrite Hx.
@@ -341,11 +349,11 @@ Lemma module_ideal_module_add_closed:
     ideal_module v ->
     ideal_module (u <+> v).
 Proof.
-  intros u v [nu [coeffsu [vectorsu [Hcoeffsu Hu]]]].
-  intros [nv [coeffsv [vectorsv [Hcoeffsv Hv]]]].
+  intros u v [nu [coeffsu [eltsu [Hcoeffsu Hu]]]].
+  intros [nv [coeffsv [eltsv [Hcoeffsv Hv]]]].
   exists (nu + nv).
   exists (append coeffsu coeffsv).
-  exists (append vectorsu vectorsv).
+  exists (append eltsu eltsv).
   split.
   { apply vector_forall_append.
     split;
@@ -353,22 +361,25 @@ Proof.
   { setoid_rewrite Hu.
     setoid_rewrite Hv.
     symmetry.
-    apply (module_linear_combin_append Radd Rmul Rone Mequiv Madd Mzero Mminus action). }
-Qed.
+    apply (module_linear_combin_append Radd Rmul Rone
+      Mequiv Madd Mzero Mminus action). }
+    Qed.
 
-Lemma module_linear_combin_minus_l {n: nat}(vectors: t M n)(coeffs: t R n):
-  linear_combin Madd Mzero action (map (fun coeff => Rminus coeff) coeffs) vectors =M=
-    Mminus (linear_combin Madd Mzero action coeffs vectors).
+Lemma module_linear_combin_minus_l {n: nat}(elts: t M n)(coeffs: t R n):
+  linear_combin Madd Mzero action
+      (map (fun coeff => Rminus coeff) coeffs) elts =M=
+    Mminus (linear_combin Madd Mzero action coeffs elts).
 Proof.
-  generalize dependent vectors.
+  generalize dependent elts.
   generalize dependent coeffs.
   generalize dependent n.
   apply vector_ind2;
     simpl.
   { symmetry.
     apply (group_inv_ident Mequiv Madd Mzero Mminus). }
-  { intros n coeffs vectors IH a b.
-    setoid_rewrite (module_minus_l Requiv Radd Rzero Rminus Rmul Rone Mequiv Madd Mzero Mminus action).
+  { intros n coeffs elts IH a b.
+    setoid_rewrite (module_minus_l Requiv Radd Rzero Rminus Rmul Rone
+      Mequiv Madd Mzero Mminus action).
     setoid_rewrite IH.
     setoid_rewrite <- (group_inv_op Mequiv Madd Mzero Mminus).
     apply Mminus_proper.
@@ -381,10 +392,10 @@ Lemma module_ideal_module_minus_closed:
     ideal_module (Mminus u).
 Proof.
   unfold ideal_module.
-  intros u [n [coeffs [vectors [Hcoeffs Hu]]]].
+  intros u [n [coeffs [elts [Hcoeffs Hu]]]].
   exists n.
   exists (map (fun r => Rminus r) coeffs).
-  exists vectors.
+  exists elts.
   split.
   { apply vector_forall_map;
       [| assumption].
@@ -406,23 +417,26 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma module_linear_combin_mul_l {n: nat}(coeffs: t R n)(vectors: t M n):
+Lemma module_linear_combin_mul_l {n: nat}(coeffs: t R n)(elts: t M n):
   forall (r: R),
-    linear_combin Madd Mzero action (map (fun coeff => r [*] coeff) coeffs) vectors
-      =M= r <.> linear_combin Madd Mzero action coeffs vectors.
+    linear_combin Madd Mzero action
+        (map (fun coeff => r [*] coeff) coeffs) elts
+      =M= r <.> linear_combin Madd Mzero action coeffs elts.
 Proof.
   intros r.
-  generalize dependent vectors.
+  generalize dependent elts.
   generalize dependent coeffs.
   generalize dependent n.
   apply vector_ind2;
     simpl.
   { symmetry.
     apply (module_0_r Requiv Radd Rmul Rone Mequiv Madd Mzero Mminus action). }
-  { intros n coeffs vectors IH a b.
+  { intros n coeffs elts IH a b.
     setoid_rewrite IH.
-    setoid_rewrite (module_distrib_Rmul Radd Rmul Rone Mequiv Madd Mzero Mminus action).
-    setoid_rewrite <- (module_distrib_Madd Radd Rmul Rone Mequiv Madd Mzero Mminus action).
+    setoid_rewrite (module_distrib_Rmul Radd Rmul Rone
+      Mequiv Madd Mzero Mminus action).
+    setoid_rewrite <- (module_distrib_Madd Radd Rmul Rone
+      Mequiv Madd Mzero Mminus action).
     apply (module_op_l Requiv Mequiv action).
     reflexivity. }
 Qed.
@@ -431,10 +445,10 @@ Lemma module_ideal_module_action:
   forall (a: M), ideal_module a ->
     forall (r: R), ideal_module (r <.> a).
 Proof.
-  intros a [n [coeffs [vectors [Hcoeffs Ha]]]] r.
+  intros a [n [coeffs [elts [Hcoeffs Ha]]]] r.
   exists n.
   exists (map (fun coeff => r [*] coeff) coeffs).
-  exists vectors.
+  exists elts.
   split.
   { apply vector_forall_map;
       [| assumption].

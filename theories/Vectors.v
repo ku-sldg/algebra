@@ -50,8 +50,11 @@ Proof.
       assumption. }
 Qed.
 
-Definition vector_ind2 {A B: Type}(P: forall {n}, t A n -> t B n -> Prop)
-    (base: P (nil A) (nil B))(ind: forall {n v1 v2}, P v1 v2 -> forall a b, P (cons A a _ v1) (cons B b _ v2)) :=
+Definition vector_ind2 {A B: Type}
+    (P: forall {n}, t A n -> t B n -> Prop)
+    (base: P (nil A) (nil B))
+    (ind: forall {n v1 v2}, P v1 v2 ->
+      forall a b, P (cons A a _ v1) (cons B b _ v2)) :=
   fix vector_ind2_fix {n} (v1: t A n): forall (v2: t B n), P v1 v2 :=
     match v1 with
     | nil _ => fun v2 => case0 _ base v2
@@ -143,11 +146,13 @@ Proof.
       assumption. } }
 Qed.
 
-Definition zipWith {A B C: Type}(f: A -> B -> C){n: nat}(u: t A n)(v: t B n): t C n :=
+Definition zipWith {A B C: Type}
+    (f: A -> B -> C){n: nat}(u: t A n)(v: t B n): t C n :=
   rect2 (fun n _ _ => t C n) (nil C)
     (fun n _ _ accum a b => cons C (f a b) n accum) u v.
 
-Theorem vector_forall_zipwith_binary_op {A: Type}(f: A -> A -> A)(P: A -> Prop):
+Theorem vector_forall_zipwith_binary_op {A: Type}
+    (f: A -> A -> A)(P: A -> Prop):
   (forall (a0 a1: A), P a0 -> P a1 -> P (f a0 a1)) ->
   forall {n: nat}(v0: t A n)(v1: t A n),
     Forall P v0 -> Forall P v1 ->

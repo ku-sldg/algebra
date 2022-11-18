@@ -55,7 +55,7 @@ Class ModuleHom := {
 }.
 
 Definition module_isomorphism :=
-  exists (moh: M2 -> M1),
-    (forall (a: M1), moh (hom a) =M1= a) /\
-    (forall (b: M2), hom (moh b) =M2= b).
+  exists (homInv: M2 -> M1),
+    (forall (a: M1), homInv (hom a) =M1= a) /\
+    (forall (b: M2), hom (homInv b) =M2= b).
 End ModuleHoms.

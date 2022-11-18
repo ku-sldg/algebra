@@ -285,12 +285,14 @@ Proof.
   { setoid_rewrite group_iter_op_double.
     setoid_rewrite IHp.
     setoid_rewrite <- (semigroup_assoc equiv op).
-    transitivity (a <o> semigroup_iter_op p (a <o> a) <o> inv a <o> semigroup_iter_op q (inv (a <o> a)));
+    transitivity (a <o> semigroup_iter_op p (a <o> a) <o> inv a <o>
+        semigroup_iter_op q (inv (a <o> a)));
       [| apply (semigroup_op_l equiv op)].
     { apply (semigroup_op_r equiv op).
       setoid_rewrite (semigroup_assoc equiv op).
       transitivity (a <o> (inv a <o> semigroup_iter_op p (a <o> a)));
-        [| apply (semigroup_op_l equiv op); apply semigroup_iter_op_comm_single].
+        [| apply (semigroup_op_l equiv op);
+          apply semigroup_iter_op_comm_single].
       { setoid_rewrite <- (semigroup_assoc equiv op).
         setoid_rewrite (group_inv_r equiv op ident inv).
         symmetry.
@@ -314,9 +316,11 @@ Proof.
     apply (semigroup_assoc equiv op). }
   { setoid_rewrite group_iter_op_pred_double.
     setoid_rewrite IHp.
-    transitivity (semigroup_iter_op p (a <o> a) <o> inv a <o> semigroup_iter_op q (inv a <o> inv a));
+    transitivity (semigroup_iter_op p (a <o> a) <o> inv a <o>
+        semigroup_iter_op q (inv a <o> inv a));
       [| apply (semigroup_assoc equiv op)].
-    transitivity (inv a <o> semigroup_iter_op p (a <o> a) <o> semigroup_iter_op q (inv a <o> inv a));
+    transitivity (inv a <o> semigroup_iter_op p (a <o> a) <o>
+        semigroup_iter_op q (inv a <o> inv a));
       [| apply (semigroup_op_r equiv op)].
     { setoid_rewrite <- (semigroup_assoc equiv op).
       apply (semigroup_op_l equiv op).

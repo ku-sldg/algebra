@@ -403,19 +403,20 @@ identify a quotient group and another group. However, by  defining a group in
 terms of an arbitrary equivalence relation, in our theory a quotient group is 
 simply defined as a group, but under an equivalence relation that is not the usual 
 equality. 
-Not much is lost due to Coq's rewrite tactics for setoids--types equipped with an equivalence relation--
+Not much is lost due to Coq's rewrite tactics for setoids--types equipped with an equivalence relation---
 can still be called upon.
 
-Moving onward, rings form the next step in our algebraic hierarchy; a ring has two binary
-operations: addition, which must be commutative, and multiplication, which need
-not be commutative in general. Next, we formalized the definition of a commutative
-ring, further requiring commutativity of multiplication, as well as a
-multiplicative identity. At this point, we formalized the notion of an ideal of
-a commutative ring, a subgroup of the ring under addition that satisfies the
-absorption property under multiplication, i.e., \(r a\) is in the ideal for
-every element \(a\) of the ideal, and every element \(r\) of the commutative
-ring. We also used this to formalize the notion of a quotient ring $R/I$, where
-$I$ is an ideal of a commutative ring $R$.
+Moving onward, rings form the next step in our algebraic hierarchy; a ring has
+two binary operations: addition, which must be commutative, and multiplication,
+which need not be commutative in general. In our formulation, rings must have a
+multiplicative identity. Next, we formalized the definition of a commutative
+ring, further requiring commutativity of multiplication. At this point, we
+formalized the notion of an ideal of a commutative ring, a subgroup of the ring
+under addition that satisfies the absorption property under multiplication,
+i.e., \(r a\) is in the ideal for every element \(a\) of the ideal, and every
+element \(r\) of the commutative ring. We also used this to formalize the
+notion of a quotient ring $R/I$, where $I$ is an ideal of a commutative ring
+$R$.
 
 
 Next, we formalized the definition of a  prime ideal, and then 
@@ -484,10 +485,10 @@ is \texttt{n}.
 
 
 \begin{minted}{coq}
-  Definition finitely_generated {n: nat}(basis: t M n) :=
-    forall (vector: M),
+  Definition finitely_generated {n: nat}(generatingSet: t M n) :=
+    forall (elt: M),
       exists (coeffs: t R n),
-        vector =M= linear_combin coeffs basis.
+        elt =M= linear_combin coeffs generatingSet.
 \end{minted}
 
 Next, given an ideal \(I\) of a commutative ring $R$ and and an $R$-module
@@ -501,9 +502,9 @@ represented this in Coq as a predicate over \(M\).
   Context {P_ideal: Ideal Radd Rzero Rminus Rmul P}.
   
   Definition ideal_module (x: M): Prop :=
-    exists (n: nat)(coeffs: t R n)(vectors: t M n),
+    exists (n: nat)(coeffs: t R n)(elts: t M n),
       Forall P coeffs /\
-      x =M= linear_combin Madd Mzero action coeffs vectors.
+      x =M= linear_combin Madd Mzero action coeffs elts.
 \end{minted}
 
 The use of  ``\verb|Forall P coeffs|'' ensures that every element of the
@@ -595,13 +596,13 @@ In other words, given any generating set  $u_{1},\dots, u_{n} \in M$  of a  fini
 
 \begin{minted}{coq}
 Lemma module_fin_gen_ideal_module:
-  forall {n: nat}(basis: t M n),
-    finitely_generated Mequiv Madd Mzero action basis ->
-    forall {m: nat}(coeffs: t R m)(vectors: t M m),
+  forall {n: nat}(generatingSet: t M n),
+    finitely_generated Mequiv Madd Mzero action generatingSet ->
+    forall {m: nat}(coeffs: t R m)(elts: t M m),
       Forall P coeffs ->
       exists (coeffs': t R n),
-        linear_combin Madd Mzero action coeffs vectors =M=
-          linear_combin Madd Mzero action coeffs' basis /\
+        linear_combin Madd Mzero action coeffs elts =M=
+          linear_combin Madd Mzero action coeffs' generatingSet /\
         Forall P coeffs'.
 \end{minted}        
 
