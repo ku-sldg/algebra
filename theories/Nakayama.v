@@ -181,20 +181,20 @@ Proof.
     pose proof
       (local_comm_ring_sub_1_nonunit Requiv Radd Rzero Rminus Rmul Rone R_local
         x1 Hx1_nonunit) as H1mx1_unit.
-    (* u1 = (y coeffs') . generatingSet *)
-    inversion_clear H1mx1_unit as [y Hy].
-    setoid_rewrite (commutative Requiv Rmul) in Hy.
-    apply (module_op_l Requiv Mequiv action) with (r:=y) in H.
+    (* u1 = (b1 coeffs') . generatingSet *)
+    inversion_clear H1mx1_unit as [b1 Hb1].
+    setoid_rewrite (commutative Requiv Rmul) in Hb1.
+    apply (module_op_l Requiv Mequiv action) with (r:=b1) in H.
     setoid_rewrite <- (module_distrib_Rmul Radd Rmul Rone
       Mequiv Madd Mzero Mminus action) in H.
-    setoid_rewrite Hy in H.
+    setoid_rewrite Hb1 in H.
     setoid_rewrite (module_Rone Radd Rmul Rone
       Mequiv Madd Mzero Mminus action) in H.
     setoid_rewrite <- (module_linear_combin_mul_l Requiv Radd Rmul Rone
       Mequiv Madd Mzero Mminus action) in H.
     (* v = v1 u1 + coeffs_v . generatingSet'
-     *   = v1 (y coeffs' . generatingSet') + coeffs_v . generatingSet'
-     *   = (v1 y coeffs' + coeffs_v) . generatingSet'
+     *   = v1 (b1 coeffs' . generatingSet') + coeffs_v . generatingSet'
+     *   = (v1 b1 coeffs' + coeffs_v) . generatingSet'
      *)
     intros v.
     pose proof (M_fingen v) as Hv.
@@ -209,7 +209,7 @@ Proof.
     setoid_rewrite <- (module_linear_combin_zipWith_add_l Radd Rmul Rone
       Mequiv Madd Mzero Mminus action) in Hcoeffs_v.
     exists (zipWith Radd coeffs_v
-      (map (fun x : R => v1 [*] (y [*] x)) coeffs')).
+      (map (fun x : R => v1 [*] (b1 [*] x)) coeffs')).
     assumption. }
 Qed.
 End NakayamaLemma.
