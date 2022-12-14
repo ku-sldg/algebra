@@ -679,19 +679,20 @@ multiplication for modules, we see that
 (1 - a_{1}) \cdot u_{1} =
   a_{2} \cdot u_{2} + \cdots + a_{n+1} \cdot u_{n+1}\text{.}
 \end{equation}
-In Coq, this bit looks like the following code below.
+In Coq, we worked backwards to establish this fact. The comments following
+each tactic offers a brief explanation of the effects on the goal.
 \begin{minted}[linenos,firstnumber=157,stepnumber=5]{coq}
-  assert ((Rone [+] Rminus x1) <.> u1 =M=
-  linear_combin Madd Mzero action coeffs' generatingSet').
+  assert ((Rone [+] Rminus a1) <.> u1 =M= (* (1 - a1) u1 = ... *)
+    linear_combin Madd Mzero action coeffs' generatingSet').
   { setoid_rewrite (module_distrib_Radd Radd Rmul Rone
-      Mequiv Madd Mzero Mminus action).
+      Mequiv Madd Mzero Mminus action). (* 1 u1 + (-a1) u1 = ... *)
     setoid_rewrite (module_Rone Radd Rmul Rone
-      Mequiv Madd Mzero Mminus action).
+      Mequiv Madd Mzero Mminus action). (* u1 + (-a1) u1 = ... *)
     setoid_rewrite (module_minus_l Requiv Radd Rzero Rminus Rmul Rone
-      Mequiv Madd Mzero Mminus action).
-    symmetry.
-    apply (group_move_r Mequiv Madd Mzero Mminus).
-    symmetry.
+      Mequiv Madd Mzero Mminus action). (* u1 - a1 u1 = ... *)
+    symmetry. (* ... = u1 - a1 u1 *)
+    apply (group_move_r Mequiv Madd Mzero Mminus). (* ... + a1 u1 = u1 *)
+    symmetry. (* u1 = ... + a1 u1 *)
     assumption. }
 \end{minted}
 
@@ -711,18 +712,25 @@ u_1 = 1 \cdot u_{1}
 \begin{minted}[linenos,firstnumber=181,stepnumber=5]{coq}
   pose proof
     (local_comm_ring_sub_1_nonunit Requiv Radd Rzero Rminus Rmul Rone
-      R_local x1 Hx1_nonunit) as H1mx1_unit.
-  (* u1 = (b1 coeffs') . generatingSet *)
-  inversion_clear H1mx1_unit as [b1 Hb1].
-  setoid_rewrite (commutative Requiv Rmul) in Hb1.
+      R_local x1 Hx1_nonunit) as H1ma1_unit.
+  (* Getting to u1 = (b1 coeffs') . generatingSet *)
+  inversion_clear H1ma1_unit as [b1 Hb1]. (* 1 - a1 is a unit *)
+  setoid_rewrite (commutative Requiv Rmul) in Hb1. (* b1 (1 - a1) = 1 *)
+\end{minted}
+This bit of proof code has the effect of naming \(b_{1}\) as the inverse of the
+unit \(1 - a_{1}\) and storing in the hypothesis \texttt{Hb1} the equation
+\(b_{1} (1 - a_{1}) = 1\). The remainder of the code goes on to multiply on the
+left by \(b_{1}\) in the equation \texttt{H} in order to say that
+\(b_{1} ((1 - a_{1}) u1) = b_{1} (a_{2} u_{2} + \cdots + a_{n+1} u_{n+1})\).
+Going on to use the rules of module actions and hypothesis \texttt{Hb1}, we can
+simplify the left hand side of \texttt{H} to be just \(u_{1}\).
+\begin{minted}[linenos,firstnumber=last,stepnumber=5]{coq}
   apply (module_op_l Requiv Mequiv action) with (r:=b1) in H.
   setoid_rewrite <- (module_distrib_Rmul Radd Rmul Rone
-    Mequiv Madd Mzero Mminus action) in H.
-  setoid_rewrite Hb1 in H.
+    Mequiv Madd Mzero Mminus action) in H. (* H: (b1 (1 - a1)) u1 = ... *)
+  setoid_rewrite Hb1 in H. (* H: (1) u1 = ... *)
   setoid_rewrite (module_Rone Radd Rmul Rone
-    Mequiv Madd Mzero Mminus action) in H.
-  setoid_rewrite <- (module_linear_combin_mul_l Requiv Radd Rmul Rone
-    Mequiv Madd Mzero Mminus action) in H.
+    Mequiv Madd Mzero Mminus action) in H. (* H: u1 = ... *)
 \end{minted}
 In particular, the generator $u_1$ can be written as a scalar combination of
 the $n$ generators $u_2, \ldots, u_{n+1}$, and is superfluous. Hence $M$ can be

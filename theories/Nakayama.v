@@ -151,10 +151,10 @@ Proof.
     inversion_clear H as [coeffs' [Hu1_genSet Hcoeffs']].
     setoid_rewrite Hu1_genSet in Hu1.
     dependent destruction coeffs'.
-    rename h into x1.
+    rename h into a1.
     simpl in Hu1.
-    (* (1 - x1) u1 = coeffs' . generatingSet' *)
-    assert ((Rone [+] Rminus x1) <.> u1 =M=
+    (* (1 - a1) u1 = coeffs' . generatingSet' *)
+    assert ((Rone [+] Rminus a1) <.> u1 =M=
       linear_combin Madd Mzero action coeffs' generatingSet').
     { setoid_rewrite (module_distrib_Radd Radd Rmul Rone
         Mequiv Madd Mzero Mminus action).
@@ -176,13 +176,13 @@ Proof.
     (* x1 cannot be a unit *)
     pose proof
       (comm_ring_maximal_ideal_nonunits Requiv Radd Rzero Rminus Rmul Rone
-        P P_maxideal x1 H3) as Hx1_nonunit.
+        P P_maxideal a1 H3) as Hx1_nonunit.
     (* 1 - x1 must be a unit with y as its inverse *)
     pose proof
       (local_comm_ring_sub_1_nonunit Requiv Radd Rzero Rminus Rmul Rone R_local
-        x1 Hx1_nonunit) as H1mx1_unit.
-    (* u1 = (b1 coeffs') . generatingSet *)
-    inversion_clear H1mx1_unit as [b1 Hb1].
+        a1 Hx1_nonunit) as H1ma1_unit.
+    (* Getting to u1 = (b1 coeffs') . generatingSet *)
+    inversion_clear H1ma1_unit as [b1 Hb1].
     setoid_rewrite (commutative Requiv Rmul) in Hb1.
     apply (module_op_l Requiv Mequiv action) with (r:=b1) in H.
     setoid_rewrite <- (module_distrib_Rmul Radd Rmul Rone
