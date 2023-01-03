@@ -159,10 +159,17 @@ $r \cdot (s+t) = r \cdot s + r \cdot t$.
 
 Other familiar examples of commutative rings include the integers modulo a
 fixed integer $n>0$, fields---commutative rings in which every nonzero element
-has a multiplicative inverse---such as the rings of rational numbers, real
-numbers, and complex numbers, and rings of polynomials in a variable $x$ with
+has a multiplicative inverse---such as the rings of rational numbers $\mathbb{Q}$, real
+numbers $\mathbb{R}$, and complex numbers $\mathbb{C}$, and the rings
+ of polynomials in a variable $x$ with
 integer coefficients, or with coefficients in a field.
 
+A \emph{subgroup} of a group $G$ is a subset  $H$ of $G$ that is itself a 
+group when the binary operation of $G$ is restricted to $H$.
+Similarly, a \emph{subring} of a ring $R$
+is a subset $S$ of $R$ that forms a group when the operations on $R$ are 
+restricted to $S$, using the same multiplicative identity.  
+One has the sequence of subrings $\mathbb{Z} \subseteq \mathbb{Q} \subseteq \mathbb{R} \subseteq \mathbb{C}$. 
 
 \paragraph{Ideals of commutative rings.}
 The concept of an {ideal} of a ring can be thought of as an extension of the
@@ -253,18 +260,28 @@ and $u, v \in M$.
 
 From this definition, one can see that a module over a field $F$ is precisely
 an $F$-vector space, so the notion of a module over an arbitrary commutative
-ring extends that of a vector space over a field. Finitely generated vector
-spaces form the foundation for matrix algebra, and the extension of this notion
+ring extends that of a vector space over a field. 
+An $R$-\emph{submodule} $N$ of a module $M$ is simply a subgroup of $M$ that inherits 
+the scalar multiplication of $N$, i.e., $r \cdot w$ is an element of $N$ whenever $w \in N$.
+Therefore, returning to the case that $F$ is a field,
+the $F$-submodules of a vector space over $F$ are precisely its vector subspaces. 
+
+
+Finitely generated vector spaces form the foundation for matrix algebra, and the extension of this notion
 to module theory is needed to state Nakayama's Lemma. We call an $R$-module
-$M$ \emph{finitely generated} if there exist a fixed finite number of elements
-$u_1, \ldots, u_n$ of $M$ with the following property:  Given any  $w \in M$,
+$M$ \emph{finitely generated} if there exist a fixed finite list of elements
+$u_1, \ldots, u_n$ of $M$ such that every element of $M$ is a scalar combination 
+of the $u_i$.  In other words, 
+given any  $w \in M$,
 there exist $r_1, \ldots, r_n \in R$ for which  
 \[w = r_1 u_1 + r_1 u_2 + \cdots + r_n u_n\text{.}\]
 The set $\{u_1, \ldots, u_n\}$ is called a \emph{generating set} for the $M$ as
 an $R$-module. 
 
-When $R = F$ is a field and $M = V$ is a finite-dimensional vector space over
-$F$, one can choose $u_1, \ldots, u_n$ to be a basis for $V$, i.e.,
+It is straightforward to see that a finitely generated module over a field is  
+simply a finite dimensional vector space.
+Moreover, if $V$ is a finite dimensional vector space over a field 
+$F$, one can choose the generators $u_1, \ldots, u_n$ to be a basis for $V$, so that  
 $n = \dim V$. In this case, the choice of scalar coefficients in the expression
 above for $w \in V$ is unique. When $R$ is not a field, however, such an
 expression is typically not unique. 
@@ -272,16 +289,19 @@ expression is typically not unique.
 
 \subsection{Nakayama's Lemma, Informal Statement}
 
-In order to state Nakayama's Lemma, we first explain some notation:  If $I$ is
-an ideal of a commutative ring $R$ and $M$ is an $R$-module, then $IM$ is the
-set of elements of the form $a_1 u_1 + a_2 u_2 + \cdots + a_k u_k$, where, for
-some positive integer $k$, $a_1, \ldots, a_k \in I$ and
-$u_1, \ldots, u_k \in M$. Notice that due to the absorption property of ideals,
-$I M$ is an $R$-module contained in $M$. 	
+In order to informally state Nakayama's Lemma, we first explain some of notational 
+conventions.  In this dicussion, suppose that  $I$ is an ideal of a commutative ring $R$, 
+and that $M$ is an $R$-module. Then $IM$ denotes the set of all scalar combinations of 
+elements in $M$ with coefficients in $I$.  That is, $IM$ is the set of  elements of the form, 
+for some positive integer $k$,
+ \[a_1 u_1 + a_2 u_2 + \cdots + a_k u_k\] 
+where $a_1, \ldots, a_k \in I$ and
+$u_1, \ldots, u_k \in M$. Observe the absorption property of ideals implies that 
+$I M$ is an $R$-submodule of $M$. 
 
-If an $R$-module $M$ consists of only one element, this element must be its
-additive identity $0$ as an abelian group under addition. The notation $M=0$
-means that we are in this situation. 
+If an $R$-module $M$ consists of just one element, this element must be its
+additive identity $0$, by virtue of the fact that $M$ is an abelian group under addition. 
+The notation $M=0$ is used to indicate that we are in this situation. 
 
 \begin{nak*}
 Let $R$ be a commutative local ring, and let $\mathfrak{m}$ denote its unique
@@ -289,15 +309,19 @@ maximal ideal. If $M$ is a finitely generated $R$-module and
 $M = \mathfrak{m} M$, then $M = 0$. 
 \end{nak*}
 
-When $R=F$ is a field, its unique maximal ideal is the zero ideal, and given
-any vector space $M=V$ over $F$, the only linear combination of vectors with
-coefficients in the zero ideal is the zero vector. Hence in this special case,
-the hypothesis that  $M = \mathfrak{m} M$ is equivalent to the conclusion that
-$M=0$. Hence Nakayama's Lemma describes one way that finitely generated modules
+When $R=F$ is a field, its unique maximal ideal is the zero ideal.  
+Given any vector space $M=V$ over $F$, the only linear combination of vectors with
+coefficients in the zero ideal is the zero vector. Hence in this case, regardless of the choice of 
+vector space, the hypothesis that  $M = \mathfrak{m} M$ is equivalent to the conclusion that
+$M=0$. 
+In particular, the hypothesis that $V$ is finitely generated, which is equivalent to the
+assumption that it is a finite-dimensional $F$-vector space, is not required in this setting. 
+Therefore, Nakayama's Lemma describes one way that finitely generated modules
 over commutative local rings are similar to vector spaces. 
 
-In general, the quotient $R/\mathfrak{m}$ of a local ring modulo its maximal
-ideal $\mathfrak{m}$ is a field, and the quotient of a module $M$ modulo the
+The quotient $R/\mathfrak{m}$ of a commutative ring $R$ modulo any maximal ideal 
+$\mathfrak{m}$ is a field; in fact, this property characterizes maximal ideals. 
+Moreover, given an arbitrary $R$-module $M$, its quotient modulo the
 submodule $\mathfrak{m}M$ is an $R/\mathfrak{m}$-module, i.e.,
 $M/\mathfrak{m}M$ is a vector space over $R/\mathfrak{m}$. Nakayama's Lemma
 implies that if $M$ is finitely generated, then bases for $M/\mathfrak{m}M$
@@ -312,7 +336,7 @@ $M=I M$, then this ensures the existence of a ring element $r$ congruent to
 $1$ modulo $I$ such that $r M = 0$, i.e., $r u = 0$ for every $u \in M$. 
 
 \section{Formalization}
-We start by describing our process of formalizing the required algebraic
+We start by describing our process of formalizing the necessary algebraic
 structures detailed in the previous section. Then, with that in hand, we move
 on to the formal proof of Nakayama's Lemma.
 
@@ -323,7 +347,7 @@ on to the formal proof of Nakayama's Lemma.
   \centering
 \end{figure}
 
-Our foundation begins by defining a semigroup class, which declares a binary
+\paragraph{Semigroups.} Our foundation begins by defining a semigroup class, which declares a binary
 operation to be associative. From here, we build up through monoids, which
 introduce identities, to groups, which introduce inverses. Note the double
 equals ``$==$'' appearing in these definitions is notation for an arbitrary
@@ -351,23 +375,30 @@ equivalence relation over the group's carrier set, which acts as equality.
       forall (a: Carrier), a <o> inv a == ident;
   }.
 \end{minted}
-Lines such as  ``\verb|monoid_semigroup :> Semigroup equiv op;|'' simply coerce
+The lines such as  ``\verb|monoid_semigroup :> Semigroup equiv op;|'' simply coerce
 the monoid typeclass into a semigroup.
 
-%While we found later on that we did not need quotients, 
-While in the end, our formal proof does not require calling upon quotients of
-algebraic structures, quotient rings and quotient modules are fundamental to
-commutative algebra, and one can use them to construct alternate proofs of
-Nakayama's Lemma. It is worth pointing out that we have formalized quotients of
-algebraic objects in Coq using typeclasses, which appear to work rather nicely. 
+
+\paragraph{Algebraic quotients.}
+While in the end, our formal proof does not call upon quotients of
+algebraic structures, alternative proofs of Nakamaya's Lemma take advantage of 
+ the structures quotient rings and quotient modules.  As algebraic 
+ quotient structures are also fundamental to commutative algebra,
+it is work pointing out that we have formalized quotients of groups, rings, and modules 
+  using typeclasses, which appear to work rather smoothly. 
 
 An algebraic quotient is, roughly, the set of equivalence classes of an
 algebraic structure with respect to an equivalence relation on its elements,
 for which the set of equivalence classes inherit the same kind of algebraic
-structure. For example, consider the quotient of a group modulo a subgroup,
-i.e., a subset of elements of the group that it itself a group under the group
-operations. Under equivalence relation on the group, every element of the
-subgroup must be in the same equivalence class as the identity. With \texttt{P}
+structure. 
+As an example, consider the quotient of a group modulo a subgroup,
+i.e., a subset of elements of the group that it itself a group using the same operations. 
+Under this equivalence relation on the group, every element of the
+subgroup must be in the same equivalence class as the identity. 
+For instance, after taking the quotient of the ring of integers $\mathbb{Z}$ by the
+subgroup $n \mathbb{Z}$ consisting of all multiples of an integer $n$, one obtains the
+group of integers modulo $n$, often denoted $\mathbb{Z}/n\mathbb{Z}$.
+In general, with \texttt{P}
 the predicate for the subgroup, there are two ways to make an equivalence
 relation from this description.
 
@@ -378,9 +409,9 @@ relation from this description.
     P (a <o> inv b).
 \end{minted}
 
-When these two relations coincide, then we can prove that this common
-equivalence relation actually preserves the group structure. Subgroups which
-have this property are called \emph{normal subgroups}.
+When these two equivalence relations coincide, then we can prove that this common
+ relation actually preserves the group structure. Subgroups of a group that satisfy 
+this property are called \emph{normal subgroups}.
 
 \begin{minted}{coq}
   Let normal_subgroup_congru_coincide :=
@@ -393,16 +424,18 @@ have this property are called \emph{normal subgroups}.
     Group (left_congru op inv P) op ident inv.
 \end{minted}
 
-The importance of quotients in commutative algebra motivates our use of
-equivalence relations to define the components of a group structure. If one
-were to instead use the regular Leibniz equality, it would be difficult to
-identify a quotient group and another group. However, by  defining a group in
+The utility--and, as a consequence, the ubiquity--of quotients in commutative algebra 
+motivates our choice to use equivalence relations to define the components of a group structure. If one
+were to instead use the traditional Leibniz equality, it would be difficult to
+identify a quotient group with another group. However, by  defining a group in
 terms of an arbitrary equivalence relation, in our theory a quotient group is 
 simply defined as a group, but under an equivalence relation that is not the
-usual equality. Not much is lost due to Coq's rewrite tactics for
-setoids--types equipped with an equivalence relation---can still be called
+usual equality. Not much is lost in adopting this convention thanks to Coq's 
+rewrite tactics for setoids--types equipped with an equivalence relation---can 
+still be called
 upon.
 
+\paragraph{Rings and their ideals.}
 Moving onward, rings form the next step in our algebraic hierarchy; a ring has
 two binary operations: addition, which must be commutative, and multiplication,
 which need not be commutative in general. In our formulation, rings must have a
@@ -410,7 +443,7 @@ multiplicative identity. Next, we formalized the definition of a commutative
 ring, further requiring commutativity of multiplication. At this point, we
 formalized the notion of an ideal of a commutative ring, a subgroup of the ring
 under addition that satisfies the absorption property under multiplication,
-i.e., \(r a\) is in the ideal for every element \(a\) of the ideal, and every
+i.e., \(r a\) sits in the ideal whenever \(a\) of the ideal, regardless of the choice of 
 element \(r\) of the commutative ring. We also used this to formalize the
 notion of a quotient ring $R/I$, where $I$ is an ideal of a commutative ring
 $R$.
@@ -431,7 +464,7 @@ which uses \texttt{P} as the predicate for the ideal.
           (forall (r: Carrier), Q r -> P r)).
 \end{minted}
 
-We then were able to take advantage of the definition of a maximal ideal
+\noindent Next, we were able to employ this definition of a maximal ideal
 to formally define a local
 ring, i.e., a commutative ring with a single maximal ideal.
  
@@ -463,13 +496,15 @@ ring, i.e., a commutative ring with a single maximal ideal.
 %  {\ttfamily basis} something like {\ttfamily generating-set}. 
 %}
 
-At this point we formalized the definition of a module over a commutative ring,
+
+\paragraph{Modules over rings.}
+At this point, we formalized the definition of a module over a commutative ring,
 the commutative-algebraic generalization of the notion of a vector space over a
 field. Nakayama's Lemma is a statement about finitely generated modules, and
-hence we must formalize the notion of a scalar combination of a finite
-collection of elements, $u_1, \ldots, u_n$, of an $R$-module $M$, i.e.,
+hence we formalized the notion of a scalar combination of a finite
+collection of elements, $u_1, \ldots, u_n$ a module $M$ over a commutative ring $R$, i.e.,
 expressions of the form $r_1 u_1 + r_1 u_2 + \cdots + r_n u_n$, where each
-$r_i \in R$.
+$r_i$ is an element of $R$.
 
 In our formalization of scalar combinations, we use  ``list'' to mean
 length-parameterized lists; since we don't use the simpler kind of lists, there
@@ -485,10 +520,13 @@ is \texttt{n}.
         elt =M= linear_combin coeffs generatingSet.
 \end{minted}
 
-Next, given an ideal \(I\) of a commutative ring $R$ and and an $R$-module
-\(M\),  we defined the submodule $IM$, the set consisting of all scalar
+Finally, we defined the submodule $IM$ of a module $M$ over a commutative ring $R$, 
+where $I$ is an arbitrary ideal of $R$.
+Recall that when $R$ is local and $I$ is its unique maximal ideal, this submodule 
+appears in the statement of Nakayama's Lemma. 
+In general, $IM$ is the set consisting of all scalar
 combinations of elements of \(M\) whose coefficients are in  \(I\). We
-represented this in Coq as a predicate over \(M\).
+represent this in Coq as a predicate over \(M\).
 
 \begin{minted}{coq}
   Context (P: R -> Prop).
@@ -501,7 +539,7 @@ represented this in Coq as a predicate over \(M\).
       x =M= linear_combin Madd Mzero action coeffs elts.
 \end{minted}
 
-The use of  ``\verb|Forall P coeffs|'' ensures that every element of the
+\noindent The use of  ``\verb|Forall P coeffs|'' ensures that every element of the
 coefficient list \texttt{coeffs} satisfies the predicate \texttt{P}.  
 
 \subsection{Constructing the Formal Proof}
@@ -512,14 +550,16 @@ i.e., an element $x^{-1} \in R$ for which $x \cdot x^{-1}$ is the
 multiplicative identity $1 \in R$.  In fact, it $x$ is a unit, it has a unique 
 inverse. 
  
-We formally proved that an ideal $I$ of a commutative ring $R$ that contains a
+We formally prove that an ideal $I$ of a commutative ring $R$ that contains a
 unit $x$, then $I$ must be the trivial ideal, i.e., the entire ring.  The
-informal logic is as follows:  By the absorption property, since $x \in I$, we
-have that $x \cdot x^{-1} = 1 \in I$.  Hence for every element $r$ of $R$,
+informal logic is as follows:  Due to the absorption property of $I$,  
+$x \cdot x^{-1} = 1 \in I$.  Hence for every element $r$ of $R$,
 $r = r \cdot 1$ is also in $I$, i.e., $I=R$. 
 
 Every non-unit element of a commutative ring is contained in some maximal
-ideal. This fact relies on the Axiom of Choice. The following standard informal
+ideal, a fact that relies on the Axiom of Choice. 
+
+The following standard informal
 proof calls upon Zorn's lemma, which is equivalent to the Axiom of Choice, and
 says that given a partially ordered set $S$, if every chain in $S$ has an upper
 bound, then $S$ must have at least one maximal element. 
@@ -547,7 +587,7 @@ bound, then $S$ must have at least one maximal element.
     bound, there exists a maximal ideal of \(R\) containing \(x\).
 \end{quote}
 
-This argument has potentially infinitely many steps. A proof with infinitely
+The above argument has potentially infinitely many steps. A proof with infinitely
 many steps is a problem in Coq. To see this from the above argument, suppose we
 wrote a proof tactic \mintinline{coq}{generate_larger_ideal} that allows us to
 go from one non-maximal ideal \(I_{k}\) which contains \(x\) to another ideal
