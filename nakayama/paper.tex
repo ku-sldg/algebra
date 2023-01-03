@@ -127,7 +127,7 @@ eisenbud}.
 Here, we give a brief description of the major mathematical structures from
 commutative algebra that are relevant to Nakayama's Lemma.
 
-\paragraph{Commutative rings.}
+\subsubsection{Commutative rings}
 In abstract algebra, the quintessential example of a commutative ring is the
 set of integers
 \[\mathbb{Z} = \{ \ldots, -3, -2, -1, 0, 1, 2, 3, \ldots \}.\]
@@ -171,7 +171,7 @@ is a subset $S$ of $R$ that forms a group when the operations on $R$ are
 restricted to $S$, using the same multiplicative identity.  
 One has the sequence of subrings $\mathbb{Z} \subseteq \mathbb{Q} \subseteq \mathbb{R} \subseteq \mathbb{C}$. 
 
-\paragraph{Ideals of commutative rings.}
+\subsubsection{Ideals of commutative rings}
 The concept of an {ideal} of a ring can be thought of as an extension of the
 notion of an integer $n$ in the ring of integers $\mathbb{Z}$. An \emph{ideal}
 of commutative ring $R$ is a subset $I$ of $R$ that is itself an abelian group
@@ -222,7 +222,7 @@ It is not a coincidence that every maximal ideal of the ring of integers is
 also a prime  ideal; the analogous statement can be proved in arbitrary
 commutative rings.
 
-\paragraph{Local rings.}
+\subsubsection{Local rings}
 A commutative ring is \emph{local} if it has exactly one maximal ideal. 
 Every field is local since the only proper ideal of a field is the zero ideal,
 though by our observations above, the ring of integers is not local. 
@@ -244,7 +244,7 @@ consists of the power series with no constant term.
 % integer $n>1$, often denoted $\mathbb{Z}/n\mathbb{Z}$ or $\mathbb{Z}_n$, are
 % local 
 
-\paragraph{Modules over commutative rings.}
+\subsubsection{Modules over commutative rings}
 Let  $R$ be a commutative ring. 
 A \emph{module over $R$}, or \emph{$R$-module}, is an abelian group $M$ under a
 binary operation $+$, and a {scalar multiplication} $R \times M \to M$ denoted
@@ -335,19 +335,19 @@ commutative ring $R$ and $M$ is a finitely generated $R$-module for which
 $M=I M$, then this ensures the existence of a ring element $r$ congruent to
 $1$ modulo $I$ such that $r M = 0$, i.e., $r u = 0$ for every $u \in M$. 
 
-\section{Formalization}
-We start by describing our process of formalizing the necessary algebraic
-structures detailed in the previous section. Then, with that in hand, we move
-on to the formal proof of Nakayama's Lemma.
+\section{Our Algebraic Hierarchy}
+In this section we describe our process of formalizing the necessary algebraic
+structures, detailed in the previous section, in Coq. Then, with these formal definitions 
+ in hand, we move
+on in the next section to detail our formal proof of Nakayama's Lemma.
 
-\subsection{Our Algebraic Hierarchy}
 \begin{figure}[t]
   \caption{The hierarchy of our algebraic structures}
   \includegraphics[width=.4\textwidth]{algebraic-structures.pdf}
   \centering
 \end{figure}
 
-\paragraph{Semigroups.} Our foundation begins by defining a semigroup class, which declares a binary
+\subsection{Semigroups} Our foundation begins by defining a semigroup class, which declares a binary
 operation to be associative. From here, we build up through monoids, which
 introduce identities, to groups, which introduce inverses. Note the double
 equals ``$==$'' appearing in these definitions is notation for an arbitrary
@@ -379,7 +379,7 @@ The lines such as  ``\verb|monoid_semigroup :> Semigroup equiv op;|'' simply coe
 the monoid typeclass into a semigroup.
 
 
-\paragraph{Algebraic quotients.}
+\subsection{Algebraic quotients}
 While in the end, our formal proof does not call upon quotients of
 algebraic structures, alternative proofs of Nakamaya's Lemma take advantage of 
  the structures quotient rings and quotient modules.  As algebraic 
@@ -435,7 +435,7 @@ rewrite tactics for setoids--types equipped with an equivalence relation---can
 still be called
 upon.
 
-\paragraph{Rings and their ideals.}
+\subsection{Rings and their ideals}
 Moving onward, rings form the next step in our algebraic hierarchy; a ring has
 two binary operations: addition, which must be commutative, and multiplication,
 which need not be commutative in general. In our formulation, rings must have a
@@ -488,7 +488,7 @@ ring, i.e., a commutative ring with a single maximal ideal.
 %  can have different sizes, but all bases of a vector space have the same
 %  cardinality, and an element of a module can typically be written as a scalar
 %  combination in multiple ways, while bases are linearly independent.  I've
-%  proposed a rewrite of the blue paragraph right above it.  Drew, can you
+%  proposed a rewrite of the blue subsubsection right above it.  Drew, can you
 %  double check it for accuracy with respect to the code? 
 %}
 %\emily[inline]{We'll also need to update the code.  I think {\ttfamily vectors}
@@ -497,7 +497,7 @@ ring, i.e., a commutative ring with a single maximal ideal.
 %}
 
 
-\paragraph{Modules over rings.}
+\subsection{Modules over rings}
 At this point, we formalized the definition of a module over a commutative ring,
 the commutative-algebraic generalization of the notion of a vector space over a
 field. Nakayama's Lemma is a statement about finitely generated modules, and
@@ -542,7 +542,7 @@ represent this in Coq as a predicate over \(M\).
 \noindent The use of  ``\verb|Forall P coeffs|'' ensures that every element of the
 coefficient list \texttt{coeffs} satisfies the predicate \texttt{P}.  
 
-\subsection{Constructing the Formal Proof}
+\section{Constructing the Formal Proof}
 Beyond formalizing the relevant structures from higher algebra, we also
 formally establish some basic theory from the field in Coq. For instance, 
 consider the notion of a \emph{unit} of a
@@ -559,7 +559,7 @@ $a^{-1}  \cdot a= 1 \in I$.  Hence for every element $r$ of $R$,
 $r = r \cdot 1$ is also in $I$, i.e., $I=R$. 
 On the other hand, if $I = R$, then the multiplicative identity $1$ is a unit in $I$.  
 
-\paragraph{Dealing with the Axiom of Choice.}
+\subsection{Dealing with the Axiom of Choice}
 Every non-unit element of a commutative ring is contained in some maximal
 ideal, a fact that relies on the Axiom of Choice. 
 The following standard informal
@@ -584,7 +584,7 @@ bound in the set, then the set must contain at least one maximal element.
     
   
   Continuing in this way, if  this process terminates, we have successfully identified a
-    maximal ideal of $R$ that contains $x$, and if not, one obtains an infinite, strictly increasing chain of proper ideals containing $x$, 
+    maximal ideal of $R$ that contains $x$, and if not, one obtains an infinite, strictly increasing chain of proper ideals of $R$, each containing $x$, 
     \[I_{1}\subsetneq I_{2}\subsetneq I_{3}\subsetneq\cdots\subsetneq I_n \subsetneq \cdots. \]
     It is straightforward to verify that an increasing union of ideals 
     is, by definition, an ideal containing every ideal in the union.  Moreover, if each ideal in the union
@@ -633,6 +633,7 @@ We also used classical logic to prove that \(1 - x\) is a unit whenever \(x\)
 is an element of a local ring that is not a unit. The proof is completed by way
 of contradiction, and uses the rule that \(\neg\neg P\rightarrow P\).
 
+\subsection{The Formal Statement of Nakayama's Lemma}
 To start describing our proof, we formalize the statement of Nakayama's Lemma
 in Coq.
 
@@ -785,11 +786,6 @@ In particular, the generator $u_1$ can be written as a scalar combination of
 the $n$ generators $u_2, \ldots, u_{n+1}$, and is superfluous. Hence $M$ can be
 generated by $n$ elements, and $M=0$ by the inductive hypothesis. 
 
-\emily[inline]{Emily: Reflecting, I think it would be valuable to include at
-least parts of the formal proof.  Pieces would work, though it is short, and it
-could be ``broken up'' among the description of the informal argument.  As is,
-our description of the proof focuses on the informal argument, which is not
-``new''.}
 
 Showing that the inductive hypothesis holds in Coq is more work than in this
 informal proof, but this extra work is just a lot of bookkeeping.
