@@ -20,7 +20,7 @@ site: \url{https://github.com/ku-sldg/algebra}}
 	Andrew Cousino \\ {\ttfamily acousino@ku.edu}
 	\and 
 	Emily E.\ Witt\thanks{Witt acknowledges support from NSF CAREER Award
-    DMS-1945611, the Keeler Intra-University Professorship from the University of Kansas, and the 2022-23 Ruth I.\, Michler Memorial Prize from the
+    DMS-1945611, the Keeler Intra-University Professorship from the University of Kansas, and the Ruth I.\, Michler Memorial Prize from the
     Association for Women in Mathematics.} \\ {\ttfamily witt@ku.edu}
   \and 
 	Perry Alexander \\ {\ttfamily palexand@ku.edu}
@@ -94,7 +94,7 @@ formalized in Coq, e.g., in the \emph{Mathematical Components Library}
 \todo{To do: Verify whether MathComp only formalized finite algebraic
   structures. Drew is about as certain as he can be that this is the case.}
 The theory, including the formalization of all algebraic structures, makes up
-approximately $100$ kB and 3300 lines of code.
+approximately $100$ kB, and 3300 lines of code.
  
 The notion of a module over a ring is an extension of the linear-algebraic
 notion of a vector space over a field, ubiquitous in mathematics and its
@@ -342,15 +342,18 @@ structures, detailed in the previous section, in Coq. Then, with these formal de
 on in the next section to detail our formal proof of Nakayama's Lemma.
 
 \begin{figure}[t]
-  \caption{The hierarchy of our algebraic structures}
+  \caption{The hierarchy of our algebraic structures in Coq}
   \includegraphics[width=.4\textwidth]{algebraic-structures.pdf}
   \centering
+   \label{alg-heirarchy: F}
 \end{figure}
 
-\subsection{Semigroups} Our foundation begins by defining a semigroup class, which declares a binary
+\subsection{Semigroups} 
+Appearing at the top of \Cref{alg-heirarchy: F}, our
+ foundation begins by defining a semigroup class, which declares a binary
 operation to be associative. From here, we build up through monoids, which
 introduce identities, to groups, which introduce inverses. Note the double
-equals ``$==$'' appearing in these definitions is notation for an arbitrary
+equals, ``$==$'', appearing in these definitions is notation for an arbitrary
 equivalence relation over the group's carrier set, which acts as equality.
 
 \begin{minted}{coq}
@@ -375,16 +378,16 @@ equivalence relation over the group's carrier set, which acts as equality.
       forall (a: Carrier), a <o> inv a == ident;
   }.
 \end{minted}
-The lines such as  ``\verb|monoid_semigroup :> Semigroup equiv op;|'' simply coerce
-the monoid typeclass into a semigroup.
+The line  ``\verb|monoid_semigroup :> Semigroup equiv op;|'' simply coerces
+the monoid typeclass into a semigroup, and similar lines perform analogous functions.
 
 
-\subsection{Algebraic quotients}
+\subsection{Algebraic Quotients}
 While in the end, our formal proof does not call upon quotients of
 algebraic structures, alternative proofs of Nakamaya's Lemma take advantage of 
  the structures quotient rings and quotient modules.  As algebraic 
  quotient structures are also fundamental to commutative algebra,
-it is work pointing out that we have formalized quotients of groups, rings, and modules 
+it is worth pointing out that we have formalized quotients of groups, rings, and modules 
   using typeclasses, which appear to work rather smoothly. 
 
 An algebraic quotient is, roughly, the set of equivalence classes of an
@@ -424,33 +427,29 @@ this property are called \emph{normal subgroups}.
     Group (left_congru op inv P) op ident inv.
 \end{minted}
 
-The utility--and, as a consequence, the ubiquity--of quotients in commutative algebra 
+The utility--and, as a consequence, the ubiquity--of quotients in algebra 
 motivates our choice to use equivalence relations to define the components of a group structure. If one
 were to instead use the traditional Leibniz equality, it would be difficult to
 identify a quotient group with another group. However, by  defining a group in
 terms of an arbitrary equivalence relation, in our theory a quotient group is 
 simply defined as a group, but under an equivalence relation that is not the
-usual equality. Not much is lost in adopting this convention thanks to Coq's 
-rewrite tactics for setoids--types equipped with an equivalence relation---can 
-still be called
-upon.
+usual equality. Not much is lost in adopting this convention, thanks to Coq's 
+rewrite tactics for setoids, which are types equipped with an equivalence relation. 
 
-\subsection{Rings and their ideals}
+\subsection{Rings and their Ideals}
 Moving onward, rings form the next step in our algebraic hierarchy; a ring has
 two binary operations: addition, which must be commutative, and multiplication,
 which need not be commutative in general. In our formulation, rings must have a
-multiplicative identity. Next, we formalized the definition of a commutative
-ring, further requiring commutativity of multiplication. At this point, we
-formalized the notion of an ideal of a commutative ring, a subgroup of the ring
-under addition that satisfies the absorption property under multiplication,
-i.e., \(r a\) sits in the ideal whenever \(a\) of the ideal, regardless of the choice of 
-element \(r\) of the commutative ring. We also used this to formalize the
+multiplicative identity. Next, we formalize the definition of a commutative
+ring, further requiring commutativity of multiplication.  
+
+At this point, we formalize several algebraic structures defined in terms of commutative rings.
+First is the definition of an ideal of a commutative ring, a subgroup of the ring
+under addition that satisfies the absorption property under multiplication, and with this, also the 
 notion of a quotient ring $R/I$, where $I$ is an ideal of a commutative ring
 $R$.
-
-Next, we formalized the definition of a  prime ideal, and then 
-moved on to do the same for the notion of a maximal ideal, a proper ideal 
-that is maximal with respect to inclusion. Below is the definition in Coq,
+We also formalize the definition of a  prime ideal, and that of a maximal ideal--a proper ideal that is maximal with respect to inclusion.
+ Below is the definition of latter in Coq,
 which uses \texttt{P} as the predicate for the ideal.
 
 \begin{minted}{coq}
@@ -464,8 +463,7 @@ which uses \texttt{P} as the predicate for the ideal.
           (forall (r: Carrier), Q r -> P r)).
 \end{minted}
 
-\noindent Next, we were able to employ this definition of a maximal ideal
-to formally define a local
+ Next, we employ the above definition to formally define a local
 ring, i.e., a commutative ring with a single maximal ideal.
  
 \begin{minted}{coq}
@@ -497,8 +495,10 @@ ring, i.e., a commutative ring with a single maximal ideal.
 %}
 
 
-\subsection{Modules over rings}
-At this point, we formalized the definition of a module over a commutative ring,
+\subsection{Modules over Rings}
+With the fundamental definitions for commutative rings and their ideals formalized, we move on 
+to build our formal module theory.  
+We start by formalizing the definition of a module over a commutative ring,
 the commutative-algebraic generalization of the notion of a vector space over a
 field. Nakayama's Lemma is a statement about finitely generated modules, and
 hence we formalized the notion of a scalar combination of a finite
@@ -508,8 +508,8 @@ $r_i$ is an element of $R$.
 
 In our formalization of scalar combinations, we use  ``list'' to mean
 length-parameterized lists; since we don't use the simpler kind of lists, there
-are no name collisions. In our code, \texttt{M} is the type of module elements,
-\texttt{R} is the type of ring elements, act as coefficients, and
+are no name collisions. In the code excerpted below, \texttt{M} is the type of module elements,
+\texttt{R} is the type of ring elements, acting as coefficients, and
 \texttt{t A n} is a list whose elements are of type \texttt{A} and whose length
 is \texttt{n}.
 
@@ -520,7 +520,7 @@ is \texttt{n}.
         elt =M= linear_combin coeffs generatingSet.
 \end{minted}
 
-Finally, we defined the submodule $IM$ of a module $M$ over a commutative ring $R$, 
+Finally, we define the submodule $IM$ of a module $M$ over a commutative ring $R$, 
 where $I$ is an arbitrary ideal of $R$.
 Recall that when $R$ is local and $I$ is its unique maximal ideal, this submodule 
 appears in the statement of Nakayama's Lemma. 
@@ -542,82 +542,80 @@ represent this in Coq as a predicate over \(M\).
 \noindent The use of  ``\verb|Forall P coeffs|'' ensures that every element of the
 coefficient list \texttt{coeffs} satisfies the predicate \texttt{P}.  
 
-\section{Constructing the Formal Proof}
-Not only to aid in the formalization of Nakayama's lemma, but also to 
-
-Beyond formalizing the relevant structures from higher algebra, we also
-formally establish some basic theory from the field in Coq. For instance, 
+\section{Constructing the Formal Proof} \label{formal-proof: S}
+Not only to aid in the formal proof of Nakayama's lemma, but also to add to the body 
+of formalized theory in commutative algebra, along with our formal definitions of algebraic structures,
+we also  
+ establish some basic theory of these objects in Coq.
+ For instance, 
 consider the notion of a \emph{unit} of a
 commutative ring $R$, which is an element $a \in R$ with a multiplicative inverse,
 i.e., there exists an element $a^{-1} \in R$ for which $x^{-1} \cdot x$ is the
 multiplicative identity $1 \in R$.  In fact, it $x$ is a unit, its inverse is unique.
 
-\emily[inline]{Emily: Just changed statement to \emph{if and only if} below; we should check whether we should update its formal proof}
-Suppose that $I$ is an ideal of a commutative rings $R$.  
-We formally establish the following: If $I$ contains a
-unit $a$ if and only if $I$ is the trivial ideal, i.e., $I=R$. 
+Suppose that $I$ is an ideal of a commutative ring $R$.   Then if $I$ is the trivial ideal, i.e., $I = R$, then it, of course, contains a unit, namely $1$. 
+We formally establish the converse of this statement: If $I$ contains a
+unit $a$, then $I=R$. 
 The informal proof logic is as follows:  Due to the absorption property of $I$,  
 $a^{-1}  \cdot a= 1 \in I$.  Hence for every element $r$ of $R$,
 $r = r \cdot 1$ is also in $I$, i.e., $I=R$. 
 On the other hand, if $I = R$, then the multiplicative identity $1$ is a unit in $I$.  
 
+
+We also use classical logic to prove that \(1 - x\) is a unit whenever \(x\)
+is an element of a local ring that is not a unit. The proof is completed by way
+of contradiction, and uses the rule that \(\neg\neg P\rightarrow P\).
+
 \subsection{Dealing with the Axiom of Choice}
+
+\emily[inline]{Emily says:  There was an issue with our argument below, so I have updated it, and need to point to 
+quotients to deal with the fact that we want a maximal ideal \emph{that contains a fixed element}.
+}
+
 Every non-unit element of a commutative ring is contained in some maximal
 ideal, a fact that relies on the Axiom of Choice. 
-The following standard informal
-proof calls upon Zorn's lemma, which is equivalent to the Axiom of Choice, and which 
+This fact can be derived from from the weaker statement that every commutative ring contains a maximal ideal:
+Indeed, assume this, and fix a non-unit $x$ of a commutative ring $R$.  Then the quotient $R/\langle x \rangle$ of $R$ modulo 
+the principal ideal generated by $x$ is a commutative ring, and so contains a maximal ideal, which corresponds precisely to a 
+maximal ideal of $R$ containing $x$ by   
+the lattice isomorphism theorem for rings. 
+
+The following standard informal proof of the fact that every commutative rings contains a maximal ideal calls upon Zorn's lemma, 
+which is equivalent to the Axiom of Choice (assuming Zermelo-Fraenkel Set Theory), and which 
 says that if every chain of elements from a partially ordered set  has an upper
 bound in the set, then the set must contain at least one maximal element. 
 
 \begin{quote}
-	Fix a non-unit $x$ in a commutative ring $R$, and  \(I_{1}\) to be the principal 
-	ideal generated by $x$, i.e., the smallest ideal containing the element $x$,
-    which consists of all $R$-multiples of it.  No element of $I_1$ is a unit, since if  
-    $y \in R$ were the multiplicative inverse of some $R$-multiple
-    $r \cdot x$, then $1 = y \cdot (r \cdot x) = (y\cdot r) \cdot x$, showing that $x^{-1} = y \cdot r$, 
-    which contradicts the assumption that $x$ is not a unit. Hence by the statement described earlier in this section, 
-    $I_1$ is proper.
-   
-   Either $I_1$ is a maximal ideal of $R$, or it is strictly contained in a maximal ideal, or there exists 
-   an inifinite chain of strictly increasing
-   proper ideals of the form 
+Fix a commutative ring $R$.  Since $1 \neq 0$ in $R$, the zero ideal is proper.  
+If the zero ideal is maximal, then we have identified a maximal ideal of $R$. 
+If not, then there must exist a proper ideal 
+$I_1$ of $R$ containing more than just the element $0$. 
+
+If $I_1$ is maximal, then we have found a maximal ideal, but if not, then there exists a proper ideal 
+$I_2$ of $R$ that strictly contains $I_1$.  
+Likewise, if $I_2$ is maximal, we are done, and if not, there exists a proper ideal $I_3$ such that $I_3 \supsetneq I_2$.
+Continuing this pattern, we either identify a maximal ideal of $R$, or we construct an infinite chain of proper ideals of $R$:
     \begin{equation} \label{infinite-chain: e}
     I_{1}\subsetneq I_{2}\subsetneq I_{3}\subsetneq\cdots\subsetneq I_n \subsetneq \cdots. 
     \end{equation}  
-   Indeed, suppose that $I_1$ is not maximal, and   
-   assume that for some integer $n \geq 1$,  there exist proper, non-maximal ideals 
-   $I_k$ of $R$, $1 < k \leq n$, such that for all such $k$,  $I_{k-1}$ is strictly contained in $I_k$.  
+    
+       More precisely, assume by induction that  there exist proper, non-maximal ideals 
+   $I_k$ of $R$, $1 < k \leq n$, such that each $I_{k-1}$ is strictly contained in $I_k$.  
    Since $I_n$ is not maximal, there exists a proper ideal $I_{n+1}$ of $R$ such that $I_n \subsetneq I_{n+1}$.
       Then either $I_{n+1}$ is maximal, or we have extended the chain by one additional link. 
-     
-%   
-%    If \(I_{1}\) is not a maximal ideal of $R$, then by definition there exists a strictly larger
-%    proper ideal \(I_{2}\) of $R$, i.e.,
-%    $x \in I_{1}\subsetneq I_{2} \subsetneq R$. Likewise, if  \(I_{2}\) is again not
-%    maximal, then there exists a strictly larger proper ideal
-%    $I_{3}$, which, if not maximal, is strictly contained in another ideal, $I_4$, etc.
-%    
 
-    It is straightforward to verify that an increasing union of ideals 
-    is, by definition, an ideal containing every ideal in the union.  
-Hence if, in this process, no maximal ideal is identified; i.e., we have ensured the existence of a chain of the form \eqref{infinite-chain: e},  then the increasing union of the $I_k$ is again an ideal, which contains $x$ since  $x \in I_1$. 
+It is straightforward to verify, by definition, 
+         that an increasing union of ideals 
+    is again an ideal.
+Hence if, in this process, no maximal ideal is identified, i.e., we have ensured the existence of a chain of the form \eqref{infinite-chain: e},  then the increasing union of the $I_k$ is again an ideal.
    
-%  Continuing in this way, if  this process terminates, we have successfully identified a
-%    maximal ideal of $R$ that contains $x$, and if not, one obtains an infinite, strictly increasing chain of proper ideals of $R$, each containing $x$, 
-%    \[I_{1}\subsetneq I_{2}\subsetneq I_{3}\subsetneq\cdots\subsetneq I_n \subsetneq \cdots. \]
-%    It is straightforward to verify that an increasing union of ideals 
-%    is, by definition, an ideal containing every ideal in the union.  Moreover, if each ideal in the union
-%    contains an element $x$, then the union certainly 
-%       contains \(x\) as well.  
-       
-      Hence the set $X$ of all proper ideals of $R$ containing $x$, partially ordered by inclusion, 
-       satisfies the property that every chain in $X$ has an upper bound in $X$.
-    Therefore, Zorn's lemma ensures the existence of a maximal element of $X$, i.e., a maximal ideal of \(R\) containing \(x\).
+Let $X$ denote the set of all proper ideals of $R$, partially ordered by inclusion.
+We have shown that every chain in $X$ has an upper bound in $X$, so  Zorn's lemma ensures the existence of a maximal element of $X$, i.e., a maximal ideal of \(R\). 
 \end{quote}
 
-The above argument has potentially infinitely many steps, posing a Coq implementation
- problem. Indeed, suppose one were to write a proof tactic called \mintinline{coq}{generate_larger_ideal} 
-allowing one to move from a non-maximal, proper ideal \(I\) that contains a fixed non-unit 
+This argument potentially requires infinitely many steps, posing an implementation
+ problem. Indeed, suppose one were to write a Coq proof tactic called \mintinline{coq}{generate_larger_ideal}
+ that allows one to move from a non-maximal, proper ideal \(I\) that contains a fixed non-unit 
 $x$ to a strictly larger ideal 
 \(J \), which is again proper, and also contains \(x\). 
 
@@ -632,8 +630,8 @@ Of course, this would occupy any machine's
 processor(s) forever, and further, the boundlessly increasing number of ideals in the proof
 state would fill any machine's memory. 
 
-After we have overwhelmed any system with
-these infinite number of calls to a single proof tactic, we still have to
+Even if it were possible not to overwhelm a system with
+these infinitely many calls to a single proof tactic, one would still have to
 invoke more tactics to finish the proof with an application of Zorn's lemma,
 which finally guarantees us a maximal ideal containing \(x\). To summarize, we
 are forced to run the following proof script which will never get past calling
@@ -642,7 +640,8 @@ are forced to run the following proof script which will never get past calling
   repeat generate_larger_ideal. (* must be called infinitely often *)
   zorns_lemma. (* called after the above non-terminating call finishes *)
 \end{minted}
-We chose to avoid this infinite proof script issue by including an axiom that
+
+We choose to avoid this infinite proof script issue by including an axiom that
 any non-unit \(x\) of a ring must be contained in some maximal ideal.
 
 \begin{minted}{coq}
@@ -654,11 +653,9 @@ Axiom comm_ring_nonunit_maximal_ideal:
       P x /\ maximal_ideal P.
 \end{minted} 
 
-We also used classical logic to prove that \(1 - x\) is a unit whenever \(x\)
-is an element of a local ring that is not a unit. The proof is completed by way
-of contradiction, and uses the rule that \(\neg\neg P\rightarrow P\).
 
-\subsection{The Formal Statement}
+
+\subsection{The Formal Statement} \label{formal-statement: SS}
 We now present our formal statement of Nakayama's Lemma
 in Coq, and describe a lemma called upon in our proof.
 
@@ -683,8 +680,8 @@ Theorem nakayama:
   forall a: M, a =M= Mzero.
 \end{minted}
 
-To use as a building block in the formal proof of Nakayama's Lemma, we first
-formally stated and proved a lemma that gives a concrete description of the
+To use as a building block in the formal proof of Nakayama's Lemma, we 
+formally state and prove a lemma that gives a concrete description of the
 elements of the submodule $\mathfrak{m} M$  appearing in its statement. 
 This lemma applies more generally, to an arbitrary finitely generated module
 $M$ over a (not necessarily local) commutative ring, and any submodule of the
@@ -725,14 +722,14 @@ inductively applying associativity,
     = \sum_{j=1}^{n}\sum_{i=1}^{k} r_i \cdot (c_{ij} \cdot u_j) 
     = \sum_{j=1}^{n}\left(\sum_{i=1}^{k} c_{ij} \cdot r_i\right) \cdot u_j.   
 \end{align*}
-By absorption in ideals, each  $c_{ij}  \cdot r_i$ is in $I$, and since ideals
+By the absorption property of ideals, each  $c_{ij}  \cdot r_i$ is in $I$, and since ideals
 are closed under addition, we inductively conclude that the coefficient $a_j
 := c_{1j} \cdot  r_1 +  c_{2j} \cdot  r_2 +  \cdots c_{kj}\cdot r_k$ of $u_j$
 is also in $I$. 
 
 \subsection{The Formal Proof}
-We now outline the formal proof of Nakayama's lemma, and  proceed
-by induction on the number of elements in a fixed generating set for the finitely generated $R$-module
+We now outline our formal proof of Nakayama's lemma, and  proceed
+by way of induction on the number of elements in a fixed generating set for the finitely generated $R$-module
 $M$. The base case in this situation is when \(M\) requires no generators, so $M$
 consists solely of the empty scalar combination, i.e., the empty sum, which, by
 convention, is the zero element. In other words, $M = 0$ by assumption, and
@@ -745,20 +742,20 @@ consisting of $n$ elements.
 
 Now, fix an $R$-module $M$ generated by $u_1, \ldots, u_{n+1} \in M$. By
 assumption, \(M = \mathfrak{m} M\), and in particular, the generator $u_1$ is
-an element of the submodule $\mathfrak{m} M$. The lemma described above
+an element of the submodule $\mathfrak{m} M$. The lemma described in \Cref{formal-statement: SS}
 guarantees the existence of ring elements $a_1, \ldots, a_n \in \mathfrak{m}$
 for which 
 \[u_{1} = a_{1} \cdot u_{1} + a_2 \cdot u_2 + \cdots + a_{n+1} \cdot u_{n+1}.\]
-
-Collecting the \(u_{1}\) terms on the left-hand side of the equation, applying
+Collecting the \(u_{1}\) terms on the left-hand side of the equation, calling on 
 the existence of additive inverses in $R$, and distributivity of scalar
 multiplication for modules, we see that
 \begin{equation}\label{equation1: e}
 (1 - a_{1}) \cdot u_{1} =
   a_{2} \cdot u_{2} + \cdots + a_{n+1} \cdot u_{n+1}\text{.}
 \end{equation}
-In Coq, we worked backwards to establish this fact. The comments following
-each tactic offers a brief explanation of the effects on the goal.
+
+In Coq, we work backward to establish \eqref{equation1: e}. The comment following
+each tactic appearing in the code below offers a brief indication of its effects on the goal.
 \begin{minted}[linenos,firstnumber=157,stepnumber=5]{coq}
   assert ((Rone [+] Rminus a1) <.> u1 =M= (* (1 - a1) u1 = ... *)
     linear_combin Madd Mzero action coeffs' generatingSet').
@@ -776,17 +773,20 @@ each tactic offers a brief explanation of the effects on the goal.
 
 Since a proper ideal contains no units and $a_1$ is taken to be in
 $\mathfrak{m}$, it is not a unit. Hence, by the formalized statement mentioned
-earlier, $1 - a_{1}$ is a unit of $R$. Let $b_{1} \in R$ denote its 
+early in \Cref{formal-proof: S}, $1 - a_{1}$ is a unit of $R$. Let $b_{1} \in R$ denote its 
 multiplicative inverse, so that $b_1 \cdot  (1 - a_{1}) = 1$. Multiplying this
 element on the either side of \eqref{equation1: e}, we deduce the following.  
-\begin{align*}
+\begin{align}
+\label{simplify-line-1}
 b_1 \cdot \left((1 - a_{1}) \cdot u_{1} \right)
-  & = b_1 \cdot (a_{2} \cdot u_{2} + \cdots + a_{n+1} \cdot u_{n+1}) \\
+  & = b_1 \cdot (a_{2} \cdot u_{2} + \cdots + a_{n+1} \cdot u_{n+1}) \\ 
+\label{simplify-line-2}
 \left( b_1 \cdot (1 - a_{1})\right) \cdot u_{1}
-  & = b_1 \cdot (a_{2} \cdot u_{2}) + \cdots + b_1 \cdot (a_{n+1} \cdot u_{n+1}) \\
+  & = b_1 \cdot (a_{2} \cdot u_{2}) + \cdots + b_1 \cdot (a_{n+1} \cdot u_{n+1}) \\ 
+   \label{simplify-line-3}
 u_1 = 1 \cdot u_{1}
-  & = (b_1 \cdot  a_{2}) \cdot u_{2} + \cdots + (b_1  \cdot  a_{n+1}) \cdot u_{n+1}  
-\end{align*}
+  & = (b_1 \cdot  a_{2}) \cdot u_{2} + \cdots + (b_1  \cdot  a_{n+1}) \cdot u_{n+1} 
+\end{align}
 \begin{minted}[linenos,firstnumber=181,stepnumber=5]{coq}
   pose proof
     (local_comm_ring_sub_1_nonunit Requiv Radd Rzero Rminus Rmul Rone
@@ -795,13 +795,13 @@ u_1 = 1 \cdot u_{1}
   inversion_clear H1ma1_unit as [b1 Hb1]. (* 1 - a1 is a unit *)
   setoid_rewrite (commutative Requiv Rmul) in Hb1. (* b1 (1 - a1) = 1 *)
 \end{minted}
-This bit of proof code has the effect of naming \(b_{1}\) as the inverse of the
-unit \(1 - a_{1}\) and storing in the hypothesis \texttt{Hb1} the equation
-\(b_{1} (1 - a_{1}) = 1\). The remainder of the code goes on to multiply on the
-left by \(b_{1}\) in the equation \texttt{H} in order to say that
-\(b_{1} ((1 - a_{1}) u1) = b_{1} (a_{2} u_{2} + \cdots + a_{n+1} u_{n+1})\).
-Going on to use the rules of module actions and hypothesis \texttt{Hb1}, we can
-simplify the left hand side of \texttt{H} to be just \(u_{1}\).
+
+This block of code has the effect of naming \(b_{1}\) as the inverse of the
+unit \(1 - a_{1}\), and storing in the hypothesis \texttt{Hb1} the equation
+\(b_{1} \cdot (1 - a_{1}) = 1\). The remainder of the code goes on to multiply on the
+left by \(b_{1}\) in the equation \texttt{H} in order to establish  \eqref{simplify-line-1}.
+Going on and applying the axioms of a module over a commutative ring, along with hypothesis \texttt{Hb1}, we can
+simplify the left hand side of \texttt{H} to be just \(u_{1}\), as in \eqref{simplify-line-3}.
 \begin{minted}[linenos,firstnumber=last,stepnumber=5]{coq}
   apply (module_op_l Requiv Mequiv action) with (r:=b1) in H.
   setoid_rewrite <- (module_distrib_Rmul Radd Rmul Rone
@@ -813,13 +813,22 @@ simplify the left hand side of \texttt{H} to be just \(u_{1}\).
 In particular, the generator $u_1$ can be written as a scalar combination of
 the $n$ generators $u_2, \ldots, u_{n+1}$, and is superfluous. Hence $M$ can be
 generated by $n$ elements, and $M=0$ by the inductive hypothesis. 
-
-
-Showing that the inductive hypothesis holds in Coq is more work than in this
-informal proof, but this extra work is just a lot of bookkeeping.
+Though showing that the inductive hypothesis holds is more technical in Coq than in this
+informal proof, the extra steps are essentially bookkeeping.
 
 \section{Conclusion}
-TODO
+Our work here is evidence that Coq is amendable to the 
+formalization of abstract algebraic notions from commutative algebra, which are often non-discrete, and their theory. 
+There are several natural directions in which to move from here, a first  step being to further develop the formal theory of quotient rings, and to formalize the isomorphism theorems for rings. 
+
+Our current body of work can be extended to include further essential concepts from commutative algebra, e.g., 
+ module homomorphisms; direct sums and free modules; tensor products of modules and exact sequences; projective, injective, and flat modules; direct and inverse limits of modules; and/or graded rings and modules.
+In this process, building formal proofs of other fundamental theorems involving these notions will likely be valuable in  
+effectively designing their formal definitions, as we noticed in building our algebraic heirarchy for Nakayama's Lemma. 
+
+Finally, integrating within the formalized commutative algebra theory some of the computational algebra that has been formally developed, such as that regarding Gr\"obner bases \cite{buchberger,persson2001integrated}, could also be a fruitful direction to pursue.
+
+
 
 \bibliographystyle{plain}
 \bibliography{references}
