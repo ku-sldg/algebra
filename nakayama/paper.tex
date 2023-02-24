@@ -1,63 +1,117 @@
 \RequirePackage[l2tabu,orthodox]{nag}
-\documentclass{article}
-\usepackage{amsthm}
-\usepackage{amssymb}
-\usepackage{mathtools}
+\RequirePackage{tikz}
+\documentclass[referee,sn-mathphys]{sn-jnl}
+% \usepackage{amsthm}
+% \usepackage{amssymb}
+% \usepackage{mathtools}
 \usepackage{minted}
+% \usepackage{amsmath}
+% \usepackage{amsfonts}
+% \usepackage{color}
+% \usepackage{mathrsfs}
+% \usepackage[mathcal]{euscript}
+% \usepackage{enumitem}
+% \usepackage{float}
+% \usepackage[center]{caption}
+% \usepackage{graphicx}
+\usepackage{cleveref}
 
-\input{preamble.tex}
+\jyear{2021}
+
+% TikZ libraries and settings
+\usetikzlibrary{positioning}
+\tikzset{
+  node/.style = {
+    shape=rectangle, %rounded corners,
+    align=center,
+    minimum width = .4cm,
+    minimum height = .4cm,
+  },
+  Snode/.style = {
+    shape=rectangle, %rounded corners,
+    align=center,
+    minimum width = .4cm,
+    minimum height = .4cm,
+    fill = green!60!blue!70
+  }
+}
+
+
+% Clever references
+\crefname{equation}{Eq.}{Eqs.}
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{lemma}{Lemma}{Lemmata}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{definition}{Definition}{Definitions}
+\crefname{rem}{Remark}{Remarks}
+\crefname{example}{Example}{Examples}
+\crefname{conventions}{Conventions}{Conventions}
+\crefname{setup}{Setup}{Setup}
+\crefname{question}{Question}{Question}
+\crefname{figure}{Figure}{Figures}
+
+%THEOREM ENVIRONMENTS
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\newtheorem*{nak*}{Nakayama's Lemma}
+
+
+%DEFINITION STYLE ENVIRONMENTS
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition-theorem}[theorem]{Definition/Theorem}
+\newtheorem{setup}[theorem]{Setup}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{conventions}[theorem]{Conventions}
+\newtheorem{example}[theorem]{Example}
+
+%REMARK STYLE ENVIRONMENTS 
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{convention}{Convention}
+
+\numberwithin{equation}{section}
+\numberwithin{figure}{subsection}
+
+%%%%%%%%
+% \mathchardef\ordinarycolon\mathcode`\:
+% \mathcode`\:=\string"8000
+% \begingroup \catcode`\:=\active
+%   \gdef:{\mathrel{\mathop\ordinarycolon}}
+% \endgroup
 
 \begin{document}
-\title{ 
+\title[Formalizing Commutative Algebra in Coq]{ 
 Formalizing Commutative Algebra in Coq: \\
 Nakayama's Lemma\thanks{Source code for this work is available on the following
 site: \url{https://github.com/ku-sldg/algebra}}
 }
 
-\date{}
+\author[1]{\fnm{Andrew} \sur{Cousino}}\email{acousino@ku.edu}
+\author[1]{\fnm{Emily E.\ Witt}}\email{witt@ku.edu}
+\author[1]{\fnm{Perry} \sur{Alexander}}\email{palexand@ku.edu}
+\affil[1]{\orgdiv{Institute for Information Sciences},
+  \orgname{University of Kansas},
+  \orgaddress{\city{Lawrence}, \postcode{66045}, \state{Kansas},
+    \country{United States of America}}}
 
-\author{ 
-	Andrew Cousino \\ {\ttfamily acousino@ku.edu}
-	\and 
-	Emily E.\ Witt\thanks{Witt acknowledges support from NSF CAREER Award
-    DMS-1945611, the Keeler Intra-University Professorship from the University of Kansas, and the Ruth I.\, Michler Memorial Prize from the
-    Association for Women in Mathematics.} \\ {\ttfamily witt@ku.edu}
-  \and 
-	Perry Alexander \\ {\ttfamily palexand@ku.edu}
-}	
-
-\maketitle	
-
-\vspace{-1cm}
-
-{\large
-\begin{center}
-	Institute for Information Sciences \\
-	The University of Kansas \\
-	Lawrence, KS 66045
-\end{center}
-}
-
-\todo[inline]{To do:  Add to/alter author list, funding acknowledgments, title,
-  and/or abstract as needed}
-
-\begin{abstract}
+\abstract{
   We describe our formal proof of Nakayama's Lemma, a fundamental theorem in
   the mathematical field of commutative algebra. The statement and proof of
   this result involve several commutative-algebraic structures including
   commutative rings, ideals of these rings, and modules over them, and we also
   explain our process of formalizing these structures.
-\end{abstract}
+}
 
-\noindent \textbf{Keywords:}
-formalization of mathematics,
-formal proof,
-commutative algebra,
-commutative ring,
-local ring,
-ideal,
-module over a ring,
-finitely generated module. 
+\keywords{formalization of mathematics, formal proof, commutative algebra,
+  commutative ring, local ring, ideal, module over a ring,
+  finitely generated module}
+
+\maketitle	
 
 \section{Introduction}
 The mathematical field of \emph{commutative algebra} stems from the study of
@@ -76,7 +130,7 @@ and has helped form our current understanding of the human genome
 basis, a special type of generating set for an ideal in a ring of polynomials,
 has become a fundamental computational tool in coding theory and cryptography
 (e.g., see  \cite{grobner-bases-cryptography}). A implementation of
-Buchberger's algorithm \cite{buchberger} for determining Gr\"obner bases of
+Buchberger's algorithm \cite{buchberger} for determining Gr\"{o}bner bases of
 ideals in polynomial rings has been proved correct within the proof assistant
 Coq \cite{the_coq_development_team_2019_3476303,thery-buchberger}, and an
 integrated formal development of the algorithm in Coq has also been carried out
@@ -91,8 +145,6 @@ such as \emph{local rings} and \emph{modules over commutative rings}, and
 objects from abstract algebra, such as groups and rings, that have been
 formalized in Coq, e.g., in the \emph{Mathematical Components Library}
 \cite{mathcomp}, we start from scratch.
-\todo{To do: Verify whether MathComp only formalized finite algebraic
-  structures. Drew is about as certain as he can be that this is the case.}
 The theory, including the formalization of all algebraic structures, makes up
 approximately $100$ kB, and 3300 lines of code.
  
@@ -343,9 +395,32 @@ on in the next section to detail our formal proof of Nakayama's Lemma.
 
 \begin{figure}[t]
   \caption{The hierarchy of our algebraic structures in Coq}
-  \includegraphics[width=.4\textwidth]{algebraic-structures.pdf}
+  \resizebox{0.5\textwidth}{0.4\textwidth}{
+    \begin{tikzpicture}[->,>=stealth,shorten >=1pt,auto,node distance=1cm,semithick]
+      \node[Snode] (Semigroup) {Semigroup};
+      \node[Snode] (Monoid) [below = of Semigroup]{Monoid};
+      \node[Snode] (Group) [below =of Monoid] {Group};
+      \node[Snode] (AbelianGroup) [below =of Group] {AbelianGroup};
+      \node[Snode] (Subgroup) [left =1.3cm of AbelianGroup] {Subgroup};
+      
+      \node[Snode] (Ring) [below = of AbelianGroup] {Ring};
+      \node[Snode] (CommutativeRing) [below =of Ring] {CommRing};
+      \node[Snode] (Module) [right = 1.3cm of CommutativeRing] {Module};
+      \node[Snode] (Submodule) [left = 1.0 of CommutativeRing] {Submodule};
+      \node[Snode] (Ideal) [left =1.0 of Submodule] {Ideal};
+      \path (Semigroup) edge (Monoid)
+        (Monoid) edge (Group)
+        (Group) edge (AbelianGroup)
+        (Group) edge (Subgroup)
+        (Subgroup) edge (Ideal)
+        (AbelianGroup) edge (Ring)
+        (AbelianGroup) edge (Module)
+        (Ring) edge (CommutativeRing)
+        (Subgroup) edge (Submodule);
+    \end{tikzpicture}
+  }
   \centering
-   \label{alg-heirarchy: F}
+  \label{alg-heirarchy: F}
 \end{figure}
 
 \subsection{Semigroups} 
@@ -478,23 +553,6 @@ ring, i.e., a commutative ring with a single maximal ideal.
         maximal_ideal Q -> forall (r: Carrier), P r <-> Q r).
 \end{minted}
 
-%\emily[inline]{Emily:  Unfortunately, I think we need to update naming
-%  conventions since in mathematics, ``vector'' is reserved for an element of a
-%  vector space over a field, rather than an element of an arbitrary module.  So
-%  this could cause confusion.  Similar with ``basis,'' which is especially
-%  tricking since two different generating sets of a finitely generated module
-%  can have different sizes, but all bases of a vector space have the same
-%  cardinality, and an element of a module can typically be written as a scalar
-%  combination in multiple ways, while bases are linearly independent.  I've
-%  proposed a rewrite of the blue subsubsection right above it.  Drew, can you
-%  double check it for accuracy with respect to the code? 
-%}
-%\emily[inline]{We'll also need to update the code.  I think {\ttfamily vectors}
-%  should be something like {\ttfamily scalar-combinations}, and
-%  {\ttfamily basis} something like {\ttfamily generating-set}. 
-%}
-
-
 \subsection{Modules over Rings}
 With the fundamental definitions for commutative rings and their ideals formalized, we move on 
 to build our formal module theory.  
@@ -514,10 +572,10 @@ are no name collisions. In the code excerpted below, \texttt{M} is the type of m
 is \texttt{n}.
 
 \begin{minted}{coq}
-  Definition finitely_generated {n: nat}(generatingSet: t M n) :=
+  Definition finitely_generated {n: nat}(genSet: t M n) :=
     forall (elt: M),
       exists (coeffs: t R n),
-        elt =M= linear_combin coeffs generatingSet.
+        elt =M= linear_combin coeffs genSet.
 \end{minted}
 
 Finally, we define the submodule $IM$ of a module $M$ over a commutative ring $R$, 
@@ -567,10 +625,6 @@ is an element of a local ring that is not a unit. The proof is completed by way
 of contradiction, and uses the rule that \(\neg\neg P\rightarrow P\).
 
 \subsection{Dealing with the Axiom of Choice}
-
-\emily[inline]{Emily says:  There was an issue with our argument below, so I have updated it, and need to point to 
-quotients to deal with the fact that we want a maximal ideal \emph{that contains a fixed element}.
-}
 
 Every non-unit element of a commutative ring is contained in some maximal
 ideal, a fact that relies on the Axiom of Choice. 
@@ -637,8 +691,10 @@ which finally guarantees us a maximal ideal containing \(x\). To summarize, we
 are forced to run the following proof script which will never get past calling
 \mintinline{coq}{generate_larger_ideal} infinitely many times.
 \begin{minted}{coq}
-  repeat generate_larger_ideal. (* must be called infinitely often *)
-  zorns_lemma. (* called after the above non-terminating call finishes *)
+  (* must be called infinitely often *)
+  repeat generate_larger_ideal.
+  (* called after the above non-terminating call finishes *)
+  zorns_lemma.
 \end{minted}
 
 We choose to avoid this infinite proof script issue by including an axiom that
@@ -648,7 +704,8 @@ any non-unit \(x\) of a ring must be contained in some maximal ideal.
 Axiom comm_ring_nonunit_maximal_ideal:
   forall (x: Carrier),
     ~ is_unit equiv mul one x ->
-    exists (P: Carrier -> Prop)(P_proper: Proper (equiv ==> iff) P)
+    exists (P: Carrier -> Prop)
+      (P_proper: Proper (equiv ==> iff) P)
     	(P_ideal: Ideal add zero minus mul P),
       P x /\ maximal_ideal P.
 \end{minted} 
@@ -668,7 +725,7 @@ only one element, its identity as an additive abelian group.
 
 \begin{minted}{coq}
 Context {P_ideal: Ideal Radd Rzero Rminus Rmul P}.
-Context {P_maxideal: maximal_ideal Requiv Radd Rzero Rminus Rmul P}.
+Context {P_maxideal: maximal_ideal Requiv Radd ... Rmul P}.
 Context {R_local: local_ring Requiv Radd Rzero Rminus Rmul}.
   
 Let ideal_module_pred := ideal_module Mequiv Madd Mzero action P.
@@ -697,13 +754,13 @@ a_2  \cdot u_2 + \cdots + a_n  \cdot u_n$, where each $a_i \in I$.
 
 \begin{minted}{coq}
 Lemma module_fin_gen_ideal_module:
-  forall {n: nat}(generatingSet: t M n),
-    finitely_generated Mequiv Madd Mzero action generatingSet ->
+  forall {n: nat}(genSet: t M n),
+    finitely_generated Mequiv Madd Mzero action genSet ->
     forall {m: nat}(coeffs: t R m)(elts: t M m),
       Forall P coeffs ->
       exists (coeffs': t R n),
         linear_combin Madd Mzero action coeffs elts =M=
-          linear_combin Madd Mzero action coeffs' generatingSet /\
+          linear_combin Madd Mzero action coeffs' genSet /\
         Forall P coeffs'.
 \end{minted}        
 
@@ -717,9 +774,9 @@ r_k \cdot w_k$. What's more, by definition of a finite generating set $u_{1},
 \cdots + c_{in} \cdot u_n$ for appropriate choices of $c_{ij} \in R$. Hence,
 inductively applying associativity, 
 \begin{align*}
-  x = \sum_{i=1}^{k} r_i \cdot w_i
-    = \sum_{i=1}^{k} r_i \cdot \left(\sum_{j=1}^n c_{ij} \cdot  u_j\right)
-    = \sum_{j=1}^{n}\sum_{i=1}^{k} r_i \cdot (c_{ij} \cdot u_j) 
+  x & = \sum_{i=1}^{k} r_i \cdot w_i
+    = \sum_{i=1}^{k} r_i \cdot \left(\sum_{j=1}^n c_{ij} \cdot  u_j\right) \\
+    & = \sum_{j=1}^{n}\sum_{i=1}^{k} r_i \cdot (c_{ij} \cdot u_j) 
     = \sum_{j=1}^{n}\left(\sum_{i=1}^{k} c_{ij} \cdot r_i\right) \cdot u_j.   
 \end{align*}
 By the absorption property of ideals, each  $c_{ij}  \cdot r_i$ is in $I$, and since ideals
@@ -757,17 +814,23 @@ multiplication for modules, we see that
 In Coq, we work backward to establish \eqref{equation1: e}. The comment following
 each tactic appearing in the code below offers a brief indication of its effects on the goal.
 \begin{minted}[linenos,firstnumber=157,stepnumber=5]{coq}
-  assert ((Rone [+] Rminus a1) <.> u1 =M= (* (1 - a1) u1 = ... *)
+  (* (1 - a1) u1 = ... *)
+  assert ((Rone [+] Rminus a1) <.> u1 =M=
     linear_combin Madd Mzero action coeffs' generatingSet').
-  { setoid_rewrite (module_distrib_Radd Radd Rmul Rone
-      Mequiv Madd Mzero Mminus action). (* 1 u1 + (-a1) u1 = ... *)
+  { (* 1 u1 + (-a1) u1 = ... *)
+    setoid_rewrite (module_distrib_Radd Radd Rmul Rone
+      Mequiv Madd Mzero Mminus action).
+    (* u1 + (-a1) u1 = ... *)
     setoid_rewrite (module_Rone Radd Rmul Rone
-      Mequiv Madd Mzero Mminus action). (* u1 + (-a1) u1 = ... *)
-    setoid_rewrite (module_minus_l Requiv Radd Rzero Rminus Rmul Rone
-      Mequiv Madd Mzero Mminus action). (* u1 - a1 u1 = ... *)
+      Mequiv Madd Mzero Mminus action).
+    (* u1 - a1 u1 = ... *)
+    setoid_rewrite (module_minus_l Requiv Radd ... Rone
+      Mequiv Madd Mzero Mminus action).
     symmetry. (* ... = u1 - a1 u1 *)
-    apply (group_move_r Mequiv Madd Mzero Mminus). (* ... + a1 u1 = u1 *)
-    symmetry. (* u1 = ... + a1 u1 *)
+    (* ... + a1 u1 = u1 *)
+    apply (group_move_r Mequiv Madd Mzero Mminus).
+    (* u1 = ... + a1 u1 *)
+    symmetry.
     assumption. }
 \end{minted}
 
@@ -789,11 +852,13 @@ u_1 = 1 \cdot u_{1}
 \end{align}
 \begin{minted}[linenos,firstnumber=181,stepnumber=5]{coq}
   pose proof
-    (local_comm_ring_sub_1_nonunit Requiv Radd Rzero Rminus Rmul Rone
+    (local_comm_ring_sub_1_nonunit Requiv Radd ... Rone
       R_local x1 Hx1_nonunit) as H1ma1_unit.
-  (* Getting to u1 = (b1 coeffs') . generatingSet *)
-  inversion_clear H1ma1_unit as [b1 Hb1]. (* 1 - a1 is a unit *)
-  setoid_rewrite (commutative Requiv Rmul) in Hb1. (* b1 (1 - a1) = 1 *)
+  (* Getting to u1 = (b1 coeffs') . genSet *)
+  (* 1 - a1 is a unit *)
+  inversion_clear H1ma1_unit as [b1 Hb1].
+  (* b1 (1 - a1) = 1 *)
+  setoid_rewrite (commutative Requiv Rmul) in Hb1.
 \end{minted}
 
 This block of code has the effect of naming \(b_{1}\) as the inverse of the
@@ -804,11 +869,14 @@ Going on and applying the axioms of a module over a commutative ring, along with
 simplify the left hand side of \texttt{H} to be just \(u_{1}\), as in \eqref{simplify-line-3}.
 \begin{minted}[linenos,firstnumber=last,stepnumber=5]{coq}
   apply (module_op_l Requiv Mequiv action) with (r:=b1) in H.
+  (* H: (b1 (1 - a1)) u1 = ... *)
   setoid_rewrite <- (module_distrib_Rmul Radd Rmul Rone
-    Mequiv Madd Mzero Mminus action) in H. (* H: (b1 (1 - a1)) u1 = ... *)
-  setoid_rewrite Hb1 in H. (* H: (1) u1 = ... *)
+    Mequiv Madd Mzero Mminus action) in H.
+  (* H: (1) u1 = ... *)
+  setoid_rewrite Hb1 in H.
+  (* H: u1 = ... *)
   setoid_rewrite (module_Rone Radd Rmul Rone
-    Mequiv Madd Mzero Mminus action) in H. (* H: u1 = ... *)
+    Mequiv Madd Mzero Mminus action) in H.
 \end{minted}
 In particular, the generator $u_1$ can be written as a scalar combination of
 the $n$ generators $u_2, \ldots, u_{n+1}$, and is superfluous. Hence $M$ can be
@@ -828,8 +896,17 @@ effectively designing their formal definitions, as we noticed in building our al
 
 Finally, integrating within the formalized commutative algebra theory some of the computational algebra that has been formally developed, such as that regarding Gr\"obner bases \cite{buchberger,persson2001integrated}, could also be a fruitful direction to pursue.
 
+\backmatter
+\bmhead{Acknowledgments}
+This work is funded in part by the NSA Science of Security initiative contract
+\#H98230-18-D-0009 and Defense Advanced Research Project Agency contract
+\#HR0011-18-9-0001 and Honeywell FMT Purchase Order \#N000422909. The views and
+conclusions contained in this document are those of the authors and should not
+be interpreted as representing the official policies, either expressed or
+implied, of the United States Government.
 
-
-\bibliographystyle{plain}
+Witt acknowledges support from NSF CAREER Award DMS-1945611, the Keeler
+Intra-University Professorship from the University of Kansas, and the Ruth I.\,
+Michler Memorial Prize from the Association for Women in Mathematics.
 \bibliography{references}
 \end{document}
