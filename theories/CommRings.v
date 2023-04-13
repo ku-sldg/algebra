@@ -255,12 +255,12 @@ Definition prime_ideal :=
   forall (a b: Carrier), P (a <*> b) -> P a \/ P b.
 
 Definition maximal_ideal :=
-  exists (r: Carrier), (not (P r) /\
-    forall (Q: Carrier -> Prop)(Q_proper: Proper (equiv ==> iff) Q)
-        (Q_ideal: Ideal add zero minus mul Q),
-      (forall (r: Carrier), P r -> Q r) ->
-      (forall (r: Carrier), Q r) \/
-        (forall (r: Carrier), Q r -> P r)).
+  (exists (r: Carrier), (not (P r)) /\
+  forall (Q: Carrier -> Prop)(Q_proper: Proper (equiv ==> iff) Q)
+      (Q_ideal: Ideal add zero minus mul Q),
+    (forall (r: Carrier), P r -> Q r) ->
+    (forall (r: Carrier), Q r) \/
+      (forall (r: Carrier), Q r -> P r)).
 
 Lemma comm_ring_maximal_ideal_omits_1:
   maximal_ideal ->
